@@ -229,6 +229,162 @@ export const Inspector: React.FC<InspectorProps> = ({ node, onClose }) => {
           </>
         )}
 
+        {node.type === 'fieldGroup' && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                value={formData.description || ''}
+                onChange={(e) => handleChange('description', e.target.value)}
+                rows={2}
+                className="input"
+                placeholder="Describe what fields this group collects..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fields to Collect
+              </label>
+              <div className="space-y-2">
+                {(formData.fields || []).map((field: string, index: number) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={field}
+                      onChange={(e) => handleArrayChange('fields', index, e.target.value)}
+                      className="input flex-1"
+                      placeholder="Field name"
+                    />
+                    <button
+                      onClick={() => handleRemoveArrayItem('fields', index)}
+                      className="btn btn-secondary px-3"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => handleAddArrayItem('fields')}
+                  className="btn btn-secondary w-full flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Field
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {node.type === 'branch' && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                value={formData.description || ''}
+                onChange={(e) => handleChange('description', e.target.value)}
+                rows={2}
+                className="input"
+                placeholder="Describe when this branch is used..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Detection Field
+              </label>
+              <input
+                type="text"
+                value={formData.detection_field || ''}
+                onChange={(e) => handleChange('detection_field', e.target.value)}
+                className="input"
+                placeholder="e.g., claim_type"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Branches ({(formData.branches || []).length})
+              </label>
+              <div className="space-y-3">
+                {(formData.branches || []).map((branch: any, index: number) => (
+                  <div key={index} className="p-3 border border-gray-200 rounded-lg space-y-2">
+                    <div className="flex items-center justify-between">
+                      <input
+                        type="text"
+                        value={branch.name || ''}
+                        onChange={(e) => {
+                          const branches = [...(formData.branches || [])];
+                          branches[index] = { ...branches[index], name: e.target.value };
+                          handleChange('branches', branches);
+                        }}
+                        className="input flex-1 font-medium"
+                        placeholder="Branch name"
+                      />
+                      <button
+                        onClick={() => handleRemoveArrayItem('branches', index)}
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <textarea
+                      value={branch.description || ''}
+                      onChange={(e) => {
+                        const branches = [...(formData.branches || [])];
+                        branches[index] = { ...branches[index], description: e.target.value };
+                        handleChange('branches', branches);
+                      }}
+                      rows={2}
+                      className="input text-sm"
+                      placeholder="When to use this branch..."
+                    />
+                    <input
+                      type="text"
+                      value={branch.conditions?.[0]?.value || ''}
+                      onChange={(e) => {
+                        const branches = [...(formData.branches || [])];
+                        branches[index] = {
+                          ...branches[index],
+                          conditions: [{
+                            field: formData.detection_field || 'input',
+                            operator: 'contains',
+                            value: e.target.value,
+                          }],
+                        };
+                        handleChange('branches', branches);
+                      }}
+                      className="input text-sm"
+                      placeholder="Keywords (separated by |)"
+                    />
+                    <div className="text-xs text-gray-500">
+                      {branch.required_fields?.length || 0} required field(s)
+                    </div>
+                  </div>
+                ))}
+                <button
+                  onClick={() => {
+                    const branches = [...(formData.branches || [])];
+                    branches.push({
+                      id: `branch-${Date.now()}`,
+                      name: `Branch ${branches.length + 1}`,
+                      description: '',
+                      conditions: [],
+                      required_fields: [],
+                    });
+                    handleChange('branches', branches);
+                  }}
+                  className="btn btn-secondary w-full flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Branch
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Delete button */}
         <div className="pt-4 border-t border-gray-200">
           <button
