@@ -36,12 +36,17 @@ export {
   FieldConfig,
   ValidationRule,
   BranchCondition,
+  BranchConfig,
   NodePosition,
   FlowStatus,
   FlowLanguage,
   NodeType,
   EdgeType,
   ConditionOperator,
+  SessionContext,
+  BranchDetectionResult,
+  FieldValidationResult,
+  FieldCollectionPlan,
 } from './flow.types';
 
 // Analytics types

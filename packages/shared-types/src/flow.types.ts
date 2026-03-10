@@ -17,13 +17,16 @@ export type FlowLanguage = 'pl' | 'en';
  */
 export type NodeType =
   | 'start'
+  | 'message'
   | 'question'
+  | 'field_group'
+  | 'branch'
   | 'confirmation'
   | 'validation'
-  | 'end'
+  | 'action'
+  | 'transfer'
   | 'escalation'
-  | 'branch'
-  | 'action';
+  | 'end';
 
 /**
  * Edge type connecting nodes
@@ -98,6 +101,26 @@ export interface BranchCondition {
 }
 
 /**
+ * Branch-specific configuration
+ */
+export interface BranchConfig {
+  /** Branch identifier */
+  id: string;
+  /** Branch name/label */
+  name: string;
+  /** Description of when this branch applies */
+  description?: string;
+  /** Conditions to enter this branch */
+  conditions: BranchCondition[];
+  /** Fields required for THIS branch only */
+  required_fields: FieldConfig[];
+  /** Whether to inherit parent fields */
+  inherit_parent_fields?: boolean;
+  /** Nested sub-branches (for multi-level branching) */
+  sub_branches?: BranchConfig[];
+}
+
+/**
  * Node position in the visual editor
  */
 export interface NodePosition {
@@ -119,14 +142,26 @@ export interface FlowNode {
   data: {
     /** Prompt or question text */
     prompt?: string;
+    /** Message to display (for message nodes) */
+    message?: string;
     /** Field to collect (for question nodes) */
     field?: string;
+    /** Fields to collect (for field_group nodes) */
+    fields?: string[];
+    /** Branch configurations (for branch nodes) */
+    branches?: BranchConfig[];
+    /** Field that triggers branch detection */
+    detection_field?: string;
     /** Validation rules */
     validation?: ValidationRule[];
     /** Conditions for branching */
     conditions?: BranchCondition[];
     /** Action to perform */
     action?: string;
+    /** Action parameters */
+    action_params?: Record<string, any>;
+    /** Description */
+    description?: string;
     /** Additional metadata */
     [key: string]: any;
   };
@@ -150,6 +185,18 @@ export interface FlowEdge {
   label?: string;
   /** Condition for this edge to be taken */
   condition?: BranchCondition;
+  /** Source handle ID (for branches with multiple outputs) */
+  sourceHandle?: string;
+  /** Target handle ID */
+  targetHandle?: string;
+  /** Visual styling */
+  style?: {
+    stroke?: string;
+    strokeWidth?: number;
+    strokeDasharray?: string;
+  };
+  /** Whether edge is animated */
+  animated?: boolean;
 }
 
 /**
@@ -246,4 +293,75 @@ export interface FlowValidationResult {
     /** Node ID if applicable */
     node_id?: string;
   }>;
+}
+
+/**
+ * Runtime session context with branch tracking
+ */
+export interface SessionContext {
+  /** Session identifier */
+  session_id: string;
+  /** Flow identifier */
+  flow_id: string;
+  /** Current node ID */
+  current_node_id: string;
+  /** Stack of active branch IDs */
+  active_branch_path: string[];
+  /** All collected field values */
+  collected_fields: Record<string, any>;
+  /** Fields required for current branch */
+  required_for_branch: FieldConfig[];
+  /** Fields still needed */
+  missing_fields: string[];
+  /** Validation errors by field name */
+  validation_errors: Record<string, string[]>;
+  /** Session creation timestamp */
+  created_at: Date;
+  /** Last update timestamp */
+  updated_at: Date;
+}
+
+/**
+ * Branch detection result
+ */
+export interface BranchDetectionResult {
+  /** Selected branch ID (null if unclear) */
+  selected_branch: string | null;
+  /** Confidence score (0-1) */
+  confidence: number;
+  /** Action to take */
+  action: 'proceed' | 'clarify' | 'reprompt';
+  /** Clarification prompt if needed */
+  clarification_prompt?: string;
+  /** All branch scores */
+  branch_scores?: Array<{
+    branch_id: string;
+    score: number;
+  }>;
+}
+
+/**
+ * Field validation result
+ */
+export interface FieldValidationResult {
+  /** Whether validation passed */
+  valid: boolean;
+  /** Field name */
+  field_name: string;
+  /** Field value */
+  value: any;
+  /** Validation errors */
+  errors: string[];
+}
+
+/**
+ * Field collection plan
+ */
+export interface FieldCollectionPlan {
+  /** Fields to collect in order */
+  fields_to_collect: FieldConfig[];
+  /** Total number of fields */
+  total_count: number;
+  /** Next field to collect */
+  next_field: FieldConfig | null;
 }
