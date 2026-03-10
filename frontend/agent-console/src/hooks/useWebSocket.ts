@@ -6,6 +6,14 @@ export interface WebSocketMessage {
   data: Session;
 }
 
+/**
+ * WebSocket hook for real-time updates
+ *
+ * This hook provides real-time updates for the agent console by connecting
+ * to the WebSocket endpoint provided by the API.
+ *
+ * @param onMessage Callback function that handles incoming WebSocket messages
+ */
 export function useWebSocket(
   onMessage?: (message: WebSocketMessage) => void
 ) {

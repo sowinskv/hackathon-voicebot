@@ -22,6 +22,11 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Get the correct values from the session object, handling both API response format and frontend format
+  const sessionId = session.session_id || session.id;
+  const startTime = session.start_time || session.started_at;
+  const clientInfo = session.client_info || session.client_metadata;
+
   return (
     <div
       onClick={onClick}
@@ -30,10 +35,10 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-semibold text-lg text-gray-900">
-            {session.session_id}
+            {sessionId}
           </h3>
           <p className="text-sm text-gray-500">
-            {formatDistanceToNow(new Date(session.start_time), {
+            {formatDistanceToNow(new Date(startTime), {
               addSuffix: true,
             })}
           </p>
@@ -43,21 +48,21 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
         </span>
       </div>
 
-      {session.client_info && (
+      {clientInfo && (
         <div className="mb-3 space-y-1">
-          {session.client_info.name && (
+          {clientInfo.name && (
             <p className="text-sm text-gray-700">
-              <span className="font-medium">Name:</span> {session.client_info.name}
+              <span className="font-medium">Name:</span> {clientInfo.name}
             </p>
           )}
-          {session.client_info.phone && (
+          {clientInfo.phone && (
             <p className="text-sm text-gray-700">
-              <span className="font-medium">Phone:</span> {session.client_info.phone}
+              <span className="font-medium">Phone:</span> {clientInfo.phone}
             </p>
           )}
-          {session.client_info.email && (
+          {clientInfo.email && (
             <p className="text-sm text-gray-700">
-              <span className="font-medium">Email:</span> {session.client_info.email}
+              <span className="font-medium">Email:</span> {clientInfo.email}
             </p>
           )}
         </div>
@@ -81,7 +86,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
               clipRule="evenodd"
             />
           </svg>
-          <span>{formatDuration(session.duration)}</span>
+          <span>{formatDuration(session.duration || session.duration_seconds)}</span>
         </div>
         {session.satisfaction_score && (
           <div className="flex items-center gap-1">

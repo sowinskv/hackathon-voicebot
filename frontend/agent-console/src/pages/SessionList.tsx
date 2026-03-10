@@ -185,9 +185,9 @@ export function SessionList() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {sessions.map(session => (
                 <SessionCard
-                  key={session.session_id}
+                  key={session.session_id || session.id}
                   session={session}
-                  onClick={() => navigate(`/sessions/${session.session_id}`)}
+                  onClick={() => navigate(`/sessions/${session.session_id || session.id}`)}
                 />
               ))}
             </div>

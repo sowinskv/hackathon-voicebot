@@ -1,27 +1,54 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export interface Session {
-  session_id: string;
+  id: string;
+  room_id: string;
   status: 'active' | 'completed' | 'escalated' | 'resolved';
-  start_time: string;
-  end_time?: string;
-  duration?: number;
+  language: string;
+  flow_id: string;
+  flow_name?: string;
+  started_at: string;
+  ended_at?: string | null;
+  duration_seconds?: number | null;
   escalated: boolean;
-  escalation_reason?: string;
-  client_info?: {
-    phone?: string;
+  escalated_at?: string | null;
+  escalation_reason?: string | null;
+  client_metadata?: {
     name?: string;
+    phone?: string;
+    email?: string;
+    [key: string]: any;
+  };
+  cost_data?: {
+    llm_tokens?: number;
+    stt_tokens?: number;
+    total_cost_usd?: number;
+    tts_characters?: number;
+    [key: string]: any;
+  };
+  tags?: string[];
+  satisfaction_score?: number | null;
+  created_at: string;
+  updated_at: string;
+
+  // For compatibility with frontend components
+  session_id?: string;
+  start_time?: string;
+  end_time?: string | null;
+  duration?: number | null;
+  client_info?: {
+    name?: string;
+    phone?: string;
     email?: string;
     [key: string]: any;
   };
   collected_data?: Record<string, any>;
   transcript?: Array<{
-    speaker: 'agent' | 'client';
+    speaker: 'agent' | 'client' | 'bot';
     text: string;
     timestamp: string;
   }>;
   audio_url?: string;
-  satisfaction_score?: number;
   agent_notes?: string;
   metadata?: Record<string, any>;
 }
@@ -36,6 +63,9 @@ export interface SessionMetrics {
   escalated_today: number;
 }
 
+/**
+ * API Client for the agent console
+ */
 class ApiClient {
   private baseUrl: string;
 
@@ -48,19 +78,48 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
+    console.log(`API Request: ${url}`);
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`API error: ${response.statusText}`, await response.text());
+        throw new Error(`API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log(`API Response:`, data);
+      return data;
+    } catch (error) {
+      console.error(`API Request failed for ${url}:`, error);
+      throw error;
     }
+  }
 
-    return response.json();
+  // Helper function to map API sessions to frontend format
+  private mapSession(session: any): Session {
+    console.log("Mapping session:", session);
+
+    // Map backend fields to frontend expected fields for compatibility
+    const mappedSession = {
+      ...session,
+      session_id: session.id,
+      start_time: session.started_at,
+      end_time: session.ended_at,
+      duration: session.duration_seconds,
+      client_info: session.client_metadata,
+      // Add any other mappings needed
+    };
+
+    console.log("Mapped session:", mappedSession);
+    return mappedSession;
   }
 
   // Sessions
@@ -85,46 +144,95 @@ class ApiClient {
     }
 
     const query = queryParams.toString();
-    return this.request<Session[]>(`/api/sessions${query ? `?${query}` : ''}`);
+    const response = await this.request<{status: string, data: any[], count: number}>(`/api/sessions${query ? `?${query}` : ''}`);
+
+    // Map each session to the format expected by the frontend
+    return response.data.map(this.mapSession);
   }
 
   async getSession(sessionId: string): Promise<Session> {
-    return this.request<Session>(`/api/sessions/${sessionId}`);
+    const response = await this.request<{status: string, data: any}>(`/api/sessions/${sessionId}`);
+    return this.mapSession(response.data);
   }
 
   async updateSessionStatus(
     sessionId: string,
     status: Session['status']
   ): Promise<Session> {
-    return this.request<Session>(`/api/sessions/${sessionId}/status`, {
+    const response = await this.request<{status: string, data: any}>(`/api/sessions/${sessionId}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     });
+    return this.mapSession(response.data);
   }
 
   async updateSessionNotes(
     sessionId: string,
     notes: string
   ): Promise<Session> {
-    return this.request<Session>(`/api/sessions/${sessionId}/notes`, {
+    const response = await this.request<{status: string, data: any}>(`/api/sessions/${sessionId}/notes`, {
       method: 'PATCH',
       body: JSON.stringify({ notes }),
     });
+    return this.mapSession(response.data);
   }
 
   async markAsResolved(
     sessionId: string,
     notes?: string
   ): Promise<Session> {
-    return this.request<Session>(`/api/sessions/${sessionId}/resolve`, {
+    const response = await this.request<{status: string, data: any}>(`/api/sessions/${sessionId}/resolve`, {
       method: 'POST',
       body: JSON.stringify({ notes }),
     });
+    return this.mapSession(response.data);
   }
 
   // Metrics
   async getMetrics(): Promise<SessionMetrics> {
-    return this.request<SessionMetrics>('/api/metrics');
+    try {
+      // Fetch metrics from the real API
+      const response = await this.request<{status: string, data: SessionMetrics}>('/api/metrics');
+
+      // Process metrics data
+      const metricsData = response.data || {
+        total_sessions: 0,
+        active_sessions: 0,
+        escalation_rate: 0,
+        avg_duration: 0,
+        avg_satisfaction: 0,
+        completed_today: 0,
+        escalated_today: 0
+      };
+
+      console.log('Real-time metrics fetched:', metricsData);
+
+      // Make sure all required metrics are present, with defaults for missing values
+      const processedMetrics: SessionMetrics = {
+        total_sessions: metricsData.total_sessions || 0,
+        active_sessions: metricsData.active_sessions || 0,
+        escalation_rate: metricsData.escalation_rate || 0,
+        avg_duration: metricsData.avg_duration || 0,
+        avg_satisfaction: metricsData.avg_satisfaction || 0,
+        completed_today: metricsData.completed_today || 0,
+        escalated_today: metricsData.escalated_today || 0
+      };
+
+      return processedMetrics;
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+
+      // Return default metrics if the API fails
+      return {
+        total_sessions: 0,
+        active_sessions: 0,
+        escalation_rate: 0,
+        avg_duration: 0,
+        avg_satisfaction: 0,
+        completed_today: 0,
+        escalated_today: 0
+      };
+    }
   }
 
   // WebSocket URL

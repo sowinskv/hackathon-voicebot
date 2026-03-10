@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import { SessionList } from './pages/SessionList';
 import { SessionDetail } from './pages/SessionDetail';
 import { NotificationBell } from './components/NotificationBell';
+import { useWebSocket, WebSocketMessage } from './hooks/useWebSocket';
+import { api } from './services/api';
+
+// Create a context for metrics updates
+export const MetricsContext = createContext<{
+  refreshMetrics: () => Promise<void>;
+}>({
+  refreshMetrics: async () => {}
+});
 
 function Navigation() {
   const location = useLocation();
@@ -96,16 +105,46 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // Implement metrics refresh function
+  const [lastMetricsUpdate, setLastMetricsUpdate] = useState(Date.now());
+
+  // Handle WebSocket messages to trigger metrics updates
+  const handleWebSocketMessage = (message: WebSocketMessage) => {
+    console.log('WebSocket message received:', message.type);
+    // When a session is updated, created, or completed, refresh metrics
+    if (['session_update', 'new_escalation', 'session_completed'].includes(message.type)) {
+      refreshMetrics();
+    }
+  };
+
+  const { connected } = useWebSocket(handleWebSocketMessage);
+
+  // Function to refresh metrics that can be called from anywhere in the app
+  const refreshMetrics = async () => {
+    console.log('Refreshing metrics due to session change');
+    // We don't actually need to do anything here since the Dashboard
+    // component already periodically refreshes metrics. We just need to
+    // update the timestamp to trigger re-renders when necessary.
+    setLastMetricsUpdate(Date.now());
+  };
+
+  // Log WebSocket connection status
+  useEffect(() => {
+    console.log('WebSocket connected:', connected);
+  }, [connected]);
+
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/sessions" element={<SessionList />} />
-          <Route path="/sessions/:sessionId" element={<SessionDetail />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <MetricsContext.Provider value={{ refreshMetrics }}>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Dashboard key={lastMetricsUpdate} />} />
+            <Route path="/sessions" element={<SessionList />} />
+            <Route path="/sessions/:sessionId" element={<SessionDetail />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </MetricsContext.Provider>
   );
 }
 
