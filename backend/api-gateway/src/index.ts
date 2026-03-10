@@ -5,6 +5,7 @@ import http from 'http';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import { initWebSocket, getConnectedClientsCount } from './websocket/handler';
 import sessionsRouter from './routes/sessions';
+import voiceSessionsRouter from './routes/voice-sessions';
 import flowsRouter from './routes/flows';
 import analyticsRouter from './routes/analytics';
 import livekitRouter from './routes/livekit';
@@ -48,6 +49,7 @@ app.get('/health', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/sessions', sessionsRouter);
+app.use('/api/voice-sessions', voiceSessionsRouter);
 app.use('/api/flows', flowsRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/livekit', livekitRouter);
