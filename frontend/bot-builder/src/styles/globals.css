@@ -257,14 +257,35 @@
 }
 
 .react-flow__edge-path {
-  stroke: rgba(255, 255, 255, 0.3);
+  stroke: rgba(255, 255, 255, 0.2);
   stroke-width: 2px;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 2.5px;
 }
 
 .react-flow__handle {
   @apply bg-white/80 border-2 border-white/40;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
+}
+
+.react-flow__attribution {
+  @apply hidden;
+}
+
+.react-flow__pane {
+  cursor: default;
+}
+
+.react-flow__controls {
+  display: none !important;
+}
+
+.react-flow__minimap {
+  box-shadow: none !important;
 }
 
 /* Loading animation */

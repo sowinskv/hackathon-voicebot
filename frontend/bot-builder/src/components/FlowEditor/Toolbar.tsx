@@ -36,8 +36,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onAddNode }) => {
   };
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto">
-      <h3 className="font-semibold text-gray-900 mb-4">{t('flow.toolbar.title')}</h3>
+    <div className="w-64 bg-white/[0.02] border-r border-white/[0.06] p-4 overflow-y-auto backdrop-blur-xl">
+      <div className="flex items-center gap-2 mb-6">
+        <div className="w-1 h-1 rounded-full bg-white/60"></div>
+        <h3 className="font-semibold text-white text-sm tracking-tight">{t('flow.toolbar.title')}</h3>
+      </div>
       <div className="space-y-2">
         {nodeDefinitions.map((node) => (
           <div
@@ -45,21 +48,24 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onAddNode }) => {
             draggable
             onDragStart={(e) => handleDragStart(e, node.type)}
             onClick={() => onAddNode(node.type)}
-            className="flex items-start gap-3 p-3 rounded-lg border-2 border-gray-200 cursor-move hover:border-primary-300 hover:bg-primary-50 transition-colors"
+            className="group flex items-start gap-3 p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] cursor-move hover:bg-white/[0.05] hover:border-white/10 transition-all duration-200"
           >
-            <node.icon className={`w-5 h-5 mt-0.5 ${node.color} flex-shrink-0`} />
+            <node.icon className={`w-4 h-4 mt-0.5 text-white/70 group-hover:text-white flex-shrink-0 transition-colors duration-200`} />
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm text-gray-900">{t(node.labelKey as any)}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{t(node.descKey as any)}</div>
+              <div className="font-medium text-sm text-white tracking-tight">{t(node.labelKey as any)}</div>
+              <div className="text-xs text-white/50 mt-0.5 leading-relaxed">{t(node.descKey as any)}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-xs text-blue-800">
-          {t('flow.toolbar.tip')}
-        </p>
+      <div className="mt-6 p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+        <div className="flex items-start gap-2">
+          <div className="w-1 h-1 rounded-full bg-white/40 mt-1.5 flex-shrink-0"></div>
+          <p className="text-xs text-white/60 leading-relaxed">
+            {t('flow.toolbar.tip')}
+          </p>
+        </div>
       </div>
     </div>
   );
