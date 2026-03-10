@@ -16,11 +16,11 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy Pipecat server code
-COPY pipecat_server.py .
+# Copy server code
+COPY simple_voice_server.py .
 
 # Expose port for WebSocket
 EXPOSE 8080
 
-# Run the Pipecat server
-CMD ["python", "pipecat_server.py"]
+# Run the voice server
+CMD ["python", "simple_voice_server.py"]

@@ -21,6 +21,9 @@ CREATE TABLE sessions (
     cost_data JSONB DEFAULT '{}',
     tags TEXT[] DEFAULT ARRAY[]::TEXT[],
     satisfaction_score INTEGER CHECK (satisfaction_score >= 1 AND satisfaction_score <= 5),
+    first_try_completion BOOLEAN DEFAULT FALSE, -- Whether all form fields were completed on first try
+    customer_extremely_angry BOOLEAN DEFAULT FALSE, -- Whether customer showed extreme anger
+    legal_threat_detected BOOLEAN DEFAULT FALSE, -- Whether customer threatened legal action
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -33,7 +36,8 @@ CREATE TABLE transcripts (
     text TEXT NOT NULL,
     timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
     audio_url TEXT,
-    sentiment VARCHAR(20) CHECK (sentiment IN ('positive', 'neutral', 'negative')),
+    sentiment VARCHAR(20) CHECK (sentiment IN ('positive', 'neutral', 'negative', 'very_negative', 'extreme_anger')),
+    contains_legal_threat BOOLEAN DEFAULT FALSE, -- Flag if message contains legal threat
     language VARCHAR(10),
     created_at TIMESTAMP DEFAULT NOW()
 );
@@ -49,6 +53,8 @@ CREATE TABLE session_data (
     confirmed_at TIMESTAMP,
     validation_status VARCHAR(20) CHECK (validation_status IN ('valid', 'invalid', 'pending')),
     collected_at TIMESTAMP DEFAULT NOW(),
+    attempt_count INTEGER DEFAULT 1, -- Number of attempts to collect this field
+    completed_on_first_try BOOLEAN DEFAULT FALSE, -- Whether field was correctly collected on first try
     updated_at TIMESTAMP DEFAULT NOW(),
     UNIQUE(session_id, field_name)
 );
@@ -149,3 +155,6 @@ CREATE TRIGGER update_sessions_updated_at BEFORE UPDATE ON sessions FOR EACH ROW
 CREATE TRIGGER update_session_data_updated_at BEFORE UPDATE ON session_data FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_flows_updated_at BEFORE UPDATE ON flows FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_escalations_updated_at BEFORE UPDATE ON escalations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Include additional triggers from triggers.sql
+\i 'triggers.sql';

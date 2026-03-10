@@ -53,14 +53,33 @@ export interface Session {
   metadata?: Record<string, any>;
 }
 
+export interface BotMetrics {
+  bot_id: string;
+  bot_name: string;
+  total_sessions: number;
+  active_sessions: number;
+  escalation_rate: number;
+  avg_satisfaction: number;
+  avg_duration: number;
+  completed: number;
+  first_try_completion_rate: number;
+  angry_customers_rate: number;
+  legal_threats_rate: number;
+}
+
 export interface SessionMetrics {
   total_sessions: number;
   active_sessions: number;
   escalation_rate: number;
   avg_duration: number;
   avg_satisfaction: number;
-  completed_today: number;
-  escalated_today: number;
+  completed: number;
+  escalated: number;
+  first_try_completion_rate: number;
+  angry_customers_rate: number;
+  legal_threats_rate: number;
+  timeframe_distribution: { [key: string]: number };
+  bots_metrics: BotMetrics[];
 }
 
 /**
@@ -189,22 +208,18 @@ class ApiClient {
   }
 
   // Metrics
-  async getMetrics(): Promise<SessionMetrics> {
+  async getMetrics(timeframe: string = 'all'): Promise<SessionMetrics> {
     try {
-      // Fetch metrics from the real API
-      const response = await this.request<{status: string, data: SessionMetrics}>('/api/metrics');
+      // Fetch metrics from the real API - no fallback to mock data
+      const response = await this.request<{status: string, data: SessionMetrics, message?: string}>(`/api/metrics?timeframe=${timeframe}`);
+
+      // Check for API error messages
+      if (response.status === 'error' && response.message) {
+        throw new Error(`API Error: ${response.message}`);
+      }
 
       // Process metrics data
-      const metricsData = response.data || {
-        total_sessions: 0,
-        active_sessions: 0,
-        escalation_rate: 0,
-        avg_duration: 0,
-        avg_satisfaction: 0,
-        completed_today: 0,
-        escalated_today: 0
-      };
-
+      const metricsData = response.data;
       console.log('Real-time metrics fetched:', metricsData);
 
       // Make sure all required metrics are present, with defaults for missing values
@@ -214,24 +229,21 @@ class ApiClient {
         escalation_rate: metricsData.escalation_rate || 0,
         avg_duration: metricsData.avg_duration || 0,
         avg_satisfaction: metricsData.avg_satisfaction || 0,
-        completed_today: metricsData.completed_today || 0,
-        escalated_today: metricsData.escalated_today || 0
+        completed: metricsData.completed || 0,
+        escalated: metricsData.escalated || 0,
+        first_try_completion_rate: metricsData.first_try_completion_rate || 0,
+        angry_customers_rate: metricsData.angry_customers_rate || 0,
+        legal_threats_rate: metricsData.legal_threats_rate || 0,
+        timeframe_distribution: metricsData.timeframe_distribution || {},
+        bots_metrics: metricsData.bots_metrics || []
       };
 
       return processedMetrics;
     } catch (error) {
       console.error("Error fetching metrics:", error);
 
-      // Return default metrics if the API fails
-      return {
-        total_sessions: 0,
-        active_sessions: 0,
-        escalation_rate: 0,
-        avg_duration: 0,
-        avg_satisfaction: 0,
-        completed_today: 0,
-        escalated_today: 0
-      };
+      // Throw the error so the UI can handle it appropriately
+      throw error;
     }
   }
 

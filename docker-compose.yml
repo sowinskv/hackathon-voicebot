@@ -13,6 +13,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
       - ./database/seeds/default_flow.sql:/docker-entrypoint-initdb.d/02-seeds.sql
+      - ./database/seeds/mock_sessions.sql:/docker-entrypoint-initdb.d/03-mock-sessions.sql
+      - ./database/seeds/extended_mock_sessions.sql:/docker-entrypoint-initdb.d/04-extended-mock-sessions.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U callcenter"]
       interval: 2s
@@ -127,13 +129,9 @@ services:
       - PORT=8080
       - API_GATEWAY_URL=http://api-gateway:3000
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID}
-      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
-      - AZURE_OPENAI_API_ENDPOINT=${AZURE_OPENAI_API_ENDPOINT}
-      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION}
-      - AZURE_OPENAI_MODEL=${AZURE_OPENAI_MODEL}
-      - AZURE_OPENAI_REGION=${AZURE_OPENAI_REGION}
     ports:
       - "8080:8080"
     networks:

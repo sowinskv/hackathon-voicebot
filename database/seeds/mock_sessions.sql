@@ -34,7 +34,10 @@ BEGIN
         client_metadata,
         cost_data,
         tags,
-        satisfaction_score
+        satisfaction_score,
+        first_try_completion,
+        customer_extremely_angry,
+        legal_threat_detected
     ) VALUES (
         uuid_generate_v4(),
         'room_ins_' || floor(random() * 10000000)::text,
@@ -50,20 +53,24 @@ BEGIN
         '{"name": "John Smith", "phone": "+1 555-123-4567", "email": "john.smith@example.com", "device_type": "mobile"}',
         '{"total_usd": 1.24, "input_tokens": 450, "output_tokens": 327, "audio_minutes": 3.5}',
         ARRAY['insurance', 'policy_update'],
-        NULL -- No satisfaction score yet
+        NULL, -- No satisfaction score yet
+        TRUE, -- First try completion success
+        FALSE, -- Customer not extremely angry
+        FALSE -- No legal threats
     );
 
     -- Get the ID of the session we just inserted
     WITH last_session AS (
         SELECT id FROM sessions ORDER BY created_at DESC LIMIT 1
     )
-    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment)
+    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment, contains_legal_threat)
     SELECT
         id,
         'client',
         'Hi, I''m calling about my car insurance policy.',
         (NOW() - interval '14 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -71,7 +78,8 @@ BEGIN
         'bot',
         'Hello! I''d be happy to help with your car insurance policy. Could you please provide your policy number?',
         (NOW() - interval '13 minutes 45 seconds'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -79,7 +87,8 @@ BEGIN
         'client',
         'Yes, it''s ABC123456.',
         (NOW() - interval '13 minutes 20 seconds'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -87,7 +96,8 @@ BEGIN
         'bot',
         'Thank you. I''ve found your policy. What specific information do you need today?',
         (NOW() - interval '13 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -95,7 +105,8 @@ BEGIN
         'client',
         'I''d like to update my coverage limits and add roadside assistance.',
         (NOW() - interval '12 minutes 30 seconds'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session;
 
     -- Add session data for the insurance session
@@ -135,7 +146,10 @@ BEGIN
         client_metadata,
         cost_data,
         tags,
-        satisfaction_score
+        satisfaction_score,
+        first_try_completion,
+        customer_extremely_angry,
+        legal_threat_detected
     ) VALUES (
         uuid_generate_v4(),
         'room_bnk_' || floor(random() * 10000000)::text,
@@ -151,20 +165,24 @@ BEGIN
         '{"name": "Emily Johnson", "phone": "+1 555-234-5678", "email": "emily.johnson@example.com", "device_type": "desktop"}',
         '{"total_usd": 2.75, "input_tokens": 950, "output_tokens": 827, "audio_minutes": 7.2}',
         ARRAY['banking', 'account_services'],
-        4 -- Good satisfaction score
+        4, -- Good satisfaction score
+        TRUE, -- First try completion success
+        FALSE, -- Customer not extremely angry
+        FALSE -- No legal threats
     );
 
     -- Get the ID of the session we just inserted
     WITH last_session AS (
         SELECT id FROM sessions ORDER BY created_at DESC LIMIT 1
     )
-    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment)
+    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment, contains_legal_threat)
     SELECT
         id,
         'client',
         'Hi, I need to check my account balance and recent transactions.',
         (NOW() - interval '2 days 3 hours'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -172,7 +190,8 @@ BEGIN
         'bot',
         'I''d be happy to assist you. For security purposes, could you please verify your account information?',
         (NOW() - interval '2 days 2 hours 55 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -180,7 +199,8 @@ BEGIN
         'client',
         'Sure, my account number is 987654321.',
         (NOW() - interval '2 days 2 hours 53 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -188,7 +208,8 @@ BEGIN
         'bot',
         'Thank you. I''ll need to verify one more piece of information. Could you please provide your date of birth?',
         (NOW() - interval '2 days 2 hours 52 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session;
 
     -- Add session data for the banking session
@@ -236,7 +257,10 @@ BEGIN
         client_metadata,
         cost_data,
         tags,
-        satisfaction_score
+        satisfaction_score,
+        first_try_completion,
+        customer_extremely_angry,
+        legal_threat_detected
     ) VALUES (
         uuid_generate_v4(),
         'room_sup_' || floor(random() * 10000000)::text,
@@ -252,20 +276,24 @@ BEGIN
         '{"name": "Michael Brown", "phone": "+1 555-345-6789", "email": "michael.brown@example.com", "device_type": "tablet"}',
         '{"total_usd": 3.15, "input_tokens": 1250, "output_tokens": 1127, "audio_minutes": 10.5}',
         ARRAY['support', 'technical', 'mobile_app'],
-        2 -- Poor satisfaction score
+        2, -- Poor satisfaction score
+        FALSE, -- Failed first try completion
+        TRUE, -- Customer extremely angry
+        FALSE -- No legal threats
     );
 
     -- Get the ID of the session we just inserted
     WITH last_session AS (
         SELECT id FROM sessions ORDER BY created_at DESC LIMIT 1
     )
-    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment)
+    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment, contains_legal_threat)
     SELECT
         id,
         'client',
         'Hello, I''m having trouble with your mobile app. It keeps crashing when I try to log in.',
         (NOW() - interval '5 hours'),
-        'negative'
+        'negative',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -273,7 +301,8 @@ BEGIN
         'bot',
         'I''m sorry to hear you''re experiencing issues with our app. Let''s troubleshoot this together. What type of device are you using?',
         (NOW() - interval '4 hours 59 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -281,7 +310,8 @@ BEGIN
         'client',
         'I''m using an iPhone 13 with the latest iOS.',
         (NOW() - interval '4 hours 58 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -289,7 +319,8 @@ BEGIN
         'bot',
         'Thank you for that information. Have you tried reinstalling the app?',
         (NOW() - interval '4 hours 57 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -297,7 +328,8 @@ BEGIN
         'client',
         'Yes, twice. It still crashes right after I enter my password.',
         (NOW() - interval '4 hours 56 minutes'),
-        'negative'
+        'negative',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -305,7 +337,8 @@ BEGIN
         'bot',
         'I understand how frustrating this must be. Let''s try a few more troubleshooting steps.',
         (NOW() - interval '4 hours 55 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -313,7 +346,8 @@ BEGIN
         'client',
         'I''ve already tried everything! This is ridiculous. Can I please speak to a real person?',
         (NOW() - interval '4 hours 50 minutes'),
-        'negative'
+        'negative',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -321,7 +355,8 @@ BEGIN
         'bot',
         'I understand your frustration. I''ll connect you with a specialist who can help resolve this issue.',
         (NOW() - interval '4 hours 45 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -329,7 +364,8 @@ BEGIN
         'agent',
         'Hello Mr. Brown, this is Sarah from technical support. I understand you''re having issues with our mobile app. Let me help you with that.',
         (NOW() - interval '4 hours 40 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session;
 
     -- Add session data for the technical support session
@@ -396,7 +432,10 @@ BEGIN
         client_metadata,
         cost_data,
         tags,
-        satisfaction_score
+        satisfaction_score,
+        first_try_completion,
+        customer_extremely_angry,
+        legal_threat_detected
     ) VALUES (
         uuid_generate_v4(),
         'room_apt_' || floor(random() * 10000000)::text,
@@ -412,20 +451,24 @@ BEGIN
         '{"name": "Sarah Wilson", "phone": "+1 555-456-7890", "email": "sarah.wilson@example.com", "device_type": "desktop"}',
         '{"total_usd": 1.85, "input_tokens": 650, "output_tokens": 527, "audio_minutes": 5.8}',
         ARRAY['appointment', 'scheduling', 'healthcare'],
-        5 -- Excellent satisfaction score
+        5, -- Excellent satisfaction score
+        TRUE, -- First try completion success
+        FALSE, -- Customer not extremely angry
+        FALSE -- No legal threats
     );
 
     -- Get the ID of the session we just inserted
     WITH last_session AS (
         SELECT id FROM sessions ORDER BY created_at DESC LIMIT 1
     )
-    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment)
+    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment, contains_legal_threat)
     SELECT
         id,
         'client',
         'Hi, I''d like to schedule a consultation with Dr. Smith.',
         (NOW() - interval '3 days 8 hours'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -433,7 +476,8 @@ BEGIN
         'bot',
         'Hello! I''d be happy to help you schedule an appointment. Do you have a preferred date and time?',
         (NOW() - interval '3 days 7 hours 59 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -441,7 +485,8 @@ BEGIN
         'client',
         'I was hoping for next Tuesday afternoon if possible.',
         (NOW() - interval '3 days 7 hours 58 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -449,7 +494,8 @@ BEGIN
         'bot',
         'Let me check Dr. Smith''s availability for next Tuesday. I see he has openings at 2:00 PM and 4:30 PM. Which would you prefer?',
         (NOW() - interval '3 days 7 hours 57 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -457,7 +503,8 @@ BEGIN
         'client',
         '2:00 PM would be perfect.',
         (NOW() - interval '3 days 7 hours 56 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -465,7 +512,8 @@ BEGIN
         'bot',
         'Great! I''ve scheduled your appointment with Dr. Smith for next Tuesday at 2:00 PM. Is there anything else you need help with today?',
         (NOW() - interval '3 days 7 hours 55 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -473,7 +521,8 @@ BEGIN
         'client',
         'No, that''s all. Thank you so much for your help!',
         (NOW() - interval '3 days 7 hours 54 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -481,7 +530,8 @@ BEGIN
         'bot',
         'You''re welcome! A confirmation will be sent to your email. Have a wonderful day!',
         (NOW() - interval '3 days 7 hours 53 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session;
 
     -- Add session data for the appointment session
@@ -537,7 +587,10 @@ BEGIN
         client_metadata,
         cost_data,
         tags,
-        satisfaction_score
+        satisfaction_score,
+        first_try_completion,
+        customer_extremely_angry,
+        legal_threat_detected
     ) VALUES (
         uuid_generate_v4(),
         'room_cpl_' || floor(random() * 10000000)::text,
@@ -553,20 +606,24 @@ BEGIN
         '{"name": "David Martinez", "phone": "+1 555-567-8901", "email": "david.martinez@example.com", "device_type": "mobile"}',
         '{"total_usd": 4.35, "input_tokens": 1850, "output_tokens": 1627, "audio_minutes": 15.2}',
         ARRAY['complaint', 'customer_service', 'refund'],
-        1 -- Poor satisfaction score
+        1, -- Poor satisfaction score
+        FALSE, -- Failed first try completion
+        TRUE, -- Customer extremely angry
+        TRUE -- Legal threats detected
     );
 
     -- Get the ID of the session we just inserted
     WITH last_session AS (
         SELECT id FROM sessions ORDER BY created_at DESC LIMIT 1
     )
-    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment)
+    INSERT INTO transcripts (session_id, speaker, text, timestamp, sentiment, contains_legal_threat)
     SELECT
         id,
         'client',
         'I want to file a complaint about the service I received yesterday.',
         (NOW() - interval '1 day 5 hours'),
-        'negative'
+        'negative',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -574,15 +631,17 @@ BEGIN
         'bot',
         'I''m sorry to hear you had a negative experience. I''d like to help resolve this issue. Could you please provide more details about what happened?',
         (NOW() - interval '1 day 4 hours 59 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
         id,
         'client',
-        'I waited on hold for over an hour, and then the representative was extremely rude and unhelpful.',
+        'I waited on hold for over an hour, and then the representative was extremely rude and unhelpful. I will be contacting my lawyer about this!',
         (NOW() - interval '1 day 4 hours 58 minutes'),
-        'negative'
+        'extreme_anger',
+        TRUE -- Contains legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -590,7 +649,8 @@ BEGIN
         'bot',
         'I sincerely apologize for that experience. That''s not the level of service we aim to provide. I''ll need to escalate this to our customer relations team.',
         (NOW() - interval '1 day 4 hours 57 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -598,7 +658,8 @@ BEGIN
         'client',
         'Yes, please do. I''m really upset about this.',
         (NOW() - interval '1 day 4 hours 56 minutes'),
-        'negative'
+        'negative',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -606,7 +667,8 @@ BEGIN
         'agent',
         'Hello Mr. Martinez, I''m Jennifer, the customer relations manager. I understand you had a negative experience yesterday. I want to personally apologize and make this right for you.',
         (NOW() - interval '1 day 4 hours 45 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -614,7 +676,8 @@ BEGIN
         'client',
         'I appreciate that, but I''m still very upset about how I was treated.',
         (NOW() - interval '1 day 4 hours 44 minutes'),
-        'negative'
+        'negative',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -622,7 +685,8 @@ BEGIN
         'agent',
         'I completely understand your frustration. This is not the service standard we aim to provide. I''d like to offer you a $50 credit to your account as a gesture of goodwill.',
         (NOW() - interval '1 day 4 hours 40 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -630,7 +694,8 @@ BEGIN
         'client',
         'I appreciate the gesture. I hope your company will improve its customer service.',
         (NOW() - interval '1 day 4 hours 35 minutes'),
-        'neutral'
+        'neutral',
+        FALSE -- No legal threat
     FROM last_session
     UNION ALL
     SELECT
@@ -638,7 +703,8 @@ BEGIN
         'agent',
         'We will definitely use your feedback to improve our service. I''ve applied the credit to your account, and I''ll personally follow up with you next week.',
         (NOW() - interval '1 day 4 hours 30 minutes'),
-        'positive'
+        'positive',
+        FALSE -- No legal threat
     FROM last_session;
 
     -- Add session data for the complaint session
