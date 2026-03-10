@@ -267,4 +267,104 @@ router.get(
   })
 );
 
+// POST /api/sessions/complete - Complete a session with transcript and collected data
+router.post(
+  '/complete',
+  asyncHandler(async (req: Request, res: Response) => {
+    const {
+      flowId,
+      language,
+      messages,
+      collectedData,
+      satisfactionScore,
+      duration
+    } = req.body;
+
+    console.log('[Sessions] Completing session:', {
+      flowId,
+      language,
+      messageCount: messages?.length,
+      dataFields: Object.keys(collectedData || {}),
+      satisfaction: satisfactionScore
+    });
+
+    // Start transaction
+    const roomId = `chat-${Date.now()}`;
+    const startedAt = new Date(Date.now() - (duration || 0) * 1000);
+    const endedAt = new Date();
+
+    // 1. Create session record
+    const sessionResult = await query(
+      `INSERT INTO sessions (
+        room_id, status, language, flow_id,
+        started_at, ended_at, duration_seconds,
+        satisfaction_score
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id`,
+      [
+        roomId,
+        'completed',
+        language || 'en',
+        flowId,
+        startedAt,
+        endedAt,
+        duration || 0,
+        satisfactionScore
+      ]
+    );
+
+    const sessionId = sessionResult.rows[0].id;
+    console.log('[Sessions] Created session:', sessionId);
+
+    // 2. Save transcripts
+    if (messages && messages.length > 0) {
+      for (const msg of messages) {
+        if (!msg.content) continue; // Skip empty messages
+
+        await query(
+          `INSERT INTO transcripts (
+            session_id, speaker, text, timestamp, language
+          ) VALUES ($1, $2, $3, $4, $5)`,
+          [
+            sessionId,
+            msg.role === 'user' ? 'client' : 'bot',
+            msg.content,
+            msg.timestamp || new Date(),
+            language || 'en'
+          ]
+        );
+      }
+      console.log('[Sessions] Saved', messages.length, 'transcripts');
+    }
+
+    // 3. Save collected data
+    if (collectedData && Object.keys(collectedData).length > 0) {
+      for (const [fieldName, fieldValue] of Object.entries(collectedData)) {
+        if (!fieldValue) continue; // Skip empty values
+
+        await query(
+          `INSERT INTO session_data (
+            session_id, field_name, field_value,
+            field_type, validation_status
+          ) VALUES ($1, $2, $3, $4, $5)`,
+          [
+            sessionId,
+            fieldName,
+            fieldValue as string,
+            'text',
+            'valid'
+          ]
+        );
+      }
+      console.log('[Sessions] Saved', Object.keys(collectedData).length, 'data fields');
+    }
+
+    res.json({
+      status: 'success',
+      sessionId,
+      message: 'Session completed and saved successfully'
+    });
+  })
+);
+
 export default router;

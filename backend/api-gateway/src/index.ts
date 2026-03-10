@@ -10,6 +10,8 @@ import flowsRouter from './routes/flows';
 import analyticsRouter from './routes/analytics';
 import livekitRouter from './routes/livekit';
 import botRouter from './routes/bot';
+import voiceRouter from './routes/voice';
+import chatRouter from './routes/chat';
 
 // Load environment variables
 dotenv.config();
@@ -74,6 +76,8 @@ app.use('/api/flows', flowsRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/livekit', livekitRouter);
 app.use('/api/bot', botRouter);
+app.use('/api/voice', voiceRouter);
+app.use('/api/chat', chatRouter);
 
 // Root endpoint
 app.get('/', (req: Request, res: Response) => {

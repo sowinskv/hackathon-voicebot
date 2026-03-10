@@ -13,7 +13,8 @@
     "react-dom": "^18.2.0",
     "@livekit/components-react": "^2.0.0",
     "livekit-client": "^2.0.0",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "lucide-react": "^0.344.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

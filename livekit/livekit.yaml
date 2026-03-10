@@ -1,0 +1,28 @@
+port: 7880
+bind_addresses:
+  - "0.0.0.0"
+
+rtc:
+  port_range_start: 50000
+  port_range_end: 50100
+  # Advertise localhost for local development
+  use_external_ip: true
+  node_ip: "127.0.0.1"
+  tcp_port: 7881
+
+keys:
+  # For development - API key and secret
+  devkey: SkVjnKqmC2vWqYjnKsAjnKqmC2vWqYjnKsAjnKqmC2v
+
+logging:
+  level: info
+
+room:
+  empty_timeout: 300
+  auto_create: true
+
+webhook:
+  # Optional: configure webhooks if needed
+  # api_key: your_webhook_key
+  # urls:
+  #   - http://api-gateway:3000/webhook/livekit

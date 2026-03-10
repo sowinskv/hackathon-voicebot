@@ -1,257 +1,162 @@
 import { useState, useEffect } from 'react'
-import VoiceControls from './components/VoiceControls'
-import TranscriptDisplay from './components/TranscriptDisplay'
-import SessionStatus from './components/SessionStatus'
-import CollectedDataPanel, { CollectedData } from './components/CollectedDataPanel'
-import SatisfactionSurvey from './components/SatisfactionSurvey'
-import NextSteps from './components/NextSteps'
-import { useLiveKit } from './hooks/useLiveKit'
-import { useWebSocket } from './hooks/useWebSocket'
+import ChatMode from './components/ChatMode'
+import PipecatVoiceCall from './components/PipecatVoiceCall'
 
-export type Language = 'en' | 'pl'
-export type SessionState = 'idle' | 'connecting' | 'active' | 'escalated' | 'completed' | 'error'
+interface Flow {
+  id: string;
+  name: string;
+  description?: string;
+  status: string;
+  language: string;
+}
+
+type Mode = 'voice' | 'chat';
 
 function App() {
-  const [language, setLanguage] = useState<Language>('en')
-  const [sessionId, setSessionId] = useState<string | null>(null)
-  const [sessionState, setSessionState] = useState<SessionState>('idle')
-  const [transcript, setTranscript] = useState<Array<{ role: 'user' | 'assistant', text: string, timestamp: Date }>>([])
-  const [collectedData, setCollectedData] = useState<CollectedData>({})
-  const [showSurvey, setShowSurvey] = useState(false)
-  const [warningCount, setWarningCount] = useState(0)
-
-  const {
-    isConnected,
-    isConnecting,
-    error: liveKitError,
-    connect,
-    disconnect,
-    audioEnabled,
-    audioStream,
-    toggleAudio,
-  } = useLiveKit()
-
-  const {
-    isConnected: wsConnected,
-    messages: wsMessages,
-    sendMessage,
-  } = useWebSocket(sessionId)
-
+  const [flows, setFlows] = useState<Flow[]>([])
+  const [selectedFlowId, setSelectedFlowId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [inCall, setInCall] = useState(false)
+  const [mode, setMode] = useState<Mode>('chat')
   useEffect(() => {
-    if (isConnecting) {
-      setSessionState('connecting')
-    } else if (isConnected && sessionState === 'connecting') {
-      setSessionState('active')
-    } else if (liveKitError) {
-      setSessionState('error')
-    }
-  }, [isConnected, isConnecting, liveKitError, sessionState])
+    fetchPublishedFlows();
+  }, []);
 
-  // Show survey when session completes
-  useEffect(() => {
-    if (sessionState === 'completed') {
-      setShowSurvey(true)
-    }
-  }, [sessionState])
-
-  useEffect(() => {
-    wsMessages.forEach((message) => {
-      if (message.type === 'slot_update' && message.field && message.value) {
-        setCollectedData((prev) => ({ ...prev, [message.field]: message.value }))
-      } else if (message.type === 'warning') {
-        setWarningCount((n) => n + 1)
-      } else if (message.type === 'transcript') {
-        setTranscript((prev) => [
-          ...prev,
-          {
-            role: message.role,
-            text: message.text,
-            timestamp: new Date(message.timestamp),
-          },
-        ])
-      } else if (message.type === 'session_status') {
-        if (message.status === 'escalated') {
-          setSessionState('escalated')
-        } else if (message.status === 'completed') {
-          setSessionState('completed')
-        }
+  const fetchPublishedFlows = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/flows?status=published`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    })
-  }, [wsMessages])
+      const result = await response.json();
+      setFlows(result.data || []);
 
-  const handleStartSession = async () => {
-    try {
-      setSessionState('connecting')
-      const newSessionId = await connect(language)
-      setSessionId(newSessionId)
-      setTranscript([])
-      setCollectedData({})
-      setWarningCount(0)
-    } catch (error) {
-      console.error('Failed to start session:', error)
-      setSessionState('error')
-    }
-  }
-
-  const handleStopSession = async () => {
-    try {
-      await disconnect()
-      setSessionState('completed')
-      setSessionId(null)
-    } catch (error) {
-      console.error('Failed to stop session:', error)
-    }
-  }
-
-  const handleEscalate = async () => {
-    if (sessionId) {
-      try {
-        sendMessage({ type: 'escalate', sessionId })
-        setSessionState('escalated')
-      } catch (error) {
-        console.error('Failed to escalate:', error)
+      // Auto-select first flow
+      if (result.data && result.data.length > 0) {
+        setSelectedFlowId(result.data[0].id);
       }
+    } catch (err: any) {
+      console.error('[APP] Error fetching flows:', err);
+      setError(err.message || 'Nie udało się pobrać listy botów');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startCall = () => {
+    if (!selectedFlowId) {
+      alert('Wybierz bota aby rozpocząć rozmowę');
+      return;
+    }
+    setInCall(true);
+  };
+
+  const endCall = () => {
+    setInCall(false);
+  };
+
+  if (inCall && selectedFlowId) {
+    if (mode === 'chat') {
+      return <ChatMode flowId={selectedFlowId} onEnd={endCall} />;
+    } else {
+      return <PipecatVoiceCall flowId={selectedFlowId} onEnd={endCall} />;
     }
   }
 
-  const handleRetry = () => {
-    setSessionState('idle')
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Ładowanie botów...</p>
+        </div>
+      </div>
+    );
   }
-
-  const handleTimeout = async () => {
-    try {
-      await disconnect()
-    } catch (_) {}
-    setSessionState('completed')
-    setSessionId(null)
-  }
-
-  const toggleLanguage = () => {
-    setLanguage((prev) => (prev === 'en' ? 'pl' : 'en'))
-  }
-
-  const isSessionActive = sessionState === 'active' || sessionState === 'escalated'
 
   return (
-    <div className="min-h-screen flex flex-col bg-notion-bg">
-      {showSurvey && (
-        <SatisfactionSurvey
-          sessionId={sessionId}
-          language={language}
-          onDismiss={() => setShowSurvey(false)}
-        />
-      )}
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-sm font-semibold" style={{ color: '#1a1a1a' }}>Voice Banking Assistant</h1>
-              <p className="text-xs" style={{ color: '#6b6869' }}>AI-powered voice support</p>
-            </div>
-          </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">VoiceBot Demo</h1>
+        <p className="text-gray-600 mb-8">Wybierz bota i rozpocznij rozmowę</p>
 
-          <div className="flex items-center gap-4">
-            <SessionStatus state={sessionState} />
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* Flow Selector */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Wybierz bota
+          </label>
+          <select
+            value={selectedFlowId || ''}
+            onChange={(e) => setSelectedFlowId(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>-- Wybierz bota --</option>
+            {flows.map(flow => (
+              <option key={flow.id} value={flow.id}>
+                {flow.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Mode Selector */}
+        <div className="mb-8">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tryb rozmowy
+          </label>
+          <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={toggleLanguage}
-              disabled={isSessionActive}
-              className="btn-secondary text-xs py-1.5 px-3 disabled:opacity-30"
+              onClick={() => setMode('chat')}
+              className={`px-6 py-4 rounded-lg font-medium transition-all ${
+                mode === 'chat'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             >
-              {language === 'en' ? '🇬🇧 English' : '🇵🇱 Polski'}
+              💬 Czat (Tekst)
+            </button>
+            <button
+              onClick={() => setMode('voice')}
+              className={`px-6 py-4 rounded-lg font-medium transition-all ${
+                mode === 'voice'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              🎤 Głos
             </button>
           </div>
         </div>
-      </header>
 
-      {/* Main */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left — Controls */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
-            <VoiceControls
-              sessionState={sessionState}
-              isConnected={isConnected}
-              audioEnabled={audioEnabled}
-              audioStream={audioStream}
-              onStart={handleStartSession}
-              onStop={handleStopSession}
-              onEscalate={handleEscalate}
-              onRetry={handleRetry}
-              onToggleAudio={toggleAudio}
-              onTimeout={handleTimeout}
-              warningCount={warningCount}
-              language={language}
-            />
+        {/* Start Button */}
+        <button
+          onClick={startCall}
+          disabled={!selectedFlowId}
+          className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+        >
+          {mode === 'chat' ? 'Rozpocznij czat' : 'Rozpocznij rozmowę'}
+        </button>
 
-            {/* Guide / Next steps */}
-            {sessionState === 'completed' ? (
-              <NextSteps language={language} />
-            ) : (
-              <div className="card animate-fadeIn">
-                <h3 className="text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
-                  {language === 'en' ? 'How it works' : 'Jak to działa'}
-                </h3>
-                <ol className="space-y-3">
-                  {[
-                    language === 'en' ? 'Click Start Session to connect' : 'Kliknij Rozpocznij, aby się połączyć',
-                    language === 'en' ? 'Speak naturally in English' : 'Mów naturalnie po polsku',
-                    language === 'en' ? 'Say "connect me to a consultant" to escalate' : 'Powiedz „połącz z konsultantem" aby eskalować',
-                    language === 'en' ? 'End the session when finished' : 'Zakończ sesję po rozmowie',
-                  ].map((step, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-notion-textLight">
-                      <span className="font-mono text-xs mt-0.5 flex-shrink-0" style={{ color: '#1a1a1a' }}>
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-
-            {liveKitError && (
-              <div className="card border-red-300 bg-red-50 animate-fadeIn">
-                <div className="panel-label text-red-400">Error</div>
-                <p className="text-sm text-red-700">{liveKitError}</p>
-              </div>
-            )}
+        {selectedFlowId && (
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Wybrany bot:</strong> {flows.find(f => f.id === selectedFlowId)?.name}
+            </p>
+            <p className="text-sm text-blue-700 mt-1">
+              <strong>Tryb:</strong> {mode === 'chat' ? 'Czat tekstowy' : 'Rozmowa głosowa'}
+            </p>
           </div>
-
-          {/* Middle — Transcript */}
-          <div className="lg:col-span-2">
-            <TranscriptDisplay
-              transcript={transcript}
-              isActive={isSessionActive}
-              language={language}
-            />
-          </div>
-
-          {/* Right — Collected Data */}
-          <div className="lg:col-span-1">
-            <CollectedDataPanel data={collectedData} language={language} />
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-notion-border">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <span className="font-mono text-xs text-notion-textLight">
-            LiveKit · ElevenLabs · Gemini 2.5
-          </span>
-          <span className="font-mono text-xs text-notion-textLight">
-            {wsConnected ? '● ws connected' : '○ ws disconnected'}
-          </span>
-        </div>
-      </footer>
+        )}
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

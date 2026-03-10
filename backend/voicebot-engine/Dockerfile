@@ -9,11 +9,8 @@ RUN npm install --only=production
 # Copy source code
 COPY . .
 
-# Build TypeScript
-RUN npm run build
-
-# Expose port (if needed for health checks)
-EXPOSE 3000
+# Build TypeScript (if src/ contains TypeScript)
+# RUN npm run build
 
 # Run the service
-CMD ["node", "dist/index.js"]
+CMD ["node", "src/index.js"]
