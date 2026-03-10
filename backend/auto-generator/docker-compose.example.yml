@@ -1,0 +1,46 @@
+# Example Docker Compose configuration
+# Add this service to your main docker-compose.yml
+
+services:
+  auto-generator:
+    build: ./auto-generator
+    container_name: auto-generator
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - DATABASE_URL=postgresql://postgres:password@db:5432/voicebot
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - AZURE_WHISPER_ENDPOINT=${AZURE_WHISPER_ENDPOINT}
+      - AZURE_WHISPER_API_KEY=${AZURE_WHISPER_API_KEY}
+      - NODE_ENV=production
+    depends_on:
+      - db
+    restart: unless-stopped
+    volumes:
+      - /tmp/uploads:/tmp/uploads
+    networks:
+      - voicebot-network
+
+  # If you don't have a database service yet:
+  # db:
+  #   image: postgres:15-alpine
+  #   container_name: postgres-db
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=password
+  #     - POSTGRES_DB=voicebot
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #     - ./auto-generator/database.sql:/docker-entrypoint-initdb.d/03-auto-generator.sql
+  #   networks:
+  #     - voicebot-network
+
+# volumes:
+#   postgres-data:
+
+# networks:
+#   voicebot-network:
+#     driver: bridge

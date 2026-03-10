@@ -1,0 +1,290 @@
+{
+  "info": {
+    "name": "Auto-Generator Service API",
+    "description": "Generate bot flows and prompts from call recordings",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3003",
+      "type": "string"
+    },
+    {
+      "key": "transcriptId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Check service health status"
+      }
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Upload Audio File",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": "/path/to/audio.wav"
+                },
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Test call recording",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/transcribe",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "transcribe"]
+            },
+            "description": "Upload audio file and transcribe with Azure Whisper"
+          }
+        },
+        {
+          "name": "Upload Transcript Text",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": {{projectId}},\n  \"transcript\": \"Agent: Hello, thank you for calling. How can I help you today?\\nCustomer: Hi, I need to schedule an appointment.\\nAgent: I'd be happy to help. Can I get your name?\\nCustomer: It's John Smith.\\nAgent: Thank you, John. What day works best for you?\\nCustomer: Next Tuesday.\\nAgent: Perfect! What time?\\nCustomer: 10 AM.\\nAgent: Great! You're all set for Tuesday at 10 AM. Have a great day!\\nCustomer: Thank you!\",\n  \"description\": \"Sample appointment scheduling call\",\n  \"source\": \"manual\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/transcript",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "transcript"]
+            },
+            "description": "Upload transcript text directly without audio file"
+          }
+        },
+        {
+          "name": "List Transcripts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/transcripts?projectId={{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "transcripts"],
+              "query": [
+                {
+                  "key": "projectId",
+                  "value": "{{projectId}}"
+                }
+              ]
+            },
+            "description": "List all transcripts, optionally filtered by project"
+          }
+        },
+        {
+          "name": "Get Transcript",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/transcripts/{{transcriptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "transcripts", "{{transcriptId}}"]
+            },
+            "description": "Get a single transcript with full text"
+          }
+        },
+        {
+          "name": "Delete Transcript",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/transcripts/{{transcriptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "transcripts", "{{transcriptId}}"]
+            },
+            "description": "Delete a transcript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generate",
+      "item": [
+        {
+          "name": "Analyze Transcript",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/generate/analyze/{{transcriptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "generate", "analyze", "{{transcriptId}}"]
+            },
+            "description": "Analyze transcript and extract conversation patterns"
+          }
+        },
+        {
+          "name": "Generate Flow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectName\": \"My Voice Bot\",\n  \"optimize\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/generate/flow/{{transcriptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "generate", "flow", "{{transcriptId}}"]
+            },
+            "description": "Generate flow diagram from analyzed pattern"
+          }
+        },
+        {
+          "name": "Generate System Prompt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectName\": \"My Voice Bot\",\n  \"includeValidation\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/generate/prompt/{{transcriptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "generate", "prompt", "{{transcriptId}}"]
+            },
+            "description": "Generate system prompt from analyzed pattern"
+          }
+        },
+        {
+          "name": "Full Generation Wizard",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectName\": \"My Voice Bot\",\n  \"optimize\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/generate/wizard/{{transcriptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "generate", "wizard", "{{transcriptId}}"]
+            },
+            "description": "Complete generation workflow: analyze, generate flow, prompt, and validation rules"
+          }
+        },
+        {
+          "name": "Get Generation History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/generate/history/{{transcriptId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "generate", "history", "{{transcriptId}}"]
+            },
+            "description": "Get generation history for a transcript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Improvements",
+      "item": [
+        {
+          "name": "Analyze Improvements",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"includeFlow\": true,\n  \"includePrompt\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/generate/improvements/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "generate", "improvements", "{{projectId}}"]
+            },
+            "description": "Analyze conversation history and suggest improvements"
+          }
+        },
+        {
+          "name": "Compare Flow Versions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldFlowId\": 1,\n  \"newFlowId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/generate/compare-flows",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "generate", "compare-flows"]
+            },
+            "description": "Compare two flow versions and highlight differences"
+          }
+        }
+      ]
+    }
+  ]
+}

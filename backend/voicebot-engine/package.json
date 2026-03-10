@@ -1,0 +1,32 @@
+{
+  "name": "voicebot-engine",
+  "version": "1.0.0",
+  "description": "Voicebot Engine - LiveKit-based conversational AI service",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "livekit-server-sdk": "^2.15.0",
+    "livekit-client": "^2.5.7",
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "pg": "^8.13.1",
+    "ws": "^8.18.0",
+    "dotenv": "^16.4.7",
+    "form-data": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.2",
+    "ts-node": "^10.9.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

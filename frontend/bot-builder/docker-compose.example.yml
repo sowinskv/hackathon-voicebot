@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  bot-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://api:8000
+    volumes:
+      # Mount source for hot reload in development
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./index.html:/app/index.html
+    depends_on:
+      - api
+    networks:
+      - voicebot-network
+
+  # Example API service (replace with your actual backend)
+  api:
+    image: your-backend-api:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/voicebot
+    networks:
+      - voicebot-network
+
+networks:
+  voicebot-network:
+    driver: bridge
+
+# Usage:
+# 1. Copy this file: cp docker-compose.example.yml docker-compose.yml
+# 2. Adjust API service configuration for your backend
+# 3. Run: docker-compose up -d
+# 4. Access: http://localhost:5173

@@ -1,0 +1,254 @@
+AUTO-GENERATOR SERVICE - Complete File List
+============================================
+
+Created: 2026-03-10
+Location: /home/marcinlojek/hackathon/backend/auto-generator/
+
+CORE APPLICATION FILES (8 TypeScript files, 1493 lines)
+========================================================
+
+1. src/index.ts (main Express server)
+   - Express server setup
+   - Health check endpoint
+   - Route registration
+   - Error handling
+   - API documentation endpoint
+
+2. src/db.ts (database connection)
+   - PostgreSQL connection pool
+   - Query helper functions
+   - Error handling
+   - Connection logging
+
+3. src/transcript-analyzer.ts (AI conversation analysis)
+   - Analyze conversation patterns
+   - Extract conversation stages
+   - Identify data fields
+   - Analyze conversation style
+   - Extract domain knowledge
+
+4. src/flow-generator.ts (flow diagram generation)
+   - Generate flow diagrams from patterns
+   - Create node-based flows
+   - Optimize flows
+   - Generate visualizations
+
+5. src/prompt-generator.ts (system prompt generation)
+   - Generate system prompts
+   - Create response templates
+   - Generate validation rules
+   - Format prompts for deployment
+
+6. src/improvement-suggester.ts (improvement analytics)
+   - Analyze conversation history
+   - Generate improvement suggestions
+   - Compare flow versions
+   - Suggest next steps
+
+7. src/routes/upload.ts (upload endpoints)
+   - Upload audio files
+   - Transcribe with Azure Whisper
+   - Upload text transcripts
+   - List/get/delete transcripts
+
+8. src/routes/generate.ts (generation endpoints)
+   - Analyze transcripts
+   - Generate flows
+   - Generate prompts
+   - Full generation wizard
+   - Improvement suggestions
+   - Compare flows
+
+CONFIGURATION FILES (5 files)
+==============================
+
+1. Dockerfile
+   - Multi-stage Node.js build
+   - Production-optimized image
+   - Port 3003 exposed
+
+2. package.json
+   - Dependencies: express, multer, @google/generative-ai, axios, pg, dotenv
+   - Dev dependencies: TypeScript, types
+   - Build and run scripts
+
+3. tsconfig.json
+   - TypeScript configuration
+   - Strict mode enabled
+   - ES2020 target
+
+4. .env.example
+   - Environment variable template
+   - Database URL, API keys
+   - Port configuration
+
+5. docker-compose.example.yml
+   - Example Docker Compose config
+   - Service definition
+   - Network and volume setup
+
+INFRASTRUCTURE FILES (3 files)
+===============================
+
+1. database.sql
+   - Complete database schema
+   - 9 tables with indexes
+   - Sample data (commented)
+   - Permission grants
+
+2. .dockerignore
+   - Docker build exclusions
+   - node_modules, logs, etc.
+
+3. .gitignore
+   - Git ignore rules
+   - Standard Node.js patterns
+
+DOCUMENTATION FILES (4 files)
+==============================
+
+1. README.md (9608 bytes)
+   - Complete API documentation
+   - Setup instructions
+   - Usage examples
+   - Architecture overview
+
+2. QUICKSTART.md (6382 bytes)
+   - 5-minute setup guide
+   - Step-by-step instructions
+   - Testing examples
+   - Troubleshooting
+
+3. SERVICE-OVERVIEW.md (10898 bytes)
+   - Complete service overview
+   - Features and capabilities
+   - Architecture details
+   - Use cases and integration
+
+4. DEPLOYMENT-CHECKLIST.md (6500+ bytes)
+   - Pre-deployment checklist
+   - Deployment options
+   - Post-deployment tests
+   - Monitoring and maintenance
+
+TESTING & EXAMPLE FILES (3 files)
+==================================
+
+1. example-usage.sh (executable)
+   - Complete workflow demo
+   - Upload transcript
+   - Run wizard
+   - Save results
+
+2. test-audio-upload.sh (executable)
+   - Audio file upload test
+   - Transcription test
+   - Next steps guidance
+
+3. postman-collection.json
+   - Complete Postman collection
+   - All endpoints included
+   - Example requests
+   - Variables configured
+
+SUMMARY
+=======
+
+Total Files: 23
+TypeScript Files: 8 (1493 lines of code)
+Documentation: 4 comprehensive guides
+Configuration: 5 files
+Scripts: 2 executable bash scripts
+Database: 1 complete schema file
+API Collection: 1 Postman collection
+
+FEATURES IMPLEMENTED
+====================
+
+✅ Audio file upload (WAV, MP3, M4A, WebM)
+✅ Azure Whisper transcription
+✅ Manual transcript upload
+✅ AI-powered conversation analysis (Gemini 1.5 Pro)
+✅ Flow diagram generation
+✅ System prompt generation
+✅ Validation rule generation
+✅ Improvement suggestions (bootstrap learning)
+✅ Flow comparison
+✅ Full generation wizard
+✅ PostgreSQL integration
+✅ Docker support
+✅ Health check endpoint
+✅ Complete error handling
+✅ Request logging
+✅ Production-ready configuration
+
+API ENDPOINTS
+=============
+
+Upload Routes (5 endpoints):
+- POST /api/upload/transcribe
+- POST /api/upload/transcript
+- GET /api/upload/transcripts
+- GET /api/upload/transcripts/:id
+- DELETE /api/upload/transcripts/:id
+
+Generate Routes (7 endpoints):
+- POST /api/generate/analyze/:id
+- POST /api/generate/flow/:id
+- POST /api/generate/prompt/:id
+- POST /api/generate/wizard/:id
+- POST /api/generate/improvements/:projectId
+- POST /api/generate/compare-flows
+- GET /api/generate/history/:id
+
+Health:
+- GET /health
+
+Total: 13 API endpoints
+
+QUICK START
+===========
+
+1. Install dependencies:
+   npm install
+
+2. Configure environment:
+   cp .env.example .env
+   # Edit .env with your credentials
+
+3. Setup database:
+   psql -U postgres -d voicebot -f database.sql
+
+4. Run service:
+   npm run dev
+
+5. Test it:
+   ./example-usage.sh
+
+DEPLOYMENT OPTIONS
+==================
+
+Option A: Docker
+docker build -t auto-generator .
+docker run -p 3003:3003 --env-file .env auto-generator
+
+Option B: Docker Compose
+docker-compose up -d auto-generator
+
+Option C: Node.js
+npm run build
+npm start
+
+STATUS
+======
+
+✅ Complete and production-ready
+✅ All requested features implemented
+✅ Comprehensive documentation
+✅ Testing scripts included
+✅ Docker support
+✅ Database schema provided
+✅ Example workflows included
+
+END OF FILE LIST
+================

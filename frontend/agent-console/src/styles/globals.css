@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-notion-text;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-notion-text text-white px-4 py-2 rounded hover:bg-opacity-90 transition-colors font-medium;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-notion-text px-4 py-2 rounded border border-notion-border hover:bg-notion-hover transition-colors font-medium;
+  }
+
+  .btn-success {
+    @apply bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors font-medium;
+  }
+
+  .card {
+    @apply bg-white rounded border border-notion-border p-6;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 text-sm border border-notion-border rounded focus:outline-none focus:border-notion-text transition-all;
+  }
+
+  .badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-green-100 text-green-800;
+  }
+
+  .badge-warning {
+    @apply badge bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-100 text-red-800;
+  }
+
+  .badge-info {
+    @apply badge bg-blue-100 text-blue-800;
+  }
+
+  .badge-gray {
+    @apply badge bg-gray-100 text-gray-800;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-notion-hover;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-notion-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-notion-textLight;
+}
