@@ -30,7 +30,6 @@ function App() {
     sendMessage,
   } = useWebSocket(sessionId)
 
-  // Update session state based on LiveKit connection
   useEffect(() => {
     if (isConnecting) {
       setSessionState('connecting')
@@ -41,7 +40,6 @@ function App() {
     }
   }, [isConnected, isConnecting, liveKitError, sessionState])
 
-  // Process WebSocket messages
   useEffect(() => {
     wsMessages.forEach((message) => {
       if (message.type === 'transcript') {
@@ -88,15 +86,16 @@ function App() {
   const handleEscalate = async () => {
     if (sessionId) {
       try {
-        sendMessage({
-          type: 'escalate',
-          sessionId,
-        })
+        sendMessage({ type: 'escalate', sessionId })
         setSessionState('escalated')
       } catch (error) {
         console.error('Failed to escalate:', error)
       }
     }
+  }
+
+  const handleRetry = () => {
+    setSessionState('idle')
   }
 
   const toggleLanguage = () => {
@@ -106,52 +105,40 @@ function App() {
   const isSessionActive = sessionState === 'active' || sessionState === 'escalated'
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-notion-bg">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Voice Banking Assistant</h1>
-                <p className="text-sm text-gray-500">AI-powered voice support</p>
-              </div>
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+              <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
             </div>
-            <div className="flex items-center gap-4">
-              <SessionStatus state={sessionState} />
-              <button
-                onClick={toggleLanguage}
-                className="btn-secondary text-sm py-2 px-4"
-                disabled={isSessionActive}
-                title={isSessionActive ? 'Cannot change language during active session' : ''}
-              >
-                {language === 'en' ? '🇬🇧 English' : '🇵🇱 Polski'}
-              </button>
+            <div>
+              <h1 className="text-sm font-semibold" style={{ color: '#1a1a1a' }}>Voice Banking Assistant</h1>
+              <p className="text-xs" style={{ color: '#6b6869' }}>AI-powered voice support</p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <SessionStatus state={sessionState} />
+            <button
+              onClick={toggleLanguage}
+              disabled={isSessionActive}
+              className="btn-secondary text-xs py-1.5 px-3 disabled:opacity-30"
+            >
+              {language === 'en' ? '🇬🇧 English' : '🇵🇱 Polski'}
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Controls */}
-          <div className="lg:col-span-1">
+          {/* Left — Controls */}
+          <div className="lg:col-span-1 flex flex-col gap-6">
             <VoiceControls
               sessionState={sessionState}
               isConnected={isConnected}
@@ -159,42 +146,40 @@ function App() {
               onStart={handleStartSession}
               onStop={handleStopSession}
               onEscalate={handleEscalate}
+              onRetry={handleRetry}
               onToggleAudio={toggleAudio}
               language={language}
             />
 
-            {/* Info Card */}
-            <div className="card mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How it works</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary-600 font-bold">1.</span>
-                  <span>Click "Start Session" to begin talking with the AI assistant</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary-600 font-bold">2.</span>
-                  <span>Speak naturally - the assistant understands {language === 'en' ? 'English' : 'Polish'}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary-600 font-bold">3.</span>
-                  <span>If needed, click "Connect to Consultant" for human help</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary-600 font-bold">4.</span>
-                  <span>End the session when your questions are answered</span>
-                </li>
-              </ul>
+            {/* How it works */}
+            <div className="card animate-fadeIn">
+              <h3 className="text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>How it works</h3>
+              <ol className="space-y-3">
+                {[
+                  language === 'en' ? 'Click Start Session to connect' : 'Kliknij Rozpocznij, aby się połączyć',
+                  language === 'en' ? `Speak naturally in ${language === 'en' ? 'English' : 'Polish'}` : 'Mów naturalnie po polsku',
+                  language === 'en' ? 'Say "connect me to a consultant" to escalate' : 'Powiedz „połącz z konsultantem" aby eskalować',
+                  language === 'en' ? 'End the session when finished' : 'Zakończ sesję po rozmowie',
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-notion-textLight">
+                    <span className="font-mono text-coral-500 font-semibold text-xs mt-0.5 flex-shrink-0">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
             </div>
 
             {liveKitError && (
-              <div className="card mt-6 bg-red-50 border border-red-200">
-                <h3 className="text-lg font-semibold text-red-900 mb-2">Connection Error</h3>
+              <div className="card border-red-300 bg-red-50 animate-fadeIn">
+                <div className="panel-label text-red-400">Error</div>
                 <p className="text-sm text-red-700">{liveKitError}</p>
               </div>
             )}
           </div>
 
-          {/* Right Column - Transcript */}
+          {/* Right — Transcript */}
           <div className="lg:col-span-2">
             <TranscriptDisplay
               transcript={transcript}
@@ -206,11 +191,14 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <p className="text-center text-sm text-gray-500">
-            Powered by LiveKit & OpenAI | Voice Banking Assistant 2026
-          </p>
+      <footer className="border-t border-notion-border">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <span className="font-mono text-xs text-notion-textLight">
+            LiveKit · ElevenLabs · Gemini 2.5
+          </span>
+          <span className="font-mono text-xs text-notion-textLight">
+            {wsConnected ? '● ws connected' : '○ ws disconnected'}
+          </span>
         </div>
       </footer>
     </div>
