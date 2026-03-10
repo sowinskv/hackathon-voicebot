@@ -37,7 +37,7 @@ Inspired by `ui-inspo/`:
 | Audio visualizer | ✅ Done | 16-bar Web Audio API visualizer, reacts to mic |
 | Session timer | ✅ Done | Elapsed MM:SS, warning at 9min, auto-stop at 10min |
 | Collected data panel | ✅ Done | 6 OC fields, progress bar, fed by WS slot_update messages |
-| Post-call satisfaction survey | ⬜ Todo | 5-point scale, shown on `completed` |
+| Post-call satisfaction survey | ✅ Done | 5-star modal on completed, optional comment, posts to API |
 | End-of-call next steps | ⬜ Todo | What the user should do after |
 | Error retry button | ⬜ Todo | Currently stuck on error state |
 | Session limit warning | ⬜ Todo | Alert at 9 min / terminate at 10 |

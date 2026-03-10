@@ -3,6 +3,7 @@ import VoiceControls from './components/VoiceControls'
 import TranscriptDisplay from './components/TranscriptDisplay'
 import SessionStatus from './components/SessionStatus'
 import CollectedDataPanel, { CollectedData } from './components/CollectedDataPanel'
+import SatisfactionSurvey from './components/SatisfactionSurvey'
 import { useLiveKit } from './hooks/useLiveKit'
 import { useWebSocket } from './hooks/useWebSocket'
 
@@ -15,6 +16,7 @@ function App() {
   const [sessionState, setSessionState] = useState<SessionState>('idle')
   const [transcript, setTranscript] = useState<Array<{ role: 'user' | 'assistant', text: string, timestamp: Date }>>([])
   const [collectedData, setCollectedData] = useState<CollectedData>({})
+  const [showSurvey, setShowSurvey] = useState(false)
 
   const {
     isConnected,
@@ -42,6 +44,13 @@ function App() {
       setSessionState('error')
     }
   }, [isConnected, isConnecting, liveKitError, sessionState])
+
+  // Show survey when session completes
+  useEffect(() => {
+    if (sessionState === 'completed') {
+      setShowSurvey(true)
+    }
+  }, [sessionState])
 
   useEffect(() => {
     wsMessages.forEach((message) => {
@@ -120,6 +129,13 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-notion-bg">
+      {showSurvey && (
+        <SatisfactionSurvey
+          sessionId={sessionId}
+          language={language}
+          onDismiss={() => setShowSurvey(false)}
+        />
+      )}
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
