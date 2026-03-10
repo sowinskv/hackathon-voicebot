@@ -122,7 +122,62 @@ Instructions:
 
 4. Create a simple collection sequence ordering the fields logically
 
-5. For the flow, keep nodes and edges empty arrays (visual flow not needed yet)
+5. For the flow, generate a visual flow with nodes and edges:
+
+   IMPORTANT: Analyze if the description requires BRANCHING (conditional paths):
+   - Look for keywords: "depending on", "based on", "if", "different", "various types", "categories"
+   - Look for scenarios where different answers lead to different follow-up questions
+
+   IF BRANCHING IS NEEDED (e.g., "different questions based on animal species"):
+   - Start with a "start" node at (100, 100)
+   - Create question nodes for initial common fields
+   - Create a "branch" node (type: "branch") at the decision point with data:
+     {
+       label: "Branch based on [field]",
+       field: "field_name_to_branch_on",
+       branches: [
+         { id: "option1", name: "Option 1 Name", condition: "value1" },
+         { id: "option2", name: "Option 2 Name", condition: "value2" }
+       ]
+     }
+   - For each branch, create separate paths with question nodes positioned horizontally:
+     - Branch 1 path at x = -100 to -200 (left side)
+     - Branch 2 path at x = 300 to 400 (right side)
+   - Merge branches back to a confirmation node
+   - Create edges with sourceHandle: "branch-option1", "branch-option2", etc.
+
+   IF NO BRANCHING NEEDED (simple linear flow):
+   - Start with a "start" node at (100, 100)
+   - For each field, create a "message" node at (100, 250 + index*150)
+   - Add a "confirmation" node after all questions
+   - Add an "end" node at the final position
+   - Create simple edges connecting nodes in sequence
+
+   Node types and required data fields:
+   - "start": { label: "Start", message: "Welcome message in ${language}" }
+   - "message": { label: "Short title", message: "Full message/question in ${language}" }
+   - "slotCollection": { label: "Collect [field]", slots: ["field1", "field2"], prompt: "Question in ${language}" }
+   - "validation": { label: "Validate [field]", field: "field_name" }
+   - "confirmation": { label: "Confirmation", message: "Confirmation question in ${language}" }
+   - "branch": { label: "Branch: [decision]", description: "Why branching", field: "field_name", branches: [{id, name, condition}] }
+   - "escalation": { label: "Escalate to Agent", reason: "Why escalating" }
+   - "end": { label: "End", message: "Goodbye message in ${language}" }
+
+   CRITICAL: Every node MUST have data.label (short title) and data.message or data.prompt (full text in ${language})
+
+   Example node structure:
+   {
+     "id": "node-1",
+     "type": "message",
+     "position": { "x": 100, "y": 250 },
+     "data": {
+       "label": "Ask Name",
+       "message": "${language === 'pl' ? 'Jak się nazywasz?' : 'What is your name?'}"
+     }
+   }
+
+   Each node: { id: string, type: string, position: {x: number, y: number}, data: {...required fields above} }
+   Each edge: { id: string, source: string, target: string, sourceHandle?: string, targetHandle?: string }
 
 Return ONLY valid JSON, no markdown formatting or explanations.`;
 
