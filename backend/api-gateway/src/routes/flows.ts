@@ -8,8 +8,15 @@ interface Flow {
   id: string;
   name: string;
   description?: string;
-  configuration: any;
-  is_active: boolean;
+  version: number;
+  status: 'draft' | 'published' | 'archived';
+  language: 'pl' | 'en';
+  system_prompt: string;
+  flow_definition: any;
+  required_fields: any[];
+  validation_rules?: any;
+  created_by?: string;
+  published_at?: Date;
   created_at: Date;
   updated_at: Date;
 }
@@ -18,19 +25,25 @@ interface Flow {
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { is_active, limit = 100, offset = 0 } = req.query;
+    const { status, language, limit = 100, offset = 0 } = req.query;
 
     let queryText = 'SELECT * FROM flows WHERE 1=1';
     const params: any[] = [];
     let paramCount = 1;
 
-    if (is_active !== undefined) {
-      queryText += ` AND is_active = $${paramCount}`;
-      params.push(is_active === 'true');
+    if (status) {
+      queryText += ` AND status = $${paramCount}`;
+      params.push(status);
       paramCount++;
     }
 
-    queryText += ` ORDER BY created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    if (language) {
+      queryText += ` AND language = $${paramCount}`;
+      params.push(language);
+      paramCount++;
+    }
+
+    queryText += ` ORDER BY updated_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
     params.push(limit, offset);
 
     const result = await query<Flow>(queryText, params);
@@ -66,28 +79,48 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { name, description, configuration, is_active = true } = req.body;
+    const {
+      name,
+      description,
+      language = 'pl',
+      system_prompt,
+      flow_definition,
+      required_fields,
+      validation_rules,
+      status = 'draft',
+    } = req.body;
 
     if (!name) {
       throw new AppError('Name is required', 400);
     }
 
-    if (!configuration) {
-      throw new AppError('Configuration is required', 400);
+    if (!system_prompt) {
+      throw new AppError('System prompt is required', 400);
     }
 
-    // Validate configuration is valid JSON
-    if (typeof configuration !== 'object') {
-      throw new AppError('Configuration must be a valid JSON object', 400);
+    if (!required_fields || !Array.isArray(required_fields)) {
+      throw new AppError('Required fields must be an array', 400);
     }
 
     const result = await query<Flow>(
       `
-      INSERT INTO flows (name, description, configuration, is_active)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO flows (
+        name, description, language, system_prompt,
+        flow_definition, required_fields, validation_rules, status
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `,
-      [name, description || null, JSON.stringify(configuration), is_active]
+      [
+        name,
+        description || null,
+        language,
+        system_prompt,
+        JSON.stringify(flow_definition || {}),
+        JSON.stringify(required_fields),
+        JSON.stringify(validation_rules || {}),
+        status,
+      ]
     );
 
     res.status(201).json({
@@ -102,10 +135,19 @@ router.put(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { name, description, configuration, is_active } = req.body;
+    const {
+      name,
+      description,
+      system_prompt,
+      flow_definition,
+      required_fields,
+      validation_rules,
+      status,
+      language,
+    } = req.body;
 
     // Check if flow exists
-    const existingFlow = await query('SELECT id FROM flows WHERE id = $1', [id]);
+    const existingFlow = await query('SELECT id, status FROM flows WHERE id = $1', [id]);
 
     if (existingFlow.rows.length === 0) {
       throw new AppError('Flow not found', 404);
@@ -128,18 +170,50 @@ router.put(
       paramCount++;
     }
 
-    if (configuration !== undefined) {
-      if (typeof configuration !== 'object') {
-        throw new AppError('Configuration must be a valid JSON object', 400);
-      }
-      updates.push(`configuration = $${paramCount}`);
-      params.push(JSON.stringify(configuration));
+    if (system_prompt !== undefined) {
+      updates.push(`system_prompt = $${paramCount}`);
+      params.push(system_prompt);
       paramCount++;
     }
 
-    if (is_active !== undefined) {
-      updates.push(`is_active = $${paramCount}`);
-      params.push(is_active);
+    if (flow_definition !== undefined) {
+      updates.push(`flow_definition = $${paramCount}`);
+      params.push(JSON.stringify(flow_definition));
+      paramCount++;
+    }
+
+    if (required_fields !== undefined) {
+      if (!Array.isArray(required_fields)) {
+        throw new AppError('Required fields must be an array', 400);
+      }
+      updates.push(`required_fields = $${paramCount}`);
+      params.push(JSON.stringify(required_fields));
+      paramCount++;
+    }
+
+    if (validation_rules !== undefined) {
+      updates.push(`validation_rules = $${paramCount}`);
+      params.push(JSON.stringify(validation_rules));
+      paramCount++;
+    }
+
+    if (status !== undefined) {
+      if (!['draft', 'published', 'archived'].includes(status)) {
+        throw new AppError('Invalid status', 400);
+      }
+      updates.push(`status = $${paramCount}`);
+      params.push(status);
+      paramCount++;
+
+      // If publishing, set published_at
+      if (status === 'published' && existingFlow.rows[0].status !== 'published') {
+        updates.push(`published_at = NOW()`);
+      }
+    }
+
+    if (language !== undefined) {
+      updates.push(`language = $${paramCount}`);
+      params.push(language);
       paramCount++;
     }
 
