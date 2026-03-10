@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import VoiceControls from './components/VoiceControls'
 import TranscriptDisplay from './components/TranscriptDisplay'
 import SessionStatus from './components/SessionStatus'
+import CollectedDataPanel, { CollectedData } from './components/CollectedDataPanel'
 import { useLiveKit } from './hooks/useLiveKit'
 import { useWebSocket } from './hooks/useWebSocket'
 
@@ -13,6 +14,7 @@ function App() {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [sessionState, setSessionState] = useState<SessionState>('idle')
   const [transcript, setTranscript] = useState<Array<{ role: 'user' | 'assistant', text: string, timestamp: Date }>>([])
+  const [collectedData, setCollectedData] = useState<CollectedData>({})
 
   const {
     isConnected,
@@ -43,7 +45,9 @@ function App() {
 
   useEffect(() => {
     wsMessages.forEach((message) => {
-      if (message.type === 'transcript') {
+      if (message.type === 'slot_update' && message.field && message.value) {
+        setCollectedData((prev) => ({ ...prev, [message.field]: message.value }))
+      } else if (message.type === 'transcript') {
         setTranscript((prev) => [
           ...prev,
           {
@@ -68,6 +72,7 @@ function App() {
       const newSessionId = await connect(language)
       setSessionId(newSessionId)
       setTranscript([])
+      setCollectedData({})
     } catch (error) {
       console.error('Failed to start session:', error)
       setSessionState('error')
@@ -145,7 +150,7 @@ function App() {
 
       {/* Main */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left — Controls */}
           <div className="lg:col-span-1 flex flex-col gap-6">
             <VoiceControls
@@ -190,13 +195,18 @@ function App() {
             )}
           </div>
 
-          {/* Right — Transcript */}
+          {/* Middle — Transcript */}
           <div className="lg:col-span-2">
             <TranscriptDisplay
               transcript={transcript}
               isActive={isSessionActive}
               language={language}
             />
+          </div>
+
+          {/* Right — Collected Data */}
+          <div className="lg:col-span-1">
+            <CollectedDataPanel data={collectedData} language={language} />
           </div>
         </div>
       </main>

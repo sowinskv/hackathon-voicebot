@@ -36,7 +36,7 @@ Inspired by `ui-inspo/`:
 | **Visual redesign** | ✅ Done | Cream bg, dark header, coral CTA, mono fonts, panel labels |
 | Audio visualizer | ✅ Done | 16-bar Web Audio API visualizer, reacts to mic |
 | Session timer | ✅ Done | Elapsed MM:SS, warning at 9min, auto-stop at 10min |
-| Collected data panel | ⬜ Todo | OC slot-filling progress display |
+| Collected data panel | ✅ Done | 6 OC fields, progress bar, fed by WS slot_update messages |
 | Post-call satisfaction survey | ⬜ Todo | 5-point scale, shown on `completed` |
 | End-of-call next steps | ⬜ Todo | What the user should do after |
 | Error retry button | ⬜ Todo | Currently stuck on error state |
