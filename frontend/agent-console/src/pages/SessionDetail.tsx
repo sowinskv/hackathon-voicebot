@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSession } from '../hooks/useSessions';
 import { TranscriptViewer } from '../components/TranscriptViewer';
@@ -6,6 +6,7 @@ import { DataFieldsDisplay } from '../components/DataFieldsDisplay';
 import { AudioPlayer } from '../components/AudioPlayer';
 import { NotesEditor } from '../components/NotesEditor';
 import { formatDistanceToNow } from 'date-fns';
+import { MetricsContext } from '../App';
 
 const statusColors = {
   active: 'badge-info',
@@ -22,6 +23,9 @@ export function SessionDetail() {
   );
   const [resolving, setResolving] = useState(false);
 
+  // Get the metrics refresh function from context
+  const { refreshMetrics } = useContext(MetricsContext);
+
   const handleMarkResolved = async () => {
     if (!window.confirm('Are you sure you want to mark this case as resolved?')) {
       return;
@@ -30,7 +34,11 @@ export function SessionDetail() {
     try {
       setResolving(true);
       await markResolved(session?.agent_notes);
-      // Refresh to show updated status
+
+      // Refresh metrics to update dashboard statistics
+      await refreshMetrics();
+      console.log('Session resolved, metrics refreshed');
+
     } catch (err) {
       alert('Failed to mark as resolved. Please try again.');
     } finally {
@@ -121,10 +129,10 @@ export function SessionDetail() {
             Back to Sessions
           </button>
           <h1 className="text-3xl font-bold text-gray-900">
-            Session {session.session_id}
+            Session {session.session_id || session.id}
           </h1>
           <p className="text-gray-600 mt-1">
-            Started {formatDistanceToNow(new Date(session.start_time), { addSuffix: true })}
+            Started {formatDistanceToNow(new Date(session.start_time || session.started_at), { addSuffix: true })}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -283,7 +291,10 @@ export function SessionDetail() {
             <h3 className="font-semibold text-gray-900 mb-4">Notes</h3>
             <NotesEditor
               initialNotes={session.agent_notes}
-              onSave={updateNotes}
+              onSave={async (notes) => {
+                await updateNotes(notes);
+                await refreshMetrics(); // Refresh metrics after updating notes
+              }}
               readOnly={session.status === 'resolved'}
             />
           </div>

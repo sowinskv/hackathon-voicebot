@@ -8,6 +8,7 @@ import sessionsRouter from './routes/sessions';
 import voiceSessionsRouter from './routes/voice-sessions';
 import flowsRouter from './routes/flows';
 import analyticsRouter from './routes/analytics';
+import metricsRouter from './routes/metrics';
 import livekitRouter from './routes/livekit';
 import botRouter from './routes/bot';
 import voiceRouter from './routes/voice';
@@ -74,6 +75,7 @@ app.use('/api/sessions', sessionsRouter);
 app.use('/api/voice-sessions', voiceSessionsRouter);
 app.use('/api/flows', flowsRouter);
 app.use('/api/analytics', analyticsRouter);
+app.use('/api/metrics', metricsRouter);
 app.use('/api/livekit', livekitRouter);
 app.use('/api/bot', botRouter);
 app.use('/api/voice', voiceRouter);
@@ -89,6 +91,7 @@ app.get('/', (req: Request, res: Response) => {
       sessions: '/api/sessions',
       flows: '/api/flows',
       analytics: '/api/analytics',
+      metrics: '/api/metrics',
       livekit: '/api/livekit',
       bot: '/api/bot',
       websocket: '/ws',

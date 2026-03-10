@@ -1,32 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { MetricsWidget } from '../components/MetricsWidget';
 import { SessionCard } from '../components/SessionCard';
 import { useSessions } from '../hooks/useSessions';
-import { api, SessionMetrics } from '../services/api';
+import { useMetrics } from '../hooks/useMetrics';
 
 export function Dashboard() {
   const { sessions, loading: sessionsLoading } = useSessions('escalated');
-  const [metrics, setMetrics] = useState<SessionMetrics | null>(null);
-  const [metricsLoading, setMetricsLoading] = useState(true);
+  const { metrics, loading: metricsLoading, lastUpdated } = useMetrics(10000);
 
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const data = await api.getMetrics();
-        setMetrics(data);
-      } catch (error) {
-        console.error('Failed to fetch metrics:', error);
-      } finally {
-        setMetricsLoading(false);
-      }
-    };
-
-    fetchMetrics();
-    const interval = setInterval(fetchMetrics, 30000); // Refresh every 30s
-
-    return () => clearInterval(interval);
-  }, []);
+  // Log metrics updates for debugging
+  React.useEffect(() => {
+    if (lastUpdated) {
+      console.log(`Dashboard metrics updated at: ${lastUpdated.toLocaleTimeString()}`);
+    }
+  }, [lastUpdated]);
 
   if (metricsLoading || sessionsLoading) {
     return (
@@ -59,11 +47,27 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">
-          Overview of your Voice AI system performance
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">
+            Overview of your Voice AI system performance
+          </p>
+        </div>
+
+        {lastUpdated && (
+          <div className="text-xs text-gray-500 flex items-center gap-1">
+            <svg className={`w-3 h-3 ${metricsLoading ? 'text-primary-400 animate-spin' : 'text-green-500'}`}
+                fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+            </svg>
+            <span>
+              {metricsLoading
+                ? "Updating metrics..."
+                : `Updated: ${lastUpdated.toLocaleTimeString()}`}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Metrics Grid */}
@@ -73,6 +77,7 @@ export function Dashboard() {
           value={metrics?.total_sessions || 0}
           subtitle="All time"
           color="blue"
+          loading={metricsLoading}
           icon={
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
@@ -85,6 +90,7 @@ export function Dashboard() {
           value={metrics?.active_sessions || 0}
           subtitle="Currently in progress"
           color="green"
+          loading={metricsLoading}
           icon={
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -101,6 +107,7 @@ export function Dashboard() {
           value={`${((metrics?.escalation_rate || 0) * 100).toFixed(1)}%`}
           subtitle={`${metrics?.escalated_today || 0} today`}
           color="red"
+          loading={metricsLoading}
           icon={
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -117,6 +124,7 @@ export function Dashboard() {
           value={`${(metrics?.avg_satisfaction || 0).toFixed(1)}/5.0`}
           subtitle="Customer rating"
           color="purple"
+          loading={metricsLoading}
           icon={
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -128,30 +136,49 @@ export function Dashboard() {
       {/* Additional Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card">
-          <h3 className="text-sm font-medium text-gray-600 mb-2">
-            Avg Call Duration
-          </h3>
-          <p className="text-2xl font-bold text-gray-900">
-            {Math.floor((metrics?.avg_duration || 0) / 60)}m{' '}
-            {Math.floor((metrics?.avg_duration || 0) % 60)}s
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">
+              Avg Call Duration
+            </h3>
+            {metricsLoading && (
+              <div className="w-2 h-2 rounded-full bg-primary-200 animate-pulse" />
+            )}
+          </div>
+          <p className={`text-2xl font-bold ${metricsLoading ? 'text-gray-400' : 'text-gray-900'}`}>
+            {metricsLoading ? "..." : (
+              <>
+                {Math.floor((metrics?.avg_duration || 0) / 60)}m{' '}
+                {Math.floor((metrics?.avg_duration || 0) % 60)}s
+              </>
+            )}
           </p>
         </div>
 
         <div className="card">
-          <h3 className="text-sm font-medium text-gray-600 mb-2">
-            Completed Today
-          </h3>
-          <p className="text-2xl font-bold text-gray-900">
-            {metrics?.completed_today || 0}
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">
+              Completed Today
+            </h3>
+            {metricsLoading && (
+              <div className="w-2 h-2 rounded-full bg-primary-200 animate-pulse" />
+            )}
+          </div>
+          <p className={`text-2xl font-bold ${metricsLoading ? 'text-gray-400' : 'text-gray-900'}`}>
+            {metricsLoading ? "..." : metrics?.completed_today || 0}
           </p>
         </div>
 
         <div className="card">
-          <h3 className="text-sm font-medium text-gray-600 mb-2">
-            Escalated Today
-          </h3>
-          <p className="text-2xl font-bold text-gray-900">
-            {metrics?.escalated_today || 0}
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">
+              Escalated Today
+            </h3>
+            {metricsLoading && (
+              <div className="w-2 h-2 rounded-full bg-primary-200 animate-pulse" />
+            )}
+          </div>
+          <p className={`text-2xl font-bold ${metricsLoading ? 'text-gray-400' : 'text-gray-900'}`}>
+            {metricsLoading ? "..." : metrics?.escalated_today || 0}
           </p>
         </div>
       </div>
@@ -192,10 +219,10 @@ export function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {sessions.slice(0, 4).map(session => (
               <SessionCard
-                key={session.session_id}
+                key={session.session_id || session.id}
                 session={session}
                 onClick={() => {
-                  window.location.href = `/sessions/${session.session_id}`;
+                  window.location.href = `/sessions/${session.session_id || session.id}`;
                 }}
               />
             ))}

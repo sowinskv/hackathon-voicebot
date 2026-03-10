@@ -32,8 +32,9 @@ export function useSessions(
   }, [fetchSessions]);
 
   const updateSession = useCallback((updatedSession: Session) => {
+    const sessionId = updatedSession.session_id || updatedSession.id;
     setSessions(prev =>
-      prev.map(s => s.session_id === updatedSession.session_id ? updatedSession : s)
+      prev.map(s => (s.session_id || s.id) === sessionId ? updatedSession : s)
     );
   }, []);
 
