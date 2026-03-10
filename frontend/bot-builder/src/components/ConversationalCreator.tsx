@@ -170,7 +170,7 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
             <button
               onClick={() => handleGenerate()}
               disabled={isGenerating || !description.trim()}
-              className="px-8 py-4 bg-primary text-white rounded-xl font-semibold text-lg shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-4 bg-ink text-white rounded-xl font-semibold text-lg shadow-lg hover:opacity-80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
                 <span className="flex items-center gap-3">
@@ -253,7 +253,7 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
             <button
               onClick={handleRefinement}
               disabled={isGenerating || !refinement.trim()}
-              className="px-8 py-4 bg-primary text-white rounded-xl font-semibold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-4 bg-ink text-white rounded-xl font-semibold shadow-lg hover:opacity-80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
                 <span className="flex items-center gap-3">

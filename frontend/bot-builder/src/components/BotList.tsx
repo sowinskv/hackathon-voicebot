@@ -155,7 +155,7 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
         </div>
         <button
           onClick={onCreateNew}
-          className="flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition"
+          className="flex items-center gap-2 px-5 py-3 bg-ink text-white rounded-lg hover:opacity-80 transition font-medium"
         >
           <Plus className="w-5 h-5" />
           Utwórz nowego bota
@@ -191,7 +191,7 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
           </p>
           <button
             onClick={onCreateNew}
-            className="px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition"
+            className="px-6 py-3 bg-ink text-white rounded-lg hover:opacity-80 transition font-medium"
           >
             Utwórz pierwszego bota
           </button>

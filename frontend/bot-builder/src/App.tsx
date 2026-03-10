@@ -94,6 +94,7 @@ function App() {
       return;
     }
     setView('list');
+    setShowAdvanced(false);
   };
 
   const handleSave = async () => {
@@ -265,7 +266,7 @@ function App() {
               <button
                 onClick={handlePublish}
                 disabled={!config}
-                className="px-5 py-2 text-sm text-white bg-primary rounded-lg hover:opacity-90 disabled:opacity-50"
+                className="px-5 py-2 text-sm text-white bg-ink rounded-lg hover:opacity-80 disabled:opacity-50 font-medium"
               >
                 Opublikuj
               </button>
