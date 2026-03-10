@@ -57,10 +57,13 @@ function App() {
   };
 
   if (inCall && selectedFlowId) {
+    const selectedFlow = flows.find(f => f.id === selectedFlowId);
+    const language = selectedFlow?.language || 'en';
+
     if (mode === 'chat') {
       return <ChatMode flowId={selectedFlowId} onEnd={endCall} />;
     } else {
-      return <PipecatVoiceCall flowId={selectedFlowId} onEnd={endCall} />;
+      return <PipecatVoiceCall flowId={selectedFlowId} language={language} onEnd={endCall} />;
     }
   }
 
