@@ -9,12 +9,14 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useFlowState } from '@/hooks/useFlowState';
+import { useLanguage } from '@/i18n/LanguageContext';
 import { nodeTypes } from './NodeTypes';
 import { Toolbar } from './Toolbar';
 import { Inspector } from './Inspector';
 import { ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 
 const FlowCanvas: React.FC = () => {
+  const { t } = useLanguage();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition, fitView } = useReactFlow();
 
@@ -107,7 +109,7 @@ const FlowCanvas: React.FC = () => {
             <button
               onClick={handleFitView}
               className="btn btn-secondary flex items-center gap-2"
-              title="Fit view"
+              title={t('flow.canvas.fitView')}
             >
               <Maximize className="w-4 h-4" />
             </button>
@@ -117,9 +119,9 @@ const FlowCanvas: React.FC = () => {
         {nodes.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center p-8 bg-white rounded-lg shadow-lg border-2 border-dashed border-gray-300">
-              <p className="text-gray-600 mb-2">Your canvas is empty</p>
+              <p className="text-gray-600 mb-2">{t('flow.canvas.empty')}</p>
               <p className="text-sm text-gray-500">
-                Drag nodes from the palette or click to add them
+                {t('flow.canvas.empty.hint')}
               </p>
             </div>
           </div>

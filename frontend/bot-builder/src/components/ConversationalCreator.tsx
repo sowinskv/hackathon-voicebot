@@ -24,16 +24,16 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
 
   const examples = [
     {
-      title: 'Zgłoszenie szkody OC',
-      text: 'Chcę bota który zbiera informacje o szkodzie komunikacyjnej OC. Powinien zapytać o datę zdarzenia, numer rejestracyjny pojazdu sprawcy, dane zgłaszającego (imię, nazwisko, email, telefon, adres), opis zdarzenia, miejsce zdarzenia i zakres uszkodzeń. Bot powinien być empatyczny ale rzeczowy.',
+      title: t('creator.example1.title'),
+      text: t('creator.example1.text'),
     },
     {
-      title: 'Wsparcie techniczne',
-      text: 'Potrzebuję bota do wsparcia technicznego. Powinien zebrać: imię i nazwisko, email, numer telefonu, kategorię problemu (techniczny/płatności/inny), opis problemu i pilność. Bot powinien być przyjazny i pomocny.',
+      title: t('creator.example2.title'),
+      text: t('creator.example2.text'),
     },
     {
-      title: 'Rezerwacja wizyt',
-      text: 'Bot do umawiania wizyt lekarskich. Zbiera: imię i nazwisko, pesel, telefon, preferowana data i godzina, powód wizyty. Bot powinien być ciepły i pomocny.',
+      title: t('creator.example3.title'),
+      text: t('creator.example3.text'),
     },
   ];
 

@@ -1,7 +1,7 @@
 export const translations = {
   pl: {
     // Header
-    'header.botBuilder': 'Bot Builder',
+    'header.botBuilder': 'Kreator Botów',
     'header.backToList': 'Lista botów',
     'header.showAdvanced': 'Pokaż zaawansowane',
     'header.hideAdvanced': 'Ukryj',
@@ -64,6 +64,12 @@ export const translations = {
     'creator.refine.update': 'Zaktualizuj bota',
     'creator.refine.updating': 'Aktualizuję...',
     'creator.history': 'Historia zmian',
+    'creator.example1.title': 'Zgłoszenie szkody OC',
+    'creator.example1.text': 'Chcę bota który zbiera informacje o szkodzie komunikacyjnej OC. Powinien zapytać o datę zdarzenia, numer rejestracyjny pojazdu sprawcy, dane zgłaszającego (imię, nazwisko, email, telefon, adres), opis zdarzenia, miejsce zdarzenia i zakres uszkodzeń. Bot powinien być empatyczny ale rzeczowy.',
+    'creator.example2.title': 'Wsparcie techniczne',
+    'creator.example2.text': 'Potrzebuję bota do wsparcia technicznego. Powinien zebrać: imię i nazwisko, email, numer telefonu, kategorię problemu (techniczny/płatności/inny), opis problemu i pilność. Bot powinien być przyjazny i pomocny.',
+    'creator.example3.title': 'Rezerwacja wizyt',
+    'creator.example3.text': 'Bot do umawiania wizyt lekarskich. Zbiera: imię i nazwisko, pesel, telefon, preferowana data i godzina, powód wizyty. Bot powinien być ciepły i pomocny.',
 
     // Prompt Tab
     'prompt.title': 'System Prompt',
@@ -76,6 +82,43 @@ export const translations = {
     'fields.validation.max': 'Max:',
     'fields.validation.pattern': 'Pattern:',
     'fields.validation.error': 'Error:',
+
+    // Flow Tab
+    'flow.canvas.empty': 'Twoje płótno jest puste',
+    'flow.canvas.empty.hint': 'Przeciągnij węzły z palety lub kliknij aby je dodać',
+    'flow.canvas.fitView': 'Dopasuj widok',
+    'flow.toolbar.title': 'Paleta węzłów',
+    'flow.toolbar.tip': 'Przeciągnij i upuść węzły na płótno lub kliknij aby dodać na środku.',
+    'flow.node.start': 'Start',
+    'flow.node.start.desc': 'Punkt startowy',
+    'flow.node.message': 'Wiadomość',
+    'flow.node.message.desc': 'Wyślij wiadomość',
+    'flow.node.fieldGroup': 'Grupa pól',
+    'flow.node.fieldGroup.desc': 'Zbieraj wiele pól',
+    'flow.node.branch': 'Rozgałęzienie',
+    'flow.node.branch.desc': 'Warunkowe rozgałęzienie',
+    'flow.node.slotCollection': 'Zbieranie slotów',
+    'flow.node.slotCollection.desc': 'Zbierz informacje',
+    'flow.node.validation': 'Walidacja',
+    'flow.node.validation.desc': 'Waliduj dane',
+    'flow.node.confirmation': 'Potwierdzenie',
+    'flow.node.confirmation.desc': 'Potwierdź z użytkownikiem',
+    'flow.node.escalation': 'Eskalacja',
+    'flow.node.escalation.desc': 'Przekaż do agenta',
+    'flow.node.end': 'Koniec',
+    'flow.node.end.desc': 'Zakończ rozmowę',
+
+    // Test Tab
+    'test.title': 'Konsola testowa',
+    'test.subtitle': 'Przetestuj konfigurację swojego bota w symulowanym środowisku.',
+    'test.comingSoon': 'Konsola testowa wkrótce...',
+    'test.comingSoon.hint': 'Ta funkcja pozwoli Ci testować rozmowy przed publikacją.',
+
+    // Versions Tab
+    'versions.title': 'Historia wersji',
+    'versions.subtitle': 'Zobacz i przywróć poprzednie wersje konfiguracji bota.',
+    'versions.empty': 'Brak zapisanych wersji',
+    'versions.empty.hint': 'Zapisz swojego bota aby utworzyć historię wersji.',
 
     // Common
     'common.unsavedChanges': 'Masz niezapisane zmiany. Czy na pewno chcesz wrócić?',
@@ -150,6 +193,12 @@ export const translations = {
     'creator.refine.update': 'Update bot',
     'creator.refine.updating': 'Updating...',
     'creator.history': 'Change history',
+    'creator.example1.title': 'Car Insurance Claim',
+    'creator.example1.text': 'I want a bot that collects information about car insurance claims. It should ask about the incident date, license plate number of the responsible party, reporter details (name, surname, email, phone, address), incident description, location, and extent of damage. The bot should be empathetic but professional.',
+    'creator.example2.title': 'Technical Support',
+    'creator.example2.text': 'I need a bot for technical support. It should collect: name and surname, email, phone number, problem category (technical/payment/other), problem description, and urgency. The bot should be friendly and helpful.',
+    'creator.example3.title': 'Appointment Booking',
+    'creator.example3.text': 'Bot for booking medical appointments. Collects: name and surname, ID number, phone, preferred date and time, reason for visit. The bot should be warm and helpful.',
 
     // Prompt Tab
     'prompt.title': 'System Prompt',
@@ -162,6 +211,43 @@ export const translations = {
     'fields.validation.max': 'Max:',
     'fields.validation.pattern': 'Pattern:',
     'fields.validation.error': 'Error:',
+
+    // Flow Tab
+    'flow.canvas.empty': 'Your canvas is empty',
+    'flow.canvas.empty.hint': 'Drag nodes from the palette or click to add them',
+    'flow.canvas.fitView': 'Fit view',
+    'flow.toolbar.title': 'Node Palette',
+    'flow.toolbar.tip': 'Drag and drop nodes onto the canvas or click to add at the center.',
+    'flow.node.start': 'Start',
+    'flow.node.start.desc': 'Starting point',
+    'flow.node.message': 'Message',
+    'flow.node.message.desc': 'Send a message',
+    'flow.node.fieldGroup': 'Field Group',
+    'flow.node.fieldGroup.desc': 'Collect multiple fields',
+    'flow.node.branch': 'Branch',
+    'flow.node.branch.desc': 'Conditional branching',
+    'flow.node.slotCollection': 'Slot Collection',
+    'flow.node.slotCollection.desc': 'Collect information',
+    'flow.node.validation': 'Validation',
+    'flow.node.validation.desc': 'Validate input',
+    'flow.node.confirmation': 'Confirmation',
+    'flow.node.confirmation.desc': 'Confirm with user',
+    'flow.node.escalation': 'Escalation',
+    'flow.node.escalation.desc': 'Transfer to agent',
+    'flow.node.end': 'End',
+    'flow.node.end.desc': 'End conversation',
+
+    // Test Tab
+    'test.title': 'Test Console',
+    'test.subtitle': 'Test your bot configuration in a simulated environment.',
+    'test.comingSoon': 'Test console coming soon...',
+    'test.comingSoon.hint': 'This feature will allow you to test conversations before publishing.',
+
+    // Versions Tab
+    'versions.title': 'Version History',
+    'versions.subtitle': 'View and restore previous versions of your bot configuration.',
+    'versions.empty': 'No versions saved yet',
+    'versions.empty.hint': 'Save your bot to create version history.',
 
     // Common
     'common.unsavedChanges': 'You have unsaved changes. Are you sure you want to go back?',
