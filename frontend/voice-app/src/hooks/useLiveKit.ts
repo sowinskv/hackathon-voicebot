@@ -14,6 +14,7 @@ export function useLiveKit() {
   const [isConnecting, setIsConnecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [audioEnabled, setAudioEnabled] = useState(true)
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null)
 
   const roomRef = useRef<Room | null>(null)
   const audioTrackRef = useRef<LocalAudioTrack | null>(null)
@@ -97,6 +98,7 @@ export function useLiveKit() {
         noiseSuppression: true,
       })
       audioTrackRef.current = audioTrack
+      setAudioStream(new MediaStream([audioTrack.mediaStreamTrack]))
       await room.localParticipant.publishTrack(audioTrack)
 
       return sessionId
@@ -123,6 +125,7 @@ export function useLiveKit() {
 
       setIsConnected(false)
       setAudioEnabled(true)
+      setAudioStream(null)
       setError(null)
     } catch (err) {
       console.error('Error disconnecting:', err)
@@ -143,6 +146,7 @@ export function useLiveKit() {
     isConnecting,
     error,
     audioEnabled,
+    audioStream,
     connect,
     disconnect,
     toggleAudio,

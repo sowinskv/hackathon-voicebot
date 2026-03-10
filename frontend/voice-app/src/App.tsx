@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import VoiceControls from './components/VoiceControls'
 import TranscriptDisplay from './components/TranscriptDisplay'
 import SessionStatus from './components/SessionStatus'
+import CollectedDataPanel, { CollectedData } from './components/CollectedDataPanel'
+import SatisfactionSurvey from './components/SatisfactionSurvey'
+import NextSteps from './components/NextSteps'
 import { useLiveKit } from './hooks/useLiveKit'
 import { useWebSocket } from './hooks/useWebSocket'
 
@@ -13,6 +16,9 @@ function App() {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [sessionState, setSessionState] = useState<SessionState>('idle')
   const [transcript, setTranscript] = useState<Array<{ role: 'user' | 'assistant', text: string, timestamp: Date }>>([])
+  const [collectedData, setCollectedData] = useState<CollectedData>({})
+  const [showSurvey, setShowSurvey] = useState(false)
+  const [warningCount, setWarningCount] = useState(0)
 
   const {
     isConnected,
@@ -21,6 +27,7 @@ function App() {
     connect,
     disconnect,
     audioEnabled,
+    audioStream,
     toggleAudio,
   } = useLiveKit()
 
@@ -40,9 +47,20 @@ function App() {
     }
   }, [isConnected, isConnecting, liveKitError, sessionState])
 
+  // Show survey when session completes
+  useEffect(() => {
+    if (sessionState === 'completed') {
+      setShowSurvey(true)
+    }
+  }, [sessionState])
+
   useEffect(() => {
     wsMessages.forEach((message) => {
-      if (message.type === 'transcript') {
+      if (message.type === 'slot_update' && message.field && message.value) {
+        setCollectedData((prev) => ({ ...prev, [message.field]: message.value }))
+      } else if (message.type === 'warning') {
+        setWarningCount((n) => n + 1)
+      } else if (message.type === 'transcript') {
         setTranscript((prev) => [
           ...prev,
           {
@@ -67,6 +85,8 @@ function App() {
       const newSessionId = await connect(language)
       setSessionId(newSessionId)
       setTranscript([])
+      setCollectedData({})
+      setWarningCount(0)
     } catch (error) {
       console.error('Failed to start session:', error)
       setSessionState('error')
@@ -98,6 +118,14 @@ function App() {
     setSessionState('idle')
   }
 
+  const handleTimeout = async () => {
+    try {
+      await disconnect()
+    } catch (_) {}
+    setSessionState('completed')
+    setSessionId(null)
+  }
+
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === 'en' ? 'pl' : 'en'))
   }
@@ -106,6 +134,13 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-notion-bg">
+      {showSurvey && (
+        <SatisfactionSurvey
+          sessionId={sessionId}
+          language={language}
+          onDismiss={() => setShowSurvey(false)}
+        />
+      )}
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -136,40 +171,49 @@ function App() {
 
       {/* Main */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left — Controls */}
           <div className="lg:col-span-1 flex flex-col gap-6">
             <VoiceControls
               sessionState={sessionState}
               isConnected={isConnected}
               audioEnabled={audioEnabled}
+              audioStream={audioStream}
               onStart={handleStartSession}
               onStop={handleStopSession}
               onEscalate={handleEscalate}
               onRetry={handleRetry}
               onToggleAudio={toggleAudio}
+              onTimeout={handleTimeout}
+              warningCount={warningCount}
               language={language}
             />
 
-            {/* How it works */}
-            <div className="card animate-fadeIn">
-              <h3 className="text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>How it works</h3>
-              <ol className="space-y-3">
-                {[
-                  language === 'en' ? 'Click Start Session to connect' : 'Kliknij Rozpocznij, aby się połączyć',
-                  language === 'en' ? `Speak naturally in ${language === 'en' ? 'English' : 'Polish'}` : 'Mów naturalnie po polsku',
-                  language === 'en' ? 'Say "connect me to a consultant" to escalate' : 'Powiedz „połącz z konsultantem" aby eskalować',
-                  language === 'en' ? 'End the session when finished' : 'Zakończ sesję po rozmowie',
-                ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-notion-textLight">
-                    <span className="font-mono text-coral-500 font-semibold text-xs mt-0.5 flex-shrink-0">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span>{step}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            {/* Guide / Next steps */}
+            {sessionState === 'completed' ? (
+              <NextSteps language={language} />
+            ) : (
+              <div className="card animate-fadeIn">
+                <h3 className="text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+                  {language === 'en' ? 'How it works' : 'Jak to działa'}
+                </h3>
+                <ol className="space-y-3">
+                  {[
+                    language === 'en' ? 'Click Start Session to connect' : 'Kliknij Rozpocznij, aby się połączyć',
+                    language === 'en' ? 'Speak naturally in English' : 'Mów naturalnie po polsku',
+                    language === 'en' ? 'Say "connect me to a consultant" to escalate' : 'Powiedz „połącz z konsultantem" aby eskalować',
+                    language === 'en' ? 'End the session when finished' : 'Zakończ sesję po rozmowie',
+                  ].map((step, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-notion-textLight">
+                      <span className="font-mono text-xs mt-0.5 flex-shrink-0" style={{ color: '#1a1a1a' }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
 
             {liveKitError && (
               <div className="card border-red-300 bg-red-50 animate-fadeIn">
@@ -179,13 +223,18 @@ function App() {
             )}
           </div>
 
-          {/* Right — Transcript */}
+          {/* Middle — Transcript */}
           <div className="lg:col-span-2">
             <TranscriptDisplay
               transcript={transcript}
               isActive={isSessionActive}
               language={language}
             />
+          </div>
+
+          {/* Right — Collected Data */}
+          <div className="lg:col-span-1">
+            <CollectedDataPanel data={collectedData} language={language} />
           </div>
         </div>
       </main>

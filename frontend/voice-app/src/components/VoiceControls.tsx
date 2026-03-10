@@ -1,14 +1,20 @@
 import { Language, SessionState } from '../App'
+import AudioVisualizer from './AudioVisualizer'
+import SessionTimer from './SessionTimer'
+import { useAudioAnalyser } from '../hooks/useAudioAnalyser'
 
 interface VoiceControlsProps {
   sessionState: SessionState
   isConnected: boolean
   audioEnabled: boolean
+  audioStream: MediaStream | null
   onStart: () => void
   onStop: () => void
   onEscalate: () => void
   onRetry: () => void
   onToggleAudio: () => void
+  onTimeout: () => void
+  warningCount: number
   language: Language
 }
 
@@ -16,13 +22,17 @@ export default function VoiceControls({
   sessionState,
   isConnected,
   audioEnabled,
+  audioStream,
   onStart,
   onStop,
   onEscalate,
   onRetry,
   onToggleAudio,
+  onTimeout,
+  warningCount,
   language,
 }: VoiceControlsProps) {
+  const levels = useAudioAnalyser(audioStream)
   const isActive = sessionState === 'active' || sessionState === 'escalated'
   const isEscalated = sessionState === 'escalated'
   const isConnecting = sessionState === 'connecting'
@@ -46,6 +56,28 @@ export default function VoiceControls({
         <span className="font-mono text-xs text-notion-textLight uppercase tracking-widest">Status</span>
         <span className="font-mono text-xs text-notion-text">{statusText[sessionState]}</span>
       </div>
+
+      {/* Timer */}
+      <div className="mb-3">
+        <SessionTimer isActive={isActive} onTimeout={onTimeout} />
+      </div>
+
+      {/* Visualizer */}
+      <div className="mb-5 py-3 flex items-center justify-center border rounded" style={{ borderColor: '#e9e9e7' }}>
+        <AudioVisualizer levels={levels} isActive={isActive} audioEnabled={audioEnabled} />
+      </div>
+
+      {/* Abuse warning */}
+      {isActive && warningCount > 0 && (
+        <div className="mb-3 px-3 py-2 rounded border border-amber-300 bg-amber-50 flex items-center justify-between animate-fadeIn">
+          <span className="text-xs text-amber-700">
+            {language === 'en' ? 'Please stay on topic' : 'Proszę trzymać się tematu'}
+          </span>
+          <span className="font-mono text-xs font-semibold text-amber-700">
+            {warningCount}/3
+          </span>
+        </div>
+      )}
 
       {/* Controls */}
       <div className="space-y-3">

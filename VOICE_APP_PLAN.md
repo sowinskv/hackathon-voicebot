@@ -34,14 +34,14 @@ Inspired by `ui-inspo/`:
 | `primary-600` color | ✅ Fixed | Matches notion accent blue |
 | `btn-warning` class | ✅ Fixed | Amber style |
 | **Visual redesign** | ✅ Done | Cream bg, dark header, coral CTA, mono fonts, panel labels |
-| Audio visualizer | ⬜ Todo | Dot-matrix mic activity indicator |
-| Session timer | ⬜ Todo | Visible countdown / elapsed time |
-| Collected data panel | ⬜ Todo | OC slot-filling progress display |
-| Post-call satisfaction survey | ⬜ Todo | 5-point scale, shown on `completed` |
-| End-of-call next steps | ⬜ Todo | What the user should do after |
+| Audio visualizer | ✅ Done | 16-bar Web Audio API visualizer, reacts to mic |
+| Session timer | ✅ Done | Elapsed MM:SS, warning at 9min, auto-stop at 10min |
+| Collected data panel | ✅ Done | 6 OC fields, progress bar, fed by WS slot_update messages |
+| Post-call satisfaction survey | ✅ Done | 5-star modal on completed, optional comment, posts to API |
+| End-of-call next steps | ✅ Done | Replaces guide card on completed, EN/PL, 4 OC-specific steps |
 | Error retry button | ⬜ Todo | Currently stuck on error state |
-| Session limit warning | ⬜ Todo | Alert at 9 min / terminate at 10 |
-| Abuse warning counter | ⬜ Todo | 3-strike display before termination |
+| Session limit warning | ✅ Done | Handled by SessionTimer (red at 9min, auto-stop at 10min) |
+| Abuse warning counter | ✅ Done | Amber banner X/3 in VoiceControls, fed by WS warning messages |
 
 ---
 
@@ -152,6 +152,38 @@ frontend/voice-app/src/
 └── styles/
     └── globals.css                ← Tailwind + design system
 ```
+
+---
+
+---
+
+## Backend Integration Issues (blockers for live session)
+
+### Problem 1 — Wrong default API URL (frontend bug, fixable now)
+`src/services/api.ts` defaults to `http://localhost:8000` but api-gateway runs on port `3000`.
+**Fix:** change fallback to `http://localhost:3000`.
+
+### Problem 2 — Wrong API paths (frontend bug, fixable now)
+`api.ts` calls `POST /sessions` but api-gateway registers routes at `/api/sessions`.
+**Fix:** prefix all paths in `api.ts` with `/api`.
+
+### Problem 3 — Mismatched session contract (backend work needed)
+The voice-app calls `POST /api/sessions` with `{ language }` and expects back:
+```json
+{ "sessionId", "livekitToken", "livekitUrl", "agentId" }
+```
+But the api-gateway's sessions route expects `{ name, flow_id }` and returns a plain DB record — **no LiveKit room creation, no token generation**.
+
+**Backend needs a voice session endpoint:**
+- `POST /api/voice-sessions` with `{ language }`
+- Creates a LiveKit room via LiveKit Server SDK
+- Generates a participant access token
+- Returns `{ sessionId, livekitToken, livekitUrl }`
+
+### Problem 4 — Backend not running
+No Docker containers active, nothing on port 3000.
+**To start:** `docker-compose up -d` (requires PostgreSQL on 5433 + LiveKit credentials in `.env`)
+**Or locally:** `cd backend/api-gateway && npm install && npm run dev` (requires `.env` from `.env.example`)
 
 ---
 
