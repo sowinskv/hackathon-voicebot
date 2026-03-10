@@ -14,8 +14,15 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import httpx
+import aiohttp
 
-from pipecat.frames.frames import EndFrame
+from pipecat.frames.frames import (
+    EndFrame,
+    Frame,
+    TextFrame,
+    TranscriptionFrame,
+    LLMMessagesFrame,
+)
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineTask
@@ -23,7 +30,8 @@ from pipecat.processors.aggregators.llm_response import (
     LLMAssistantResponseAggregator,
     LLMUserResponseAggregator,
 )
-from pipecat.services.azure.stt import AzureSTTService
+from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
+from pipecat.services.elevenlabs.stt import ElevenLabsSTTService
 from pipecat.services.google.llm import GoogleLLMService
 from pipecat.services.elevenlabs.tts import ElevenLabsTTSService
 from pipecat.transports.websocket.fastapi import (
@@ -55,6 +63,47 @@ app.add_middleware(
 active_sessions: Dict[str, PipelineRunner] = {}
 
 
+class TranscriptLogger(FrameProcessor):
+    """Captures and sends transcripts to the WebSocket client"""
+
+    def __init__(self, websocket):
+        super().__init__()
+        self.websocket = websocket
+
+    async def process_frame(self, frame: Frame, direction: FrameDirection):
+        await super().process_frame(frame, direction)
+
+        # Capture user speech (from STT)
+        if isinstance(frame, TranscriptionFrame):
+            logger.info(f"User transcript: {frame.text}")
+            try:
+                await self.websocket.send_json({
+                    "type": "transcript",
+                    "speaker": "user",
+                    "text": frame.text,
+                    "timestamp": frame.timestamp if hasattr(frame, 'timestamp') else None,
+                })
+            except Exception as e:
+                logger.error(f"Failed to send user transcript: {e}")
+
+        # Capture assistant response (from LLM)
+        elif isinstance(frame, TextFrame):
+            # Only log substantial text responses
+            if frame.text and len(frame.text.strip()) > 0:
+                logger.info(f"Bot transcript: {frame.text}")
+                try:
+                    await self.websocket.send_json({
+                        "type": "transcript",
+                        "speaker": "bot",
+                        "text": frame.text,
+                        "timestamp": None,
+                    })
+                except Exception as e:
+                    logger.error(f"Failed to send bot transcript: {e}")
+
+        await self.push_frame(frame, direction)
+
+
 async def get_flow_config(flow_id: str) -> Dict:
     """Fetch flow configuration from API Gateway"""
     try:
@@ -76,9 +125,9 @@ async def health():
         "status": "healthy",
         "active_sessions": len(active_sessions),
         "services": {
-            "azure_stt": bool(os.getenv("AZURE_OPENAI_API_KEY")),
+            "elevenlabs_stt": bool(os.getenv("ELEVENLABS_API_KEY")),
             "gemini": bool(os.getenv("GEMINI_API_KEY")),
-            "elevenlabs": bool(os.getenv("ELEVENLABS_API_KEY")),
+            "elevenlabs_tts": bool(os.getenv("ELEVENLABS_API_KEY")),
         }
     }
 
@@ -127,15 +176,18 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         )
 
         # Initialize services
-        # Use region from environment variable
-        region = os.getenv("AZURE_OPENAI_REGION", "swedencentral")
+        logger.info(f"Initializing ElevenLabs STT for language: {language}")
 
-        logger.info(f"Using Azure region: {region}")
+        # Create aiohttp session for ElevenLabs services
+        aiohttp_session = aiohttp.ClientSession()
 
-        stt = AzureSTTService(
-            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-            region=region,
-            language=language,
+        # Map language codes for ElevenLabs (supports: en, es, fr, de, it, pt, pl, ja, zh, hi, ko, nl, tr, sv, id, fil, uk, el, cs, fi, ro, ru, da, bg, ms, sk, hr, ar, ta)
+        elevenlabs_language = language if language in ['en', 'pl'] else 'en'
+
+        stt = ElevenLabsSTTService(
+            aiohttp_session=aiohttp_session,
+            api_key=os.getenv("ELEVENLABS_API_KEY"),
+            language=elevenlabs_language,
         )
 
         llm = GoogleLLMService(
@@ -145,23 +197,20 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         )
 
         tts = ElevenLabsTTSService(
+            aiohttp_session=aiohttp_session,
             api_key=os.getenv("ELEVENLABS_API_KEY"),
             voice_id=os.getenv("ELEVENLABS_VOICE_ID", "a3t1chm1dQkLxOQK6Jp7"),
             model="eleven_multilingual_v2",
         )
 
-        # Build pipeline
-        user_response = LLMUserResponseAggregator()
-        assistant_response = LLMAssistantResponseAggregator()
+        # Build simplified pipeline - just TTS output for now
+        transcript_logger = TranscriptLogger(websocket)
 
         pipeline = Pipeline([
             transport.input(),
-            stt,
-            user_response,
-            llm,
+            transcript_logger,
             tts,
             transport.output(),
-            assistant_response,
         ])
 
         # Create and run task
@@ -170,6 +219,103 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         # Store session
         runner = PipelineRunner()
         active_sessions[session_id] = runner
+
+        # Start periodic bot messages
+        async def periodic_messages():
+            """Send periodic messages from the bot"""
+            messages = [
+                "Hello! I am your insurance assistant. How can I help you today?",
+                "You can always report damage through our mobile app.",
+                "Do you have any questions about your policy?",
+                "I'm here to help you with all insurance matters.",
+            ]
+            index = 0
+
+            # Send initial greeting immediately
+            await asyncio.sleep(2)
+            if session_id in active_sessions:
+                try:
+                    text = messages[0]
+                    logger.info(f"[Periodic] Sending: {text}")
+
+                    # Send to frontend as transcript
+                    await websocket.send_json({
+                        "type": "transcript",
+                        "speaker": "bot",
+                        "text": text,
+                    })
+
+                    # Generate audio with ElevenLabs directly and send to frontend
+                    async with aiohttp_session.post(
+                        f"https://api.elevenlabs.io/v1/text-to-speech/{os.getenv('ELEVENLABS_VOICE_ID', 'a3t1chm1dQkLxOQK6Jp7')}",
+                        json={
+                            "text": text,
+                            "model_id": "eleven_multilingual_v2",
+                        },
+                        headers={
+                            "xi-api-key": os.getenv("ELEVENLABS_API_KEY"),
+                            "Content-Type": "application/json",
+                        }
+                    ) as resp:
+                        if resp.status == 200:
+                            audio_data = await resp.read()
+                            logger.info(f"[Periodic] Got audio, size: {len(audio_data)} bytes")
+                            # Send audio as binary to frontend
+                            await websocket.send_bytes(audio_data)
+                            logger.info(f"[Periodic] Sent audio to frontend")
+                        else:
+                            logger.error(f"[Periodic] ElevenLabs error: {resp.status}")
+
+                except Exception as e:
+                    logger.error(f"[Periodic] Error sending greeting: {e}", exc_info=True)
+
+            index = 1
+
+            # Send periodic messages
+            while session_id in active_sessions:
+                await asyncio.sleep(15)  # Wait 15 seconds
+
+                if session_id not in active_sessions:
+                    break
+
+                try:
+                    text = messages[index % len(messages)]
+                    index += 1
+
+                    logger.info(f"[Periodic] Sending: {text}")
+
+                    # Send to frontend as transcript
+                    await websocket.send_json({
+                        "type": "transcript",
+                        "speaker": "bot",
+                        "text": text,
+                    })
+
+                    # Generate audio with ElevenLabs directly and send to frontend
+                    async with aiohttp_session.post(
+                        f"https://api.elevenlabs.io/v1/text-to-speech/{os.getenv('ELEVENLABS_VOICE_ID', 'a3t1chm1dQkLxOQK6Jp7')}",
+                        json={
+                            "text": text,
+                            "model_id": "eleven_multilingual_v2",
+                        },
+                        headers={
+                            "xi-api-key": os.getenv("ELEVENLABS_API_KEY"),
+                            "Content-Type": "application/json",
+                        }
+                    ) as resp:
+                        if resp.status == 200:
+                            audio_data = await resp.read()
+                            logger.info(f"[Periodic] Got audio, size: {len(audio_data)} bytes")
+                            await websocket.send_bytes(audio_data)
+                            logger.info(f"[Periodic] Sent audio to frontend")
+                        else:
+                            logger.error(f"[Periodic] ElevenLabs error: {resp.status}")
+
+                except Exception as e:
+                    logger.error(f"[Periodic] Error generating message: {e}", exc_info=True)
+
+        # Start periodic messages in background
+        asyncio.create_task(periodic_messages())
 
         # Run pipeline
         await runner.run(task)
@@ -182,6 +328,11 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         # Cleanup
         if session_id in active_sessions:
             del active_sessions[session_id]
+
+        # Close aiohttp session if it exists
+        if 'aiohttp_session' in locals() and aiohttp_session and not aiohttp_session.closed:
+            await aiohttp_session.close()
+
         logger.info(f"Session ended: {session_id}")
 
 

@@ -127,14 +127,19 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, onEn
       };
 
       ws.onmessage = async (event) => {
+        console.log('[Voice] Received message, type:', typeof event.data, 'is Blob:', event.data instanceof Blob);
+
         if (event.data instanceof Blob) {
           // Audio from bot
+          console.log('[Voice] Received audio blob, size:', event.data.size);
           const arrayBuffer = await event.data.arrayBuffer();
+          console.log('[Voice] ArrayBuffer size:', arrayBuffer.byteLength);
           playAudio(arrayBuffer);
         } else {
           // Text message (transcript)
           try {
             const data = JSON.parse(event.data);
+            console.log('[Voice] Received JSON:', data);
             if (data.type === 'transcript') {
               addTranscript(data.speaker, data.text);
             }
@@ -163,14 +168,31 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, onEn
   };
 
   const playAudio = async (arrayBuffer: ArrayBuffer) => {
-    if (!audioContextRef.current) return;
+    console.log('[Voice] playAudio called, audioContext exists:', !!audioContextRef.current);
+
+    if (!audioContextRef.current) {
+      console.error('[Voice] No audio context!');
+      return;
+    }
+
+    // Resume audio context if suspended (browser autoplay policy)
+    if (audioContextRef.current.state === 'suspended') {
+      console.log('[Voice] Resuming suspended audio context');
+      await audioContextRef.current.resume();
+    }
 
     try {
+      console.log('[Voice] Decoding audio data...');
       const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer);
+      console.log('[Voice] Audio decoded, duration:', audioBuffer.duration, 'seconds');
+
       const source = audioContextRef.current.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(audioContextRef.current.destination);
+
+      console.log('[Voice] Starting audio playback');
       source.start();
+      console.log('[Voice] Audio playback started');
     } catch (err) {
       console.error('[Voice] Error playing audio:', err);
     }
