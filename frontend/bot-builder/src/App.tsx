@@ -326,61 +326,139 @@ function App() {
                 <ConversationalCreator onGenerate={handleGenerate} currentConfig={config || undefined} />
               )}
           {activeTab === 'prompt' && config && (
-            <div className="card p-6">
-              <h2 className="text-h2 mb-4">{t('prompt.title')}</h2>
-              <textarea
-                value={config.prompt}
-                onChange={(e) => updatePrompt(e.target.value)}
-                className="input min-h-[500px] font-mono"
-              />
+            <div className="max-w-5xl mx-auto py-4 space-y-8">
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-2">
+                <div className="w-1 h-1 rounded-full bg-white/60"></div>
+                <h2 className="text-2xl font-semibold text-white tracking-tight">{t('prompt.title')}</h2>
+              </div>
+              <p className="text-white/60 text-sm mb-6 -mt-4 ml-5">
+                The system prompt defines your bot's personality, behavior, and instructions
+              </p>
+
+              {/* Prompt editor */}
+              <div className="relative group">
+                {/* Subtle accent line */}
+                <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+
+                <textarea
+                  value={config.prompt}
+                  onChange={(e) => updatePrompt(e.target.value)}
+                  className="w-full min-h-[500px] bg-white/[0.02] backdrop-blur-sm border border-white/[0.06] rounded-xl p-8 pl-10 text-white/90 text-[15px] leading-[1.7] tracking-[-0.01em] focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/10 focus:bg-white/[0.04] placeholder:text-white/30 transition-all duration-300 resize-y hover:bg-white/[0.03] hover:border-white/10"
+                  placeholder="Enter your system prompt here..."
+                  spellCheck="false"
+                />
+
+                {/* Character count */}
+                <div className="absolute bottom-4 right-4 text-xs text-white/40 font-mono">
+                  {config.prompt.length} characters
+                </div>
+              </div>
+
+              {/* Helpful tips */}
+              <div className="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/40 mt-1.5 flex-shrink-0"></div>
+                <div className="text-xs text-white/60 leading-relaxed">
+                  <span className="font-medium text-white/80">Tip:</span> Be specific about tone, format, and constraints. Include examples if needed.
+                </div>
+              </div>
             </div>
           )}
           {activeTab === 'fields' && config && (
-            <div className="card p-6">
-              <h2 className="text-h2 mb-4">{t('fields.title')}</h2>
-              <div className="space-y-4">
+            <div className="max-w-5xl mx-auto py-4 space-y-8">
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-2">
+                <div className="w-1 h-1 rounded-full bg-white/60"></div>
+                <h2 className="text-2xl font-semibold text-white tracking-tight">{t('fields.title')}</h2>
+              </div>
+              <p className="text-white/60 text-sm mb-6 -mt-4 ml-5">
+                {config.fields.length} {config.fields.length === 1 ? 'field' : 'fields'} will be collected during conversations
+              </p>
+
+              {/* Fields list */}
+              <div className="space-y-3">
                 {config.fields.map((field, idx) => {
                   // Handle translation objects - extract the string value
                   const getDisplayValue = (value: any) => {
                     if (typeof value === 'string') return value;
                     if (typeof value === 'object' && value !== null) {
-                      // If it's a translation object {en: "...", pl: "..."}, use current language or first available
                       return value[botLanguage] || value.pl || value.en || Object.values(value)[0] || JSON.stringify(value);
                     }
                     return String(value);
                   };
 
                   return (
-                    <div key={idx} className="card p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h3 className="font-medium text-ink">{getDisplayValue(field.label)}</h3>
-                          <p className="text-sm text-ink-light mt-1">
-                            <span className="font-mono">{getDisplayValue(field.name)}</span>
-                            <span className="mx-2">•</span>
-                            <span>{getDisplayValue(field.type)}</span>
-                          </p>
-                          {field.required && (
-                            <span className="inline-block mt-2 text-xs font-medium text-white bg-ink px-2 py-1 rounded">
-                              {t('fields.required')}
-                            </span>
-                          )}
-                          {field.promptTemplate && (
-                            <p className="text-sm text-ink-medium mt-2 italic">
-                              "{getDisplayValue(field.promptTemplate)}"
-                            </p>
-                          )}
-                          {field.validation && Object.keys(field.validation).length > 0 && (
-                            <div className="mt-3 text-xs text-ink-light space-y-1">
-                              <p className="font-medium">{t('fields.validation')}</p>
-                              {field.validation.min && <p>{t('fields.validation.min')} {field.validation.min}</p>}
-                              {field.validation.max && <p>{t('fields.validation.max')} {field.validation.max}</p>}
-                              {field.validation.pattern && <p>{t('fields.validation.pattern')} <code className="bg-cream px-1 rounded">{field.validation.pattern}</code></p>}
-                              {field.validation.errorMessage && <p>{t('fields.validation.error')} {getDisplayValue(field.validation.errorMessage)}</p>}
-                            </div>
-                          )}
+                    <div
+                      key={idx}
+                      className="relative group bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] hover:border-white/10 rounded-xl p-6 transition-all duration-300"
+                    >
+                      {/* Accent line */}
+                      <div className="absolute left-0 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex-1 min-w-0 pl-4">
+                          {/* Field label */}
+                          <h3 className="font-semibold text-white text-lg mb-2 tracking-tight">{getDisplayValue(field.label)}</h3>
+
+                          {/* Field metadata */}
+                          <div className="flex items-center gap-3 text-sm text-white/50">
+                            <code className="px-2 py-0.5 bg-white/5 rounded text-xs text-white/70 font-mono">{getDisplayValue(field.name)}</code>
+                            <span className="text-white/30">•</span>
+                            <span className="text-xs uppercase tracking-wider">{getDisplayValue(field.type)}</span>
+                            {field.required && (
+                              <>
+                                <span className="text-white/30">•</span>
+                                <span className="text-xs text-white/60 font-medium">Required</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
+
+                      {/* Prompt template */}
+                      {field.promptTemplate && (
+                        <div className="pl-4 mb-3">
+                          <p className="text-sm text-white/60 leading-relaxed italic">
+                            "{getDisplayValue(field.promptTemplate)}"
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Validation rules */}
+                      {field.validation && Object.keys(field.validation).length > 0 && (
+                        <div className="pl-4 mt-4 pt-4 border-t border-white/5">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-1 h-1 rounded-full bg-white/40"></div>
+                            <span className="text-xs text-white/50 uppercase tracking-wider font-medium">Validation</span>
+                          </div>
+                          <div className="space-y-1.5 text-xs text-white/50 pl-3">
+                            {field.validation.min && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-white/30">→</span>
+                                <span>Min: {field.validation.min}</span>
+                              </div>
+                            )}
+                            {field.validation.max && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-white/30">→</span>
+                                <span>Max: {field.validation.max}</span>
+                              </div>
+                            )}
+                            {field.validation.pattern && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-white/30">→</span>
+                                <span>Pattern: <code className="bg-white/5 px-1.5 py-0.5 rounded text-white/60">{field.validation.pattern}</code></span>
+                              </div>
+                            )}
+                            {field.validation.errorMessage && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-white/30">→</span>
+                                <span>Error: {getDisplayValue(field.validation.errorMessage)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
