@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Database - Using port 5433 to avoid conflict
   postgres:
@@ -17,9 +15,10 @@ services:
       - ./database/seeds/default_flow.sql:/docker-entrypoint-initdb.d/02-seeds.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U callcenter"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 2s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
     networks:
       - callcenter-network
 
@@ -33,6 +32,7 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://callcenter:${DB_PASSWORD:-devpassword123}@postgres:5432/callcenter
       - PORT=3000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-your_livekit_api_key_here}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-your_livekit_api_secret_here}
       - LIVEKIT_URL=${LIVEKIT_URL:-your_livekit_url_here}
@@ -51,9 +51,10 @@ services:
 
   # Frontend - Voice App
   voice-app:
-    image: node:20-alpine
+    build:
+      context: ./frontend/voice-app
+      dockerfile: Dockerfile.dev
     container_name: callcenter-voice-app
-    working_dir: /app
     environment:
       - VITE_API_URL=http://localhost:3000
       - VITE_WS_URL=ws://localhost:3000
@@ -61,48 +62,56 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend/voice-app:/app
-      - /app/node_modules
+      - ./frontend/voice-app/src:/app/src
+      - ./frontend/voice-app/public:/app/public
+      - ./frontend/voice-app/index.html:/app/index.html
+      - ./frontend/voice-app/vite.config.ts:/app/vite.config.ts
+      - ./frontend/voice-app/.env:/app/.env
     networks:
       - callcenter-network
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     stdin_open: true
     tty: true
 
   # Frontend - Bot Builder
   bot-builder:
-    image: node:20-alpine
+    build:
+      context: ./frontend/bot-builder
+      dockerfile: Dockerfile.dev
     container_name: callcenter-builder
-    working_dir: /app
     environment:
       - VITE_API_URL=http://localhost:3000
     ports:
       - "5174:5173"
     volumes:
-      - ./frontend/bot-builder:/app
-      - /app/node_modules
+      - ./frontend/bot-builder/src:/app/src
+      - ./frontend/bot-builder/public:/app/public
+      - ./frontend/bot-builder/index.html:/app/index.html
+      - ./frontend/bot-builder/vite.config.ts:/app/vite.config.ts
+      - ./frontend/bot-builder/.env:/app/.env
     networks:
       - callcenter-network
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     stdin_open: true
     tty: true
 
   # Frontend - Agent Console
   agent-console:
-    image: node:20-alpine
+    build:
+      context: ./frontend/agent-console
+      dockerfile: Dockerfile.dev
     container_name: callcenter-console
-    working_dir: /app
     environment:
       - VITE_API_URL=http://localhost:3000
       - VITE_WS_URL=ws://localhost:3000
     ports:
       - "5175:5173"
     volumes:
-      - ./frontend/agent-console:/app
-      - /app/node_modules
+      - ./frontend/agent-console/src:/app/src
+      - ./frontend/agent-console/public:/app/public
+      - ./frontend/agent-console/index.html:/app/index.html
+      - ./frontend/agent-console/vite.config.ts:/app/vite.config.ts
+      - ./frontend/agent-console/.env:/app/.env
     networks:
       - callcenter-network
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     stdin_open: true
     tty: true
 
