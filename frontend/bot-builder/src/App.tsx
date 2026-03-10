@@ -215,38 +215,44 @@ function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <header className="bg-white sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+    <div className="min-h-screen flex flex-col">
+      <header className="sticky top-4 z-50 mx-4 mb-6">
+        <div className="max-w-7xl mx-auto px-8 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               {view === 'list' ? (
-                <h1 className="text-xl font-bold text-ink">super kitties</h1>
+                <div className="flex items-center gap-3">
+                  <div className="accent-dot"></div>
+                  <h1 className="text-2xl font-bold text-gradient">super kitties</h1>
+                </div>
               ) : (
                 <>
-                  <input
-                    type="text"
-                    value={botName}
-                    onChange={(e) => {
-                      setBotName(e.target.value);
-                      setHasUnsavedChanges(true);
-                    }}
-                    className="text-xl font-bold text-ink bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-blue rounded px-2"
-                  />
-                  {hasUnsavedChanges && (
-                    <span className="text-sm text-warning">• {t('header.unsaved')}</span>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <div className="accent-dot"></div>
+                    <input
+                      type="text"
+                      value={botName}
+                      onChange={(e) => {
+                        setBotName(e.target.value);
+                        setHasUnsavedChanges(true);
+                      }}
+                      className="text-xl font-bold text-gradient bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-[#c17b5c]/50 rounded-lg px-2"
+                    />
+                    {hasUnsavedChanges && (
+                      <span className="text-xs text-[#c17b5c] font-medium">• {t('header.unsaved')}</span>
+                    )}
+                  </div>
                 </>
               )}
             </div>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-3">
               {view === 'list' && <LanguageSwitcher />}
               {view === 'editor' && (
                 <>
                   <LanguageSwitcher />
                   <button
                     onClick={handleBackToList}
-                    className="flex items-center gap-2 px-4 py-2 text-sm border border-border-light text-ink rounded-lg hover:bg-cream"
+                    className="btn btn-secondary flex items-center gap-2"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     {t('header.backToList')}
@@ -254,7 +260,7 @@ function App() {
               {config && (
                 <button
                   onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm border border-border-light text-ink rounded-lg hover:bg-cream"
+                  className="btn btn-secondary flex items-center gap-2"
                 >
                   {showAdvanced ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   {showAdvanced ? t('header.hideAdvanced') : t('header.showAdvanced')}
@@ -263,7 +269,7 @@ function App() {
               <button
                 onClick={handleSave}
                 disabled={!config || !hasUnsavedChanges}
-                className="flex items-center gap-2 px-5 py-2 text-sm border border-border-light text-ink rounded-lg hover:bg-cream disabled:opacity-50"
+                className="btn btn-secondary flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
                 {t('header.save')}
@@ -271,7 +277,7 @@ function App() {
               <button
                 onClick={handlePublish}
                 disabled={!config}
-                className="px-5 py-2 text-sm text-white bg-ink rounded-lg hover:opacity-80 disabled:opacity-50 font-medium"
+                className="btn btn-primary"
               >
                 {t('header.publish')}
               </button>
@@ -283,22 +289,22 @@ function App() {
       </header>
 
       {showAdvanced && (
-        <div className="bg-white border-b border-border-light sticky top-[73px] z-40">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex gap-1">
+        <div className="glass-card sticky top-24 z-40 mx-4 mb-6">
+          <div className="max-w-7xl mx-auto px-8 py-2">
+            <div className="flex gap-2">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-5 py-3 text-sm font-medium border-b-2 ${
+                  className={`relative px-6 py-3 text-sm font-medium rounded-lg transition-all ${
                     activeTab === tab.id
-                      ? 'border-ink text-ink'
-                      : 'border-transparent text-ink-medium hover:text-ink'
+                      ? 'bg-gradient-to-r from-[#c17b5c] to-[#8b5c4c] text-white shadow-lg shadow-[#c17b5c]/30'
+                      : 'text-secondary hover:bg-white/50'
                   }`}
                 >
-                  <div>
+                  <div className="flex flex-col items-start">
                     <span>{tab.label}</span>
-                    <span className="text-xs block opacity-75">{tab.desc}</span>
+                    <span className="text-xs opacity-75">{tab.desc}</span>
                   </div>
                 </button>
               ))}
@@ -307,8 +313,8 @@ function App() {
         </div>
       )}
 
-      <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+      <main className="flex-1 pb-12">
+        <div className="max-w-7xl mx-auto px-4">
           {view === 'list' ? (
             <BotList onCreateNew={handleCreateNew} onEditBot={handleEditBot} />
           ) : (

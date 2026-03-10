@@ -103,13 +103,14 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-4">
       {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-ink mb-3">
+      <div className="glass-card p-12 text-center mb-8">
+        <div className="accent-dot mx-auto mb-4"></div>
+        <h1 className="text-5xl font-bold text-gradient mb-4">
           {currentConfig ? t('creator.title.refine') : t('creator.title.create')}
         </h1>
-        <p className="text-lg text-ink-medium">
+        <p className="text-xl text-secondary">
           {currentConfig
             ? t('creator.subtitle.refine')
             : t('creator.subtitle.create')
@@ -119,23 +120,23 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
 
       {/* Language Selection */}
       <div className="mb-8 flex justify-center">
-        <div className="inline-flex rounded-lg border border-border-light bg-white p-1">
+        <div className="glass-card inline-flex rounded-2xl p-1.5">
           <button
             onClick={() => setLanguage('pl')}
-            className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`px-8 py-3 rounded-xl text-base font-medium transition-all ${
               language === 'pl'
-                ? 'bg-ink text-white shadow-sm'
-                : 'text-ink-medium hover:text-ink'
+                ? 'bg-gradient-to-r from-[#c17b5c] to-[#8b5c4c] text-white shadow-lg shadow-[#c17b5c]/30'
+                : 'text-secondary hover:bg-white/50'
             }`}
           >
             {t('creator.language.pl')}
           </button>
           <button
             onClick={() => setLanguage('en')}
-            className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`px-8 py-3 rounded-xl text-base font-medium transition-all ${
               language === 'en'
-                ? 'bg-ink text-white shadow-sm'
-                : 'text-ink-medium hover:text-ink'
+                ? 'bg-gradient-to-r from-[#c17b5c] to-[#8b5c4c] text-white shadow-lg shadow-[#c17b5c]/30'
+                : 'text-secondary hover:bg-white/50'
             }`}
           >
             {t('creator.language.en')}
@@ -146,25 +147,25 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
       {!currentConfig ? (
         /* Initial Creation */
         <>
-          <div className="card rounded-xl p-8 mb-8">
-            <label className="block text-sm font-semibold text-ink mb-3">
+          <div className="glass-card p-10 mb-8">
+            <label className="section-label mb-4">
               {t('creator.label.describe')}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('creator.placeholder')}
-              className="input min-h-[200px] text-base"
+              className="input min-h-[240px] text-lg"
               disabled={isGenerating}
             />
-            <div className="mt-3 text-sm text-ink-light">
+            <div className="mt-4 text-sm text-muted">
               {t('creator.hint')}
             </div>
           </div>
 
           {error && (
-            <div className="mb-6 card p-4 rounded-xl border-danger text-sm text-danger">
-              {error}
+            <div className="mb-8 glass-card p-6 border border-[#c17b7b]/30">
+              <p className="text-[#c17b7b] text-center">{error}</p>
             </div>
           )}
 
@@ -172,16 +173,16 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
             <button
               onClick={() => handleGenerate()}
               disabled={isGenerating || !description.trim()}
-              className="px-8 py-4 bg-ink text-white rounded-xl font-semibold text-lg shadow-lg hover:opacity-80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-primary text-xl px-12 py-5 shadow-premium-lg"
             >
               {isGenerating ? (
                 <span className="flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-6 h-6 animate-spin" />
                   {t('creator.generating')}
                 </span>
               ) : (
-                <span className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
+                <span className="flex items-center gap-3">
+                  <Sparkles className="w-6 h-6" />
                   {t('creator.generate')}
                 </span>
               )}
@@ -189,23 +190,23 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
           </div>
 
           {/* Examples */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-ink mb-4">
+          <div className="space-y-6">
+            <h3 className="section-label text-base">
               {t('creator.examples.title')}
             </h3>
-            <div className="grid gap-4">
+            <div className="grid gap-5">
               {examples.map((example, idx) => (
                 <div
                   key={idx}
                   onClick={() => !isGenerating && setDescription(example.text)}
-                  className="card-hover p-5 rounded-xl cursor-pointer"
+                  className="card-hover"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-6">
                     <div className="flex-1">
-                      <h4 className="font-semibold text-ink mb-2">{example.title}</h4>
-                      <p className="text-sm text-ink-medium line-clamp-2">{example.text}</p>
+                      <h4 className="font-bold text-primary text-lg mb-3">{example.title}</h4>
+                      <p className="text-base text-secondary line-clamp-2 leading-relaxed">{example.text}</p>
                     </div>
-                    <button className="text-xs text-ink hover:opacity-70 font-medium ml-4">
+                    <button className="btn btn-secondary px-6 whitespace-nowrap">
                       {t('creator.examples.use')}
                     </button>
                   </div>
@@ -216,55 +217,55 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
         </>
       ) : (
         /* Refinement Mode */
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Success message */}
-          <div className="card rounded-xl p-5 flex items-start gap-3 border-success bg-cream">
-            <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0 mt-0.5" />
+          <div className="glass-card p-8 flex items-start gap-4 border border-[#8b9c5c]/30 bg-white/90">
+            <CheckCircle2 className="w-8 h-8 text-[#8b9c5c] flex-shrink-0 mt-1" />
             <div>
-              <h3 className="font-semibold text-ink mb-1">{t('creator.success')}</h3>
-              <p className="text-sm text-ink-medium">
+              <h3 className="font-bold text-primary text-xl mb-2">{t('creator.success')}</h3>
+              <p className="text-base text-secondary">
                 {t('creator.success.hint')}
               </p>
             </div>
           </div>
 
           {/* Refinement input */}
-          <div className="card rounded-xl p-8">
-            <label className="block text-sm font-semibold text-ink mb-3">
+          <div className="glass-card p-10">
+            <label className="section-label mb-4">
               {t('creator.refine.label')}
             </label>
             <textarea
               value={refinement}
               onChange={(e) => setRefinement(e.target.value)}
               placeholder={t('creator.refine.placeholder')}
-              className="input min-h-[150px] text-base"
+              className="input min-h-[180px] text-lg"
               disabled={isGenerating}
             />
-            <div className="mt-3 text-sm text-ink-light">
+            <div className="mt-4 text-sm text-muted">
               {t('creator.refine.hint')}
             </div>
           </div>
 
           {error && (
-            <div className="card p-4 rounded-xl border-danger text-sm text-danger">
-              {error}
+            <div className="glass-card p-6 border border-[#c17b7b]/30">
+              <p className="text-[#c17b7b] text-center">{error}</p>
             </div>
           )}
 
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center">
             <button
               onClick={handleRefinement}
               disabled={isGenerating || !refinement.trim()}
-              className="px-8 py-4 bg-ink text-white rounded-xl font-semibold shadow-lg hover:opacity-80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-primary text-xl px-12 py-5 shadow-premium-lg"
             >
               {isGenerating ? (
                 <span className="flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-6 h-6 animate-spin" />
                   {t('creator.refine.updating')}
                 </span>
               ) : (
-                <span className="flex items-center gap-2">
-                  <RefreshCw className="w-5 h-5" />
+                <span className="flex items-center gap-3">
+                  <RefreshCw className="w-6 h-6" />
                   {t('creator.refine.update')}
                 </span>
               )}
@@ -273,11 +274,11 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
 
           {/* History */}
           {history.length > 0 && (
-            <div className="card rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-ink mb-3">{t('creator.history')}</h3>
-              <div className="space-y-2">
+            <div className="glass-card p-8">
+              <h3 className="section-label text-base mb-6">{t('creator.history')}</h3>
+              <div className="space-y-3">
                 {history.map((item, idx) => (
-                  <div key={idx} className="text-sm text-ink-medium pl-3 border-l-2 border-border-light">
+                  <div key={idx} className="text-base text-secondary pl-5 border-l-2 border-[#c17b5c]/40 py-2">
                     {item}
                   </div>
                 ))}

@@ -7,24 +7,24 @@ export const LanguageSwitcher: React.FC = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <Globe className="w-4 h-4 text-ink-light" />
-      <div className="inline-flex rounded-md border border-border-light bg-white">
+      <Globe className="w-4 h-4 text-secondary" />
+      <div className="inline-flex rounded-xl bg-white/60 backdrop-blur-sm p-1 border border-[#d4b69c]/30">
         <button
           onClick={() => setLanguage('pl')}
-          className={`px-3 py-1 text-sm font-medium transition-all ${
+          className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
             language === 'pl'
-              ? 'bg-ink text-white'
-              : 'text-ink-medium hover:text-ink'
+              ? 'bg-gradient-to-r from-[#c17b5c] to-[#8b5c4c] text-white shadow-md'
+              : 'text-secondary hover:bg-white/50'
           }`}
         >
           PL
         </button>
         <button
           onClick={() => setLanguage('en')}
-          className={`px-3 py-1 text-sm font-medium transition-all ${
+          className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
             language === 'en'
-              ? 'bg-ink text-white'
-              : 'text-ink-medium hover:text-ink'
+              ? 'bg-gradient-to-r from-[#c17b5c] to-[#8b5c4c] text-white shadow-md'
+              : 'text-secondary hover:bg-white/50'
           }`}
         >
           EN

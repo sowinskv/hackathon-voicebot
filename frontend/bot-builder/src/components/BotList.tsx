@@ -124,8 +124,8 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ink mx-auto mb-4"></div>
-          <p className="text-ink-medium">{t('botList.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c17b5c] mx-auto mb-4"></div>
+          <p className="text-secondary">{t('botList.loading')}</p>
         </div>
       </div>
     );
@@ -133,11 +133,11 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
 
   if (error) {
     return (
-      <div className="card p-6 text-center border-danger">
-        <p className="text-danger">{error}</p>
+      <div className="glass-card p-8 text-center">
+        <p className="text-[#c17b7b] mb-4">{error}</p>
         <button
           onClick={fetchBots}
-          className="mt-4 px-4 py-2 bg-danger text-white rounded-lg hover:opacity-90"
+          className="btn btn-danger"
         >
           {t('botList.error.retry')}
         </button>
@@ -146,34 +146,34 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-12 py-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-ink">{t('botList.title')}</h1>
-          <p className="text-ink-medium mt-1">
+          <h1 className="text-5xl font-bold text-white mb-3">{t('botList.title')}</h1>
+          <p className="text-white/70 text-xl">
             {t('botList.subtitle')}
           </p>
         </div>
         <button
           onClick={onCreateNew}
-          className="flex items-center gap-2 px-5 py-3 bg-ink text-white rounded-lg hover:opacity-80 transition font-medium"
+          className="btn btn-primary flex items-center gap-2 text-base px-6 py-3 font-normal"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4" />
           {t('botList.createNew')}
         </button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2">
+      <div className="flex gap-4">
         {['all', 'draft', 'published', 'archived'].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`px-4 py-2 text-sm font-normal transition-all ${
               filter === f
-                ? 'bg-ink text-white'
-                : 'bg-white border border-border-light text-ink hover:bg-cream'
+                ? 'text-white border-b-2 border-white'
+                : 'text-white/60 hover:text-white/90 border-b-2 border-transparent'
             }`}
           >
             {f === 'all' ? t('botList.filter.all') : getStatusLabel(f)}
@@ -183,17 +183,17 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
 
       {/* Bot List */}
       {bots.length === 0 ? (
-        <div className="bg-white rounded-xl border-2 border-dashed border-border-light p-12 text-center">
-          <Bot className="w-16 h-16 text-ink-light mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-ink mb-2">
+        <div className="glass-card p-16 text-center border-2 border-dashed border-[#d4b69c]/40">
+          <Bot className="w-20 h-20 text-secondary/40 mx-auto mb-6" />
+          <h3 className="text-2xl font-semibold text-primary mb-3">
             {filter === 'all' ? t('botList.empty') : `${t('botList.empty.filtered')} "${getStatusLabel(filter)}"`}
           </h3>
-          <p className="text-ink-medium mb-6">
+          <p className="text-secondary text-lg mb-8">
             {t('botList.empty.cta')}
           </p>
           <button
             onClick={onCreateNew}
-            className="px-6 py-3 bg-ink text-white rounded-lg hover:opacity-80 transition font-medium"
+            className="btn btn-primary text-lg px-8 py-4"
           >
             {t('botList.createFirst')}
           </button>
@@ -203,42 +203,48 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
           {bots.map((bot) => (
             <div
               key={bot.id}
-              className="card p-6 card-hover cursor-pointer"
+              className="card-hover"
+              onClick={() => onEditBot(bot)}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-ink rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-6 h-6 text-white" />
+              <div className="flex items-start gap-4 mb-5">
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#c17b5c] to-[#8b5c4c] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#c17b5c]/30">
+                    <Bot className="w-7 h-7 text-white" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-ink truncate">{bot.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      {getStatusIcon(bot.status)}
-                      <span className="text-xs text-ink-medium">{getStatusLabel(bot.status)}</span>
-                    </div>
+                  <div className="absolute -bottom-1 -right-1">
+                    {getStatusIcon(bot.status)}
                   </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-primary text-lg mb-1 truncate">{bot.name}</h3>
+                  <span className="text-xs text-muted uppercase tracking-wider font-medium">
+                    {getStatusLabel(bot.status)}
+                  </span>
                 </div>
               </div>
 
               {bot.description && (
-                <p className="text-sm text-ink-medium mb-4 line-clamp-2">{bot.description}</p>
+                <p className="text-sm text-secondary mb-5 line-clamp-2 leading-relaxed">{bot.description}</p>
               )}
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm text-ink-light">
+              <div className="space-y-3 mb-5">
+                <div className="flex items-center gap-3 text-sm text-muted">
                   <FileText className="w-4 h-4" />
                   <span>{bot.required_fields.length} {t('botList.fields')}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-ink-light">
+                <div className="flex items-center gap-3 text-sm text-muted">
                   <Clock className="w-4 h-4" />
-                  <span>{t('botList.updated')} {formatDate(bot.updated_at)}</span>
+                  <span>{formatDate(bot.updated_at)}</span>
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-4 border-t border-border-light">
+              <div className="flex gap-2 pt-5 border-t border-[#d4b69c]/30">
                 <button
-                  onClick={() => onEditBot(bot)}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-ink text-white rounded-lg hover:bg-ink-medium transition text-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditBot(bot);
+                  }}
+                  className="flex-1 btn btn-primary flex items-center justify-center gap-2"
                 >
                   <Edit2 className="w-4 h-4" />
                   {t('botList.edit')}
@@ -248,7 +254,7 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
                     e.stopPropagation();
                     handleDelete(bot.id, bot.name);
                   }}
-                  className="px-4 py-2 border border-border-light text-ink rounded-lg hover:bg-danger hover:border-danger hover:text-white transition text-sm"
+                  className="btn btn-secondary px-4"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
