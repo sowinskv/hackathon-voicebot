@@ -6,7 +6,9 @@ import {
   CheckCircle,
   AlertCircle,
   PhoneForwarded,
-  StopCircle
+  StopCircle,
+  GitBranch,
+  FolderInput
 } from 'lucide-react';
 
 interface ToolbarProps {
@@ -16,7 +18,9 @@ interface ToolbarProps {
 const nodeDefinitions = [
   { type: 'start', label: 'Start', icon: Play, color: 'text-green-600', description: 'Starting point' },
   { type: 'message', label: 'Message', icon: MessageSquare, color: 'text-blue-600', description: 'Send a message' },
-  { type: 'slotCollection', label: 'Slot Collection', icon: Database, color: 'text-purple-600', description: 'Collect information' },
+  { type: 'fieldGroup', label: 'Field Group', icon: FolderInput, color: 'text-purple-600', description: 'Collect multiple fields' },
+  { type: 'branch', label: 'Branch', icon: GitBranch, color: 'text-orange-600', description: 'Conditional branching' },
+  { type: 'slotCollection', label: 'Slot Collection', icon: Database, color: 'text-purple-500', description: 'Collect information' },
   { type: 'validation', label: 'Validation', icon: CheckCircle, color: 'text-amber-600', description: 'Validate input' },
   { type: 'confirmation', label: 'Confirmation', icon: AlertCircle, color: 'text-cyan-600', description: 'Confirm with user' },
   { type: 'escalation', label: 'Escalation', icon: PhoneForwarded, color: 'text-red-600', description: 'Transfer to agent' },

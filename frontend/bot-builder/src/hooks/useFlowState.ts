@@ -195,6 +195,19 @@ function getDefaultNodeData(type: string): Record<string, any> {
         slots: [],
         prompt: '',
       };
+    case 'fieldGroup':
+      return {
+        label: 'Field Group',
+        description: 'Collect multiple fields',
+        fields: [],
+      };
+    case 'branch':
+      return {
+        label: 'Branch Decision',
+        description: 'Route conversation based on conditions',
+        branches: [],
+        detection_field: '',
+      };
     case 'validation':
       return {
         label: 'Validation',

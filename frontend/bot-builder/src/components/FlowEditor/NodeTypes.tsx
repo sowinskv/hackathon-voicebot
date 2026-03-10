@@ -7,7 +7,9 @@ import {
   CheckCircle,
   AlertCircle,
   PhoneForwarded,
-  StopCircle
+  StopCircle,
+  GitBranch,
+  FolderInput
 } from 'lucide-react';
 
 const NodeWrapper: React.FC<{
@@ -125,10 +127,107 @@ export const EndNode = memo(({ data, selected }: NodeProps) => (
   </NodeWrapper>
 ));
 
+export const BranchNode = memo(({ data, selected }: NodeProps) => {
+  const branches = data.branches || [];
+
+  return (
+    <div
+      className={`bg-white rounded-lg border-2 shadow-lg min-w-[250px] ${
+        selected ? 'ring-2 ring-orange-300 ring-offset-2' : ''
+      }`}
+      style={{ borderColor: '#f97316' }}
+    >
+      <Handle type="target" position={Position.Top} className="!bg-orange-500" />
+
+      {/* Header */}
+      <div className="p-3 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <GitBranch className="w-5 h-5 text-orange-600" />
+          <div className="font-semibold text-gray-900">{data.label}</div>
+        </div>
+        {data.description && (
+          <p className="text-xs text-gray-500 mt-1">{data.description}</p>
+        )}
+      </div>
+
+      {/* Branches */}
+      <div className="p-2 space-y-1">
+        {branches.length > 0 ? (
+          branches.map((branch: any, idx: number) => (
+            <div
+              key={branch.id || idx}
+              className="text-xs bg-orange-50 rounded px-2 py-1 flex items-center justify-between"
+            >
+              <span className="font-medium text-orange-700">{branch.name}</span>
+              <span className="text-gray-500">
+                {branch.required_fields?.length || 0} fields
+              </span>
+            </div>
+          ))
+        ) : (
+          <div className="text-xs text-gray-400 text-center py-2">
+            No branches configured
+          </div>
+        )}
+      </div>
+
+      {/* Multiple output handles (one per branch) */}
+      {branches.map((branch: any, idx: number) => (
+        <Handle
+          key={branch.id || idx}
+          type="source"
+          position={Position.Bottom}
+          id={branch.id}
+          className="!bg-orange-500"
+          style={{
+            left: `${(100 / (branches.length + 1)) * (idx + 1)}%`,
+          }}
+        />
+      ))}
+
+      {/* Default fallback handle */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="fallback"
+        className="!bg-gray-400"
+      />
+    </div>
+  );
+});
+
+export const FieldGroupNode = memo(({ data, selected }: NodeProps) => {
+  const fields = data.fields || [];
+
+  return (
+    <NodeWrapper color="#a855f7" selected={selected}>
+      <Handle type="target" position={Position.Top} className="!bg-purple-500" />
+      <div className="flex items-center gap-2 mb-2">
+        <FolderInput className="w-5 h-5 text-purple-600" />
+        <div className="font-semibold text-gray-900">{data.label}</div>
+      </div>
+      {data.description && (
+        <div className="text-xs text-gray-500 mb-2">{data.description}</div>
+      )}
+      {fields.length > 0 ? (
+        <div className="text-xs text-gray-600 mt-1">
+          {fields.length} field{fields.length !== 1 ? 's' : ''}: {fields.slice(0, 3).join(', ')}
+          {fields.length > 3 && '...'}
+        </div>
+      ) : (
+        <div className="text-xs text-gray-400 mt-1">No fields selected</div>
+      )}
+      <Handle type="source" position={Position.Bottom} className="!bg-purple-500" />
+    </NodeWrapper>
+  );
+});
+
 export const nodeTypes = {
   start: StartNode,
   message: MessageNode,
   slotCollection: SlotCollectionNode,
+  fieldGroup: FieldGroupNode,
+  branch: BranchNode,
   validation: ValidationNode,
   confirmation: ConfirmationNode,
   escalation: EscalationNode,
