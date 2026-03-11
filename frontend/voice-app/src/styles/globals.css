@@ -173,6 +173,13 @@
   .divider {
     @apply border-t border-white/10;
   }
+
+  /* Glass morphism button */
+  .glass-button {
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
+  }
 }
 
 @layer utilities {

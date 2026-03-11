@@ -379,7 +379,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <div className="bg-white/[0.02] backdrop-blur-xl p-4 flex items-center justify-between">
+      <div className="p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="w-2.5 h-2.5 rounded-full bg-white shadow-lg shadow-white/50" />
@@ -393,14 +393,12 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
 
         <button
           onClick={onEnd}
-          className="group relative w-14 h-14 rounded-full transition-all duration-300"
+          className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
           style={{
-            background: 'radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.15))',
-            boxShadow: '0 0 40px rgba(239, 68, 68, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1)',
+            background: 'rgba(239, 68, 68, 0.15)'
           }}
         >
-          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/10 to-transparent opacity-50" />
-          <PhoneOff size={22} className="relative text-white/90 mx-auto" />
+          <PhoneOff size={22} className="text-white" />
         </button>
       </div>
 
@@ -457,7 +455,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
       </div>
 
       {/* Input */}
-      <div className="bg-white/[0.02] backdrop-blur-xl p-4">
+      <div className="p-4">
         <div className="flex gap-2">
           <input
             ref={inputRef}
@@ -473,10 +471,13 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isLoading || callEnded}
-            className="btn btn-primary flex items-center gap-2"
+            className="glass-button px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)'
+            }}
           >
-            <Send size={20} />
-            Send
+            <Send size={20} className="text-white" />
+            <span className="text-white">Send</span>
           </button>
         </div>
       </div>

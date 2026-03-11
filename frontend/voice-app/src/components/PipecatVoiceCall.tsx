@@ -599,81 +599,7 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
-      <div className="bg-white/[0.02] backdrop-blur-xl p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="w-2.5 h-2.5 rounded-full bg-white shadow-lg shadow-white/50" />
-            <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-white animate-ping opacity-40" />
-          </div>
-          <h2 className="text-xl font-semibold text-white">
-            {isConnecting ? 'Connecting...' : isConnected ? 'Connected' : 'Disconnected'}
-          </h2>
-
-          {/* Voice Recognition Badge */}
-          {voiceRecognized && recognizedCustomer && (
-            <div className="ml-4 px-3 py-1 bg-green-500/20 border border-green-400/40 rounded-full flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-sm text-green-100">
-                Recognized: {recognizedCustomer.customer_name} ({Math.round(recognizedCustomer.confidence * 100)}%)
-              </span>
-            </div>
-          )}
-
-          {recognizing && (
-            <div className="ml-4 px-3 py-1 bg-white/10 border border-white/20 rounded-full flex items-center gap-2">
-              <Loader2 className="w-3 h-3 animate-spin text-white/80" />
-              <span className="text-sm text-white/70">Identifying voice...</span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex gap-3">
-          {/* Push to Talk Button */}
-          <button
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={!isConnected}
-            className="group relative w-14 h-14 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center justify-center"
-            style={{
-              background: isRecording
-                ? 'rgba(239, 68, 68, 0.15)'
-                : 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: isRecording
-                ? '1px solid rgba(239, 68, 68, 0.3)'
-                : '1px solid rgba(255, 255, 255, 0.18)',
-              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)'
-            }}
-          >
-            {isRecording ? (
-              <div className="flex flex-col items-center justify-center">
-                <Mic size={20} className="text-white mb-0.5" />
-                <span className="text-[10px] text-white font-semibold">{recordingTimer}s</span>
-              </div>
-            ) : (
-              <Mic size={22} className="text-white" />
-            )}
-          </button>
-
-          {/* End Call Button */}
-          <button
-            onClick={endCall}
-            className="group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
-            style={{
-              background: 'rgba(239, 68, 68, 0.15)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)'
-            }}
-          >
-            <PhoneOff size={22} className="text-white" />
-          </button>
-        </div>
-      </div>
-
-      {/* Transcripts */}
+      {/* Transcripts - moved to top */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {error && (
           <div className="bg-white/[0.08] border border-white/20 text-white px-4 py-3 rounded-xl">
@@ -712,6 +638,70 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
           </div>
         ))}
         <div ref={transcriptsEndRef} />
+      </div>
+
+      {/* Header - moved to bottom */}
+      <div className="p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="w-2.5 h-2.5 rounded-full bg-white shadow-lg shadow-white/50" />
+            <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-white animate-ping opacity-40" />
+          </div>
+          <h2 className="text-xl font-semibold text-white">
+            {isConnecting ? 'Connecting...' : isConnected ? 'Connected' : 'Disconnected'}
+          </h2>
+
+          {/* Voice Recognition Badge */}
+          {voiceRecognized && recognizedCustomer && (
+            <div className="ml-4 px-3 py-1 bg-green-500/20 border border-green-400/40 rounded-full flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-sm text-green-100">
+                Recognized: {recognizedCustomer.customer_name} ({Math.round(recognizedCustomer.confidence * 100)}%)
+              </span>
+            </div>
+          )}
+
+          {recognizing && (
+            <div className="ml-4 px-3 py-1 bg-white/10 border border-white/20 rounded-full flex items-center gap-2">
+              <Loader2 className="w-3 h-3 animate-spin text-white/80" />
+              <span className="text-sm text-white/70">Identifying voice...</span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3">
+          {/* Push to Talk Button */}
+          <button
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={!isConnected}
+            className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center justify-center"
+            style={{
+              background: isRecording
+                ? 'rgba(239, 68, 68, 0.15)'
+                : 'rgba(255, 255, 255, 0.1)'
+            }}
+          >
+            {isRecording ? (
+              <div className="flex flex-col items-center justify-center">
+                <Mic size={20} className="text-white mb-0.5" />
+                <span className="text-[10px] text-white font-semibold">{recordingTimer}s</span>
+              </div>
+            ) : (
+              <Mic size={22} className="text-white" />
+            )}
+          </button>
+
+          {/* End Call Button */}
+          <button
+            onClick={endCall}
+            className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)'
+            }}
+          >
+            <PhoneOff size={22} className="text-white" />
+          </button>
+        </div>
       </div>
     </div>
   );
