@@ -183,8 +183,15 @@ function App() {
         </button>
 
         {error && (
-          <div className="mt-6 bg-white/[0.08] border border-white/20 rounded-xl p-4">
-            <p className="text-white/90 text-sm">{error}</p>
+          <div className="mt-8 text-center">
+            <h3 className="text-xl font-semibold text-white mb-2">Oops! Something went wrong</h3>
+            <p className="text-white/70 text-sm mb-6">{error}</p>
+            <button
+              onClick={fetchPublishedFlows}
+              className="px-6 py-3 bg-transparent hover:bg-white/10 border border-white/20 hover:border-white/40 text-white rounded-xl font-medium transition-all duration-300"
+            >
+              Try Again
+            </button>
           </div>
         )}
       </div>

@@ -170,8 +170,8 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
           </div>
 
           {error && (
-            <div className="mb-8 glass-card p-6 border border-[#c17b7b]/30">
-              <p className="text-[#c17b7b] text-center">{error}</p>
+            <div className="mb-8 text-center">
+              <p className="text-white/70 text-sm">{error}</p>
             </div>
           )}
 
@@ -261,8 +261,8 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
           </div>
 
           {error && (
-            <div className="glass-card p-6 border border-[#c17b7b]/30">
-              <p className="text-[#c17b7b] text-center">{error}</p>
+            <div className="text-center py-6">
+              <p className="text-white/70 text-sm">{error}</p>
             </div>
           )}
 

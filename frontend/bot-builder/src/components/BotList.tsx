@@ -133,11 +133,12 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
 
   if (error) {
     return (
-      <div className="glass-card p-8 text-center">
-        <p className="text-red-300/90 mb-4">{error}</p>
+      <div className="p-8 text-center">
+        <p className="text-white font-semibold mb-2">Something went wrong</p>
+        <p className="text-white/70 text-sm mb-6">{error}</p>
         <button
           onClick={fetchBots}
-          className="btn btn-danger"
+          className="px-6 py-3 bg-transparent hover:bg-white/10 border border-white/20 hover:border-white/40 text-white rounded-xl font-medium transition-all duration-300"
         >
           {t('botList.error.retry')}
         </button>

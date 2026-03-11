@@ -602,9 +602,9 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
       {/* Transcripts - moved to top */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {error && (
-          <div className="bg-white/[0.08] border border-white/20 text-white px-4 py-3 rounded-xl">
-            <p className="font-semibold">Error</p>
-            <p className="text-white/80">{error}</p>
+          <div className="text-center py-8">
+            <p className="font-semibold text-white mb-2">Something went wrong</p>
+            <p className="text-white/70 text-sm">{error}</p>
           </div>
         )}
 
