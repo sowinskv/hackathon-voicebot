@@ -55,8 +55,8 @@ export function SessionList() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Sessions</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-white">Sessions</h1>
+        <p className="text-white/70 mt-1">
           View and manage all customer interaction sessions
         </p>
       </div>
@@ -74,7 +74,7 @@ export function SessionList() {
                 className="input-field pl-10"
               />
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -113,7 +113,7 @@ export function SessionList() {
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <svg
-                className="animate-spin h-12 w-12 mx-auto text-primary-600 mb-4"
+                className="animate-spin h-12 w-12 mx-auto text-white/80 mb-4"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -131,7 +131,7 @@ export function SessionList() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <p className="text-gray-600">Loading sessions...</p>
+              <p className="text-white/70">Loading sessions...</p>
             </div>
           </div>
         ) : error ? (
@@ -149,16 +149,16 @@ export function SessionList() {
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="text-red-600 font-medium mb-2">Failed to load sessions</p>
-            <p className="text-gray-600 text-sm mb-4">{error}</p>
+            <p className="text-red-300 font-medium mb-2">Failed to load sessions</p>
+            <p className="text-white/70 text-sm mb-4">{error}</p>
             <button onClick={refresh} className="btn-primary">
               Try Again
             </button>
           </div>
         ) : sessions.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-white/60">
             <svg
-              className="w-16 h-16 mx-auto mb-4 text-gray-400"
+              className="w-16 h-16 mx-auto mb-4 text-white/40"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -179,7 +179,7 @@ export function SessionList() {
           </div>
         ) : (
           <>
-            <div className="mb-4 text-sm text-gray-600">
+            <div className="mb-4 text-sm text-white/70">
               Showing {sessions.length} session{sessions.length !== 1 ? 's' : ''}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

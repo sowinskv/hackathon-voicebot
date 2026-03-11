@@ -34,10 +34,10 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-lg text-gray-900">
+          <h3 className="font-semibold text-lg text-white">
             {sessionId}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-white/60">
             {formatDistanceToNow(new Date(startTime), {
               addSuffix: true,
             })}
@@ -51,17 +51,17 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
       {clientInfo && (
         <div className="mb-3 space-y-1">
           {clientInfo.name && (
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-white/80">
               <span className="font-medium">Name:</span> {clientInfo.name}
             </p>
           )}
           {clientInfo.phone && (
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-white/80">
               <span className="font-medium">Phone:</span> {clientInfo.phone}
             </p>
           )}
           {clientInfo.email && (
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-white/80">
               <span className="font-medium">Email:</span> {clientInfo.email}
             </p>
           )}
@@ -69,15 +69,15 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
       )}
 
       {session.escalated && session.escalation_reason && (
-        <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm font-medium text-red-900 mb-1">
+        <div className="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+          <p className="text-sm font-medium text-red-300 mb-1">
             Escalation Reason:
           </p>
-          <p className="text-sm text-red-700">{session.escalation_reason}</p>
+          <p className="text-sm text-red-200">{session.escalation_reason}</p>
         </div>
       )}
 
-      <div className="flex items-center gap-4 text-sm text-gray-600">
+      <div className="flex items-center gap-4 text-sm text-white/70">
         <div className="flex items-center gap-1">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path

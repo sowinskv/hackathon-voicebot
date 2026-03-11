@@ -20,10 +20,10 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
         <button
           key={status.value}
           onClick={() => onChange(status.value)}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
             value === status.value
-              ? 'bg-primary-600 text-white'
-              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              ? 'bg-white/20 text-white border border-white/40'
+              : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'
           }`}
         >
           {status.label}

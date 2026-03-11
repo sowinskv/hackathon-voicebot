@@ -56,7 +56,7 @@ export function TimeframeDistributionChart({
   if (loading) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-white/20 border-t-white/80 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -64,7 +64,7 @@ export function TimeframeDistributionChart({
   // If no data, display a message
   if (Object.keys(data).length === 0) {
     return (
-      <div className="h-48 flex items-center justify-center text-gray-500">
+      <div className="h-48 flex items-center justify-center text-white/60">
         {language === 'en' ? 'No distribution data available' : 'Brak danych do wykresu'}
       </div>
     );
@@ -72,19 +72,19 @@ export function TimeframeDistributionChart({
 
   return (
     <div className="pt-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">
+      <h3 className="text-sm font-medium text-white/70 mb-3">
         {language === 'en' ? 'Call Distribution' : 'Rozkład połączeń'}
       </h3>
       <div className="h-48 flex items-end gap-1">
         {sortedData.map(([unit, value]) => (
           <div key={unit} className="flex flex-col items-center flex-1">
             <div
-              className="w-full bg-primary-500 rounded-t"
+              className="w-full bg-white/80 rounded-t"
               style={{
                 height: `${Math.max(8, (value / maxValue) * 100)}%`,
               }}
             ></div>
-            <div className="text-xs text-gray-600 mt-1 w-full text-center truncate">
+            <div className="text-xs text-white/60 mt-1 w-full text-center truncate">
               {getLabelForTimeUnit(unit, timeframe)}
             </div>
           </div>
