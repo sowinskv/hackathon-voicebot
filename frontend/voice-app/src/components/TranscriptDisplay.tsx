@@ -40,12 +40,12 @@ export default function TranscriptDisplay({
   return (
     <div className="card flex flex-col" style={{ minHeight: '600px' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-4" style={{ borderBottom: '1px solid #d4cfc8' }}>
-        <h2 className="text-base font-semibold" style={{ color: '#1a1a1a' }}>Conversation Transcript</h2>
+      <div className="flex items-center justify-between mb-4 pb-4" className="border-b border-white/10">
+        <h2 className="text-base font-semibold" className="text-white">Conversation Transcript</h2>
         {isActive && (
           <div className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-            <span className="font-mono text-xs" style={{ color: '#6b6869' }}>live</span>
+            <span className="font-mono text-xs" className="text-white/70">live</span>
           </div>
         )}
       </div>
@@ -82,7 +82,7 @@ export default function TranscriptDisplay({
               <div
                 className={`max-w-[80%] rounded px-4 py-3 text-sm leading-relaxed ${
                   message.role === 'user'
-                    ? 'bg-[#1a1a1a] text-white'
+                    ? 'bg-white/20 text-white'
                     : 'bg-notion-bg border border-notion-border text-notion-text'
                 }`}
               >

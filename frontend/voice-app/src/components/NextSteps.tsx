@@ -22,13 +22,13 @@ interface NextStepsProps {
 export default function NextSteps({ language }: NextStepsProps) {
   return (
     <div className="card animate-fadeIn">
-      <h3 className="text-sm font-semibold mb-3" style={{ color: '#1a1a1a' }}>
+      <h3 className="text-sm font-semibold mb-3" className="text-white">
         {language === 'en' ? 'What happens next?' : 'Co dalej?'}
       </h3>
       <ol className="space-y-3">
         {STEPS[language].map((step, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm" style={{ color: '#6b6869' }}>
-            <span className="font-mono text-xs mt-0.5 flex-shrink-0" style={{ color: '#1a1a1a' }}>
+          <li key={i} className="flex items-start gap-3 text-sm" className="text-white/70">
+            <span className="font-mono text-xs mt-0.5 flex-shrink-0" className="text-white">
               {String(i + 1).padStart(2, '0')}
             </span>
             <span>{step}</span>

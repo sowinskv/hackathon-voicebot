@@ -86,11 +86,11 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'published':
-        return <CheckCircle className="w-4 h-4 text-ink" />;
+        return <CheckCircle className="w-4 h-4 text-white" />;
       case 'draft':
-        return <FileText className="w-4 h-4 text-ink-medium" />;
+        return <FileText className="w-4 h-4 text-white/70" />;
       case 'archived':
-        return <Archive className="w-4 h-4 text-ink-light" />;
+        return <Archive className="w-4 h-4 text-white/50" />;
       default:
         return null;
     }
@@ -124,8 +124,8 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c17b5c] mx-auto mb-4"></div>
-          <p className="text-secondary">{t('botList.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white/40 mx-auto mb-4"></div>
+          <p className="text-white/70">{t('botList.loading')}</p>
         </div>
       </div>
     );
@@ -134,7 +134,7 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
   if (error) {
     return (
       <div className="glass-card p-8 text-center">
-        <p className="text-[#c17b7b] mb-4">{error}</p>
+        <p className="text-red-300/90 mb-4">{error}</p>
         <button
           onClick={fetchBots}
           className="btn btn-danger"
@@ -151,7 +151,7 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-5xl font-bold text-white mb-3">{t('botList.title')}</h1>
-          <p className="text-white/70 text-xl">
+          <p className="text-white text-xl">
             {t('botList.subtitle')}
           </p>
         </div>

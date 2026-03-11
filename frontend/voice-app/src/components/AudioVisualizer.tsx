@@ -21,7 +21,7 @@ export default function AudioVisualizer({ levels, isActive, audioEnabled }: Audi
             className="w-[3px] rounded-sm"
             style={{
               height: `${height}px`,
-              backgroundColor: isActive && audioEnabled ? '#1a1a1a' : '#d1d1d1',
+              backgroundColor: isActive && audioEnabled ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.1)',
               transition: 'height 80ms ease-out, background-color 200ms ease',
             }}
           />

@@ -49,7 +49,7 @@ export default function VoiceControls({
 
   return (
     <div className="card">
-      <h2 className="text-base font-semibold mb-4" style={{ color: '#1a1a1a' }}>Voice Controls</h2>
+      <h2 className="text-base font-semibold mb-4" className="text-white">Voice Controls</h2>
 
       {/* Status row */}
       <div className="flex items-center justify-between mb-6">

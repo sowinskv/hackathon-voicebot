@@ -69,10 +69,10 @@ Twoim celem jest sprawne przyjęcie zgłoszenia szkody komunikacyjnej OC:
     <div className="h-full flex flex-col bg-white">
       <div className="border-b border-gray-200 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <FileText className="w-5 h-5 text-gray-600" />
+          <FileText className="w-5 h-5 text-white/600" />
           <div>
-            <h3 className="font-semibold text-gray-900">System Prompt</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="font-semibold text-white/900">System Prompt</h3>
+            <p className="text-sm text-white/500">
               Define the bot's behavior and personality
             </p>
           </div>
@@ -103,7 +103,7 @@ Twoim celem jest sprawne przyjęcie zgłoszenia szkody komunikacyjnej OC:
       <div className="border-t border-gray-200 p-4 bg-gray-50">
         <div className="flex items-start gap-3 text-sm">
           <div className="text-blue-600 font-medium">Tips:</div>
-          <div className="text-gray-600 space-y-1">
+          <div className="text-white/600 space-y-1">
             <div>• Use {'{REQUIRED_FIELDS}'} to reference configured fields</div>
             <div>• Use {'{CONVERSATION_FLOW}'} to reference the visual flow</div>
             <div>• Keep instructions clear and specific for best results</div>

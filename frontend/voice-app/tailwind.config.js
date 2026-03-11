@@ -7,14 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Cream/warm palette (ui-inspo aesthetic)
+        // Dark theme palette
         notion: {
-          bg: '#f0ede8',        // warm cream background
-          surface: '#faf8f5',   // slightly lighter surface for cards
-          text: '#1a1a1a',      // near-black
-          textLight: '#6b6869', // warm mid-gray
-          border: '#d4cfc8',    // warm light border
-          hover: '#e8e3dc',     // cream hover
+          bg: 'transparent',    // use body gradient
+          surface: 'rgba(255, 255, 255, 0.05)',   // glass surface
+          text: '#ffffff',      // white
+          textLight: 'rgba(255, 255, 255, 0.7)', // white 70%
+          border: 'rgba(255, 255, 255, 0.1)',    // white 10%
+          hover: 'rgba(255, 255, 255, 0.1)',     // white hover
           accent: '#2383e2',    // blue for data/links
         },
         // Coral accent — main CTA color (PlayerZero-inspired)

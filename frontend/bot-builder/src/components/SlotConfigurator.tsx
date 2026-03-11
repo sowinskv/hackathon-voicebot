@@ -129,8 +129,8 @@ export const SlotConfigurator: React.FC = () => {
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900">Required Fields Configuration</h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <h3 className="font-semibold text-white/900">Required Fields Configuration</h3>
+            <p className="text-sm text-white/500 mt-1">
               Define the information your bot needs to collect
             </p>
           </div>
@@ -172,8 +172,8 @@ export const SlotConfigurator: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-semibold text-gray-900">{field.name}</h4>
-                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                      <h4 className="font-semibold text-white/900">{field.name}</h4>
+                      <span className="px-2 py-0.5 bg-gray-100 text-white/600 text-xs rounded">
                         {field.type}
                       </span>
                       {field.validation?.required && (
@@ -182,9 +182,9 @@ export const SlotConfigurator: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600">{field.description}</p>
+                    <p className="text-sm text-white/600">{field.description}</p>
                     {field.validation && (
-                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-500">
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-white/500">
                         {field.validation.minLength && (
                           <span>Min length: {field.validation.minLength}</span>
                         )}
@@ -236,7 +236,7 @@ export const SlotConfigurator: React.FC = () => {
           )}
 
           {requiredFields.length === 0 && !isAdding && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-white/500">
               <p className="mb-2">No fields configured yet</p>
               <p className="text-sm">
                 Click "Add Field" or "AI Suggest" to get started
@@ -269,7 +269,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
   <div className="space-y-4">
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-white/700 mb-1">
           Field Name *
         </label>
         <input
@@ -281,7 +281,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-white/700 mb-1">
           Type *
         </label>
         <select
@@ -299,7 +299,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
     </div>
 
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-white/700 mb-1">
         Description
       </label>
       <textarea
@@ -312,7 +312,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
     </div>
 
     <div className="border-t border-gray-200 pt-4">
-      <h5 className="font-medium text-gray-900 mb-3">Validation Rules</h5>
+      <h5 className="font-medium text-white/900 mb-3">Validation Rules</h5>
 
       <div className="space-y-3">
         <label className="flex items-center gap-2">
@@ -322,14 +322,14 @@ const FieldForm: React.FC<FieldFormProps> = ({
             onChange={(e) => updateValidation('required', e.target.checked)}
             className="rounded border-gray-300"
           />
-          <span className="text-sm text-gray-700">Required field</span>
+          <span className="text-sm text-white/700">Required field</span>
         </label>
 
         {formData.type === 'string' && (
           <>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-700 mb-1">Min Length</label>
+                <label className="block text-sm text-white/700 mb-1">Min Length</label>
                 <input
                   type="number"
                   value={formData.validation?.minLength || ''}
@@ -339,7 +339,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-700 mb-1">Max Length</label>
+                <label className="block text-sm text-white/700 mb-1">Max Length</label>
                 <input
                   type="number"
                   value={formData.validation?.maxLength || ''}
@@ -350,7 +350,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">Pattern (Regex)</label>
+              <label className="block text-sm text-white/700 mb-1">Pattern (Regex)</label>
               <input
                 type="text"
                 value={formData.validation?.pattern || ''}
@@ -365,7 +365,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
         {formData.type === 'number' && (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">Min Value</label>
+              <label className="block text-sm text-white/700 mb-1">Min Value</label>
               <input
                 type="number"
                 value={formData.validation?.min ?? ''}
@@ -374,7 +374,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-700 mb-1">Max Value</label>
+              <label className="block text-sm text-white/700 mb-1">Max Value</label>
               <input
                 type="number"
                 value={formData.validation?.max ?? ''}

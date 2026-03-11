@@ -18,10 +18,10 @@
      Text Colors
      ======================================== */
 
-  --color-text-primary: #1a1a1a;      /* Almost black */
-  --color-text-secondary: #4a4a4a;    /* Medium gray */
-  --color-text-tertiary: #787774;     /* Light gray */
-  --color-text-inverse: #ffffff;      /* White text on dark bg */
+  --color-text-primary: #ffffff;      /* White */
+  --color-text-secondary: rgba(255, 255, 255, 0.8);    /* White 80% */
+  --color-text-tertiary: rgba(255, 255, 255, 0.6);     /* White 60% */
+  --color-text-inverse: #1a1a1a;      /* Dark text on light bg */
 
   /* ========================================
      Borders
@@ -121,7 +121,6 @@
 body {
   font: var(--font-body);
   color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
 }
 
 /* Monospace for specific elements */

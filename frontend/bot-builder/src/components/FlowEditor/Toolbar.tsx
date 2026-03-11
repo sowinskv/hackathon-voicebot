@@ -28,7 +28,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ onAddNode }) => {
     { type: 'validation', labelKey: 'flow.node.validation', descKey: 'flow.node.validation.desc', icon: CheckCircle, color: 'text-amber-600' },
     { type: 'confirmation', labelKey: 'flow.node.confirmation', descKey: 'flow.node.confirmation.desc', icon: AlertCircle, color: 'text-cyan-600' },
     { type: 'escalation', labelKey: 'flow.node.escalation', descKey: 'flow.node.escalation.desc', icon: PhoneForwarded, color: 'text-red-600' },
-    { type: 'end', labelKey: 'flow.node.end', descKey: 'flow.node.end.desc', icon: StopCircle, color: 'text-gray-600' },
+    { type: 'end', labelKey: 'flow.node.end', descKey: 'flow.node.end.desc', icon: StopCircle, color: 'text-white/600' },
   ];
   const handleDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);

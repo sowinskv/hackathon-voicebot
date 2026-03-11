@@ -78,10 +78,10 @@ export const TestConsole: React.FC = () => {
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <MessageCircle className="w-5 h-5 text-gray-600" />
+            <MessageCircle className="w-5 h-5 text-white/600" />
             <div>
-              <h3 className="font-semibold text-gray-900">Test Console</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-semibold text-white/900">Test Console</h3>
+              <p className="text-sm text-white/500">
                 Test your bot with the current draft configuration
               </p>
             </div>
@@ -132,11 +132,11 @@ export const TestConsole: React.FC = () => {
 
       {!session ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-          <MessageCircle className="w-16 h-16 text-gray-300 mb-4" />
-          <h4 className="text-lg font-medium text-gray-900 mb-2">
+          <MessageCircle className="w-16 h-16 text-white/300 mb-4" />
+          <h4 className="text-lg font-medium text-white/900 mb-2">
             Ready to test your bot?
           </h4>
-          <p className="text-gray-600 mb-6 max-w-md">
+          <p className="text-white/600 mb-6 max-w-md">
             Start a test session to interact with your bot using the current flow,
             system prompt, and required fields configuration.
           </p>
@@ -175,7 +175,7 @@ export const TestConsole: React.FC = () => {
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   <p
                     className={`text-xs mt-1 ${
-                      msg.role === 'user' ? 'text-primary-100' : 'text-gray-400'
+                      msg.role === 'user' ? 'text-primary-100' : 'text-white/400'
                     }`}
                   >
                     {format(new Date(msg.timestamp), 'HH:mm:ss')}
@@ -183,7 +183,7 @@ export const TestConsole: React.FC = () => {
                 </div>
                 {msg.role === 'user' && (
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                    <User className="w-5 h-5 text-gray-600" />
+                    <User className="w-5 h-5 text-white/600" />
                   </div>
                 )}
               </div>

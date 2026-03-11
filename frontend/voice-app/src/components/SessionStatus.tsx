@@ -5,7 +5,7 @@ interface SessionStatusProps {
 }
 
 const config: Record<SessionState, { dot: string; label: string }> = {
-  idle:       { dot: 'bg-[#4a4a4a]',    label: 'idle' },
+  idle:       { dot: 'bg-white/40',    label: 'idle' },
   connecting: { dot: 'bg-yellow-400 animate-pulse', label: 'connecting' },
   active:     { dot: 'bg-green-500 animate-pulse',  label: 'active' },
   escalated:  { dot: 'bg-amber-400 animate-pulse',  label: 'escalated' },
@@ -19,7 +19,7 @@ export default function SessionStatus({ state }: SessionStatusProps) {
   return (
     <div className="flex items-center gap-2">
       <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
-      <span className="font-mono text-xs text-[#888]">{label}</span>
+      <span className="font-mono text-xs text-white/70">{label}</span>
     </div>
   )
 }

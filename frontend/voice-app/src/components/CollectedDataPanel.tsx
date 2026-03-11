@@ -38,10 +38,10 @@ export default function CollectedDataPanel({ data, language }: CollectedDataPane
   return (
     <div className="card flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold" style={{ color: '#1a1a1a' }}>
+        <h2 className="text-base font-semibold" className="text-white">
           {language === 'en' ? 'Collected Data' : 'Zebrane dane'}
         </h2>
-        <span className="font-mono text-xs" style={{ color: '#6b6869' }}>
+        <span className="font-mono text-xs" className="text-white/70">
           {filledRequired}/{REQUIRED_COUNT}
         </span>
       </div>
@@ -52,7 +52,7 @@ export default function CollectedDataPanel({ data, language }: CollectedDataPane
           className="h-full rounded-full transition-all duration-500"
           style={{
             width: `${completeness}%`,
-            backgroundColor: completeness === 100 ? '#16a34a' : '#1a1a1a',
+            backgroundColor: completeness === 100 ? '#16a34a' : 'rgba(255, 255, 255, 0.2)',
           }}
         />
       </div>
@@ -64,11 +64,11 @@ export default function CollectedDataPanel({ data, language }: CollectedDataPane
           return (
             <div key={key} className="flex flex-col gap-0.5">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs" style={{ color: '#6b6869' }}>
+                <span className="text-xs" className="text-white/70">
                   {label[language]}
                 </span>
                 {required && (
-                  <span className="font-mono text-xs" style={{ color: '#d4cfc8' }}>*</span>
+                  <span className="font-mono text-xs" className="text-white/30">*</span>
                 )}
               </div>
               <div
