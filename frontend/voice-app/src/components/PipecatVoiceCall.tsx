@@ -633,38 +633,42 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
           <button
             onClick={isRecording ? stopRecording : startRecording}
             disabled={!isConnected}
-            className="group relative w-14 h-14 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative w-14 h-14 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center justify-center"
             style={{
               background: isRecording
-                ? 'radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.15))'
-                : 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05))',
-              boxShadow: isRecording
-                ? '0 0 40px rgba(239, 68, 68, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1)'
-                : '0 0 30px rgba(255, 255, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1)',
+                ? 'rgba(239, 68, 68, 0.15)'
+                : 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: isRecording
+                ? '1px solid rgba(239, 68, 68, 0.3)'
+                : '1px solid rgba(255, 255, 255, 0.18)',
+              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)'
             }}
           >
-            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/10 to-transparent opacity-50" />
             {isRecording ? (
-              <div className="relative flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center">
                 <Mic size={20} className="text-white mb-0.5" />
                 <span className="text-[10px] text-white font-semibold">{recordingTimer}s</span>
               </div>
             ) : (
-              <Mic size={22} className="relative text-white/90 mx-auto" />
+              <Mic size={22} className="text-white" />
             )}
           </button>
 
           {/* End Call Button */}
           <button
             onClick={endCall}
-            className="group relative w-14 h-14 rounded-full transition-all duration-300"
+            className="group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
             style={{
-              background: 'radial-gradient(circle at 30% 30%, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.15))',
-              boxShadow: '0 0 40px rgba(239, 68, 68, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1)',
+              background: 'rgba(239, 68, 68, 0.15)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)'
             }}
           >
-            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/10 to-transparent opacity-50" />
-            <PhoneOff size={22} className="relative text-white/90 mx-auto" />
+            <PhoneOff size={22} className="text-white" />
           </button>
         </div>
       </div>

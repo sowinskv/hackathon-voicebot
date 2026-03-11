@@ -79,7 +79,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-8">
       {/* Logo - Top Left */}
       <div className="fixed top-8 left-8 z-50">
         <div className="flex items-center gap-3">
@@ -88,148 +88,105 @@ function App() {
         </div>
       </div>
 
-      {/* Ambient glow particles */}
-      <div className="fixed top-1/4 left-1/4 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-[glowFloat_6s_ease-in-out_infinite]" />
-      <div className="fixed top-1/3 right-1/4 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-[glowFloat_8s_ease-in-out_infinite_1s]" />
-      <div className="fixed bottom-1/4 right-1/3 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-[glowFloat_10s_ease-in-out_infinite_2s]" />
-
-      {/* Decorative Lines */}
-      <div className="fixed top-0 left-1/3 w-px h-full bg-gradient-to-b from-transparent via-white/[0.08] to-transparent" />
-      <div className="fixed top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-white/[0.08] to-transparent" />
-
-      {/* Left Side - Hero */}
-      <div className="flex-1 flex items-center justify-center p-12 relative z-10">
-        <div className="max-w-lg">
-          <div className="mb-8">
-            <div className="inline-block px-4 py-1.5 bg-white/[0.08] border border-white/10 rounded-full mb-6">
-              <span className="text-xs font-medium text-white/70 uppercase tracking-wider">AI Voice Assistant</span>
-            </div>
-            <h2 className="text-6xl font-bold text-white mb-4 leading-tight">
-              Start Your
-              <br />
-              <span className="bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
-                Conversation
-              </span>
-            </h2>
-            <p className="text-white/50 text-lg leading-relaxed">
-              Connect with intelligent voice bots that understand and respond naturally
-            </p>
+      {/* Centered Card */}
+      <div className="max-w-4xl w-full p-12 relative z-10">
+        <div className="mb-12">
+          <div className="inline-block px-4 py-1.5 bg-white/[0.08] border border-white/10 rounded-full mb-6">
+            <span className="text-xs font-medium text-white uppercase tracking-wider">AI Voice Assistant</span>
           </div>
-
-          {/* Stats/Features */}
-          <div className="grid grid-cols-3 gap-6">
-            <div className="relative">
-              <div className="absolute inset-0 bg-white/[0.03] rounded-xl blur-sm" />
-              <div className="relative bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 backdrop-blur-sm">
-                <div className="text-2xl font-bold text-white mb-1">{flows.length}</div>
-                <div className="text-xs text-white/50 uppercase tracking-wider">Active Bots</div>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-white/[0.03] rounded-xl blur-sm" />
-              <div className="relative bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 backdrop-blur-sm">
-                <div className="text-2xl font-bold text-white mb-1">2</div>
-                <div className="text-xs text-white/50 uppercase tracking-wider">Modes</div>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-0 bg-white/[0.03] rounded-xl blur-sm" />
-              <div className="relative bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 backdrop-blur-sm">
-                <div className="text-2xl font-bold text-white mb-1">24/7</div>
-                <div className="text-xs text-white/50 uppercase tracking-wider">Available</div>
-              </div>
-            </div>
-          </div>
+          <h2 className="text-7xl font-bold text-white mb-6 leading-tight">
+            Start Your
+            <br />
+            Conversation
+          </h2>
+          <p className="text-white text-xl leading-relaxed max-w-2xl">
+            Connect with intelligent voice bots that understand and respond naturally
+          </p>
         </div>
-      </div>
 
-      {/* Right Side - Control Panel */}
-      <div className="w-[480px] flex items-center justify-center p-12 relative z-10">
-        <div className="w-full">
-          <div className="glass-card p-8">
-            {error && (
-              <div className="mb-6 bg-white/[0.08] border border-white/20 rounded-xl p-4">
-                <p className="text-white/90 text-sm">{error}</p>
-              </div>
-            )}
-
-            {/* Flow Selector */}
-            <div className="mb-6">
-              <label className="block text-[11px] font-semibold text-white/50 mb-3 uppercase tracking-widest">
-                Select Bot
-              </label>
-              <select
-                value={selectedFlowId || ''}
-                onChange={(e) => setSelectedFlowId(e.target.value)}
-                className="input"
-              >
-                <option value="" disabled>Select a bot</option>
-                {flows.map(flow => (
-                  <option key={flow.id} value={flow.id}>
-                    {flow.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Mode Selector */}
-            <div className="mb-8">
-              <label className="block text-[11px] font-semibold text-white/50 mb-3 uppercase tracking-widest">
-                Mode
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => setMode('chat')}
-                  className={`relative px-6 py-4 rounded-xl font-medium transition-all duration-300 overflow-hidden ${
-                    mode === 'chat'
-                      ? 'bg-white/20 text-white border border-white/40 shadow-[0_0_30px_rgba(255,255,255,0.1)]'
-                      : 'bg-white/[0.04] text-white/70 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
-                  }`}
-                >
-                  {mode === 'chat' && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50" />
-                  )}
-                  <span className="relative">Chat</span>
-                </button>
-                <button
-                  onClick={() => setMode('voice')}
-                  className={`relative px-6 py-4 rounded-xl font-medium transition-all duration-300 overflow-hidden ${
-                    mode === 'voice'
-                      ? 'bg-white/20 text-white border border-white/40 shadow-[0_0_30px_rgba(255,255,255,0.1)]'
-                      : 'bg-white/[0.04] text-white/70 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
-                  }`}
-                >
-                  {mode === 'voice' && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50" />
-                  )}
-                  <span className="relative">Voice</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Start Button */}
-            <button
-              onClick={startCall}
-              disabled={!selectedFlowId}
-              className="w-full btn btn-success text-base py-4 shadow-lg mb-6"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+          {/* Flow Selector */}
+          <div>
+            <label className="block text-[11px] font-semibold text-white/50 mb-3 uppercase tracking-widest">
+              Select Bot
+            </label>
+            <select
+              value={selectedFlowId || ''}
+              onChange={(e) => setSelectedFlowId(e.target.value)}
+              className="input"
             >
-              {mode === 'chat' ? 'Start Chat' : 'Start Call'}
-            </button>
+              <option value="" disabled>Select a bot</option>
+              {flows.map(flow => (
+                <option key={flow.id} value={flow.id}>
+                  {flow.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            {selectedFlowId && (
-              <div className="p-4 bg-white/[0.03] border border-white/[0.08] rounded-xl">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-white/50">Selected:</span>
-                  <span className="text-white/90 font-medium">{flows.find(f => f.id === selectedFlowId)?.name}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-white/50">Mode:</span>
-                  <span className="text-white/90 font-medium">{mode === 'chat' ? 'Text chat' : 'Voice call'}</span>
-                </div>
-              </div>
-            )}
+          {/* Mode Selector */}
+          <div>
+            <label className="block text-[11px] font-semibold text-white/50 mb-3 uppercase tracking-widest">
+              Mode
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setMode('chat')}
+                className={`relative px-4 py-3 rounded-xl font-medium transition-all duration-300 overflow-hidden ${
+                  mode === 'chat'
+                    ? 'bg-white/20 text-white border border-white/40 shadow-[0_0_30px_rgba(255,255,255,0.1)]'
+                    : 'bg-white/[0.04] text-white/70 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
+                }`}
+              >
+                {mode === 'chat' && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50" />
+                )}
+                <span className="relative">Chat</span>
+              </button>
+              <button
+                onClick={() => setMode('voice')}
+                className={`relative px-4 py-3 rounded-xl font-medium transition-all duration-300 overflow-hidden ${
+                  mode === 'voice'
+                    ? 'bg-white/20 text-white border border-white/40 shadow-[0_0_30px_rgba(255,255,255,0.1)]'
+                    : 'bg-white/[0.04] text-white/70 border border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20'
+                }`}
+              >
+                {mode === 'voice' && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50" />
+                )}
+                <span className="relative">Voice</span>
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Start Button */}
+        <button
+          onClick={startCall}
+          disabled={!selectedFlowId}
+          className="group relative mt-8 px-12 py-5 rounded-full font-medium text-lg overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)'
+          }}
+        >
+          <span className="relative text-white flex items-center justify-center gap-3">
+            {mode === 'chat' ? 'Start Chat' : 'Start Call'}
+            <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </span>
+          <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </button>
+
+        {error && (
+          <div className="mt-6 bg-white/[0.08] border border-white/20 rounded-xl p-4">
+            <p className="text-white/90 text-sm">{error}</p>
+          </div>
+        )}
       </div>
     </div>
   );
