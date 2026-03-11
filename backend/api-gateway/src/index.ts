@@ -13,6 +13,7 @@ import livekitRouter from './routes/livekit';
 import botRouter from './routes/bot';
 import voiceRouter from './routes/voice';
 import chatRouter from './routes/chat';
+import voiceRecognitionRouter from './routes/voice-recognition';
 
 // Load environment variables
 dotenv.config();
@@ -80,6 +81,7 @@ app.use('/api/livekit', livekitRouter);
 app.use('/api/bot', botRouter);
 app.use('/api/voice', voiceRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/voice-recognition', voiceRecognitionRouter);
 
 // Root endpoint
 app.get('/', (req: Request, res: Response) => {
@@ -94,6 +96,7 @@ app.get('/', (req: Request, res: Response) => {
       metrics: '/api/metrics',
       livekit: '/api/livekit',
       bot: '/api/bot',
+      voice_recognition: '/api/voice-recognition',
       websocket: '/ws',
     },
   });

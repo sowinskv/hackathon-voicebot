@@ -34,6 +34,9 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
   const [collectedData, setCollectedData] = useState<Record<string, string>>({});
   const [requiredFields, setRequiredFields] = useState<RequiredField[]>([]);
   const [extractingData, setExtractingData] = useState(false);
+  const [voiceRecognized, setVoiceRecognized] = useState(false);
+  const [recognizedCustomer, setRecognizedCustomer] = useState<any>(null);
+  const [recognizing, setRecognizing] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -45,6 +48,8 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef(false);
+  const voiceRecognitionAudioRef = useRef<Int16Array[]>([]);
+  const sessionIdRef = useRef<string>('');
 
   useEffect(() => {
     // Prevent double execution in React Strict Mode
@@ -103,11 +108,19 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
 
       // Create session ID
       const sessionId = `session-${Date.now()}`;
+      sessionIdRef.current = sessionId;
 
       // Connect WebSocket with query parameters
       const wsUrl = `ws://localhost:8080/ws/${sessionId}?flowId=${encodeURIComponent(flowId)}&language=${encodeURIComponent(language)}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
+
+      // Start voice recognition after 10 seconds
+      setTimeout(() => {
+        if (voiceRecognitionAudioRef.current.length > 0) {
+          identifySpeaker();
+        }
+      }, 10000);
 
       ws.onopen = async () => {
         console.log('[Voice] WebSocket connected');
@@ -124,6 +137,13 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
           worklet.port.onmessage = (event) => {
             if (isRecordingRef.current && !isMuted && ws && ws.readyState === WebSocket.OPEN) {
               ws.send(event.data);
+
+              // Collect first 10 seconds for voice recognition
+              if (!voiceRecognized && voiceRecognitionAudioRef.current.length < 100) {
+                const int16Data = new Int16Array(event.data);
+                voiceRecognitionAudioRef.current.push(int16Data);
+              }
+
               audioChunkCount++;
               if (audioChunkCount % 50 === 0) {
                 console.log(`[Voice] Sent ${audioChunkCount} audio chunks`);
@@ -149,6 +169,12 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
                 int16Data[i] = Math.max(-32768, Math.min(32767, audioData[i] * 32768));
               }
               ws.send(int16Data.buffer);
+
+              // Collect first 10 seconds for voice recognition
+              if (!voiceRecognized && voiceRecognitionAudioRef.current.length < 100) {
+                voiceRecognitionAudioRef.current.push(int16Data);
+              }
+
               audioChunkCount++;
               if (audioChunkCount % 50 === 0) {
                 console.log(`[Voice] Sent ${audioChunkCount} audio chunks (ScriptProcessor)`);
@@ -254,6 +280,55 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
         timestamp: new Date(),
       }
     ]);
+  };
+
+  const identifySpeaker = async () => {
+    if (voiceRecognized || recognizing) return;
+
+    console.log('[Voice] Attempting voice recognition...');
+    setRecognizing(true);
+
+    try {
+      // Combine all audio chunks
+      const totalLength = voiceRecognitionAudioRef.current.reduce((sum, chunk) => sum + chunk.length, 0);
+      const combinedAudio = new Int16Array(totalLength);
+      let offset = 0;
+      for (const chunk of voiceRecognitionAudioRef.current) {
+        combinedAudio.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      // Convert to base64
+      const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(combinedAudio.buffer)));
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/voice-recognition/identify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: sessionIdRef.current,
+          audioBase64,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.data.recognized) {
+          console.log('[Voice] Customer recognized:', result.data.customer_name);
+          setVoiceRecognized(true);
+          setRecognizedCustomer(result.data);
+          addTranscript('bot', `Welcome back, ${result.data.customer_name}! I've recognized your voice.`);
+        } else {
+          console.log('[Voice] Voice not recognized');
+        }
+      }
+    } catch (err) {
+      console.error('[Voice] Voice recognition error:', err);
+    } finally {
+      setRecognizing(false);
+      voiceRecognitionAudioRef.current = []; // Clear buffer
+    }
   };
 
   const extractCollectedData = async () => {
@@ -534,6 +609,23 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
           <h2 className="text-xl font-semibold text-white">
             {isConnecting ? 'Connecting...' : isConnected ? 'Connected' : 'Disconnected'}
           </h2>
+
+          {/* Voice Recognition Badge */}
+          {voiceRecognized && recognizedCustomer && (
+            <div className="ml-4 px-3 py-1 bg-green-500/20 border border-green-400/40 rounded-full flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-sm text-green-100">
+                Recognized: {recognizedCustomer.customer_name} ({Math.round(recognizedCustomer.confidence * 100)}%)
+              </span>
+            </div>
+          )}
+
+          {recognizing && (
+            <div className="ml-4 px-3 py-1 bg-white/10 border border-white/20 rounded-full flex items-center gap-2">
+              <Loader2 className="w-3 h-3 animate-spin text-white/80" />
+              <span className="text-sm text-white/70">Identifying voice...</span>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3">

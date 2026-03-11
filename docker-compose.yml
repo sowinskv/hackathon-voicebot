@@ -15,6 +15,8 @@ services:
       - ./database/triggers.sql:/docker-entrypoint-initdb.d/01a-triggers.sql
       - ./database/seeds/default_flow.sql:/docker-entrypoint-initdb.d/02-seeds.sql
       - ./database/seeds/mock_sessions.sql:/docker-entrypoint-initdb.d/03-mock-sessions.sql
+      - ./database/seeds/extended_mock_sessions.sql:/docker-entrypoint-initdb.d/04-extended-mock-sessions.sql
+      - ./database/migrations/004_add_voice_recognition.sql:/docker-entrypoint-initdb.d/05-voice-recognition.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U callcenter"]
       interval: 2s
@@ -40,6 +42,9 @@ services:
       - AZURE_OPENAI_API_ENDPOINT=${AZURE_OPENAI_API_ENDPOINT}
       - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION}
       - AZURE_OPENAI_MODEL=${AZURE_OPENAI_MODEL}
+      - AZURE_SPEAKER_RECOGNITION_KEY=${AZURE_SPEAKER_RECOGNITION_KEY}
+      - AZURE_SPEAKER_RECOGNITION_REGION=${AZURE_SPEAKER_RECOGNITION_REGION:-eastus}
+      - VOICE_RECOGNITION_CONFIDENCE_THRESHOLD=${VOICE_RECOGNITION_CONFIDENCE_THRESHOLD:-0.75}
       - CORS_ORIGIN=http://localhost:5173,http://localhost:5174,http://localhost:5175
     ports:
       - "3000:3000"

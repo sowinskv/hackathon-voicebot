@@ -136,25 +136,37 @@ async def generate_llm_response(client, model_name: str, system_prompt: str, his
 
 async def check_conversation_end(bot_response: str, user_message: str) -> bool:
     """Check if conversation should end based on bot response or user message"""
-    # Goodbye phrases in bot response
-    goodbye_phrases = [
-        "goodbye", "bye", "have a great day", "have a nice day", "take care",
-        "thank you for calling", "thanks for calling", "end of call",
-        "do widzenia", "dziękuję za telefon", "miłego dnia", "trzymaj się",
-        "koniec rozmowy", "dziękuję i do widzenia"
+    # Strong goodbye phrases that indicate conversation end
+    strong_goodbye_phrases = [
+        "goodbye", "bye", "end of call", "koniec rozmowy"
     ]
 
-    bot_lower = bot_response.lower()
-    user_lower = user_message.lower()
+    # Phrases that only indicate goodbye when at the END of bot's message
+    end_phrases = [
+        "have a great day", "have a nice day", "take care",
+        "thank you for calling", "thanks for calling",
+        "do widzenia", "dziękuję za telefon", "miłego dnia", "trzymaj się",
+        "dziękuję i do widzenia"
+    ]
 
-    # Check if bot is saying goodbye
-    for phrase in goodbye_phrases:
+    bot_lower = bot_response.lower().strip()
+    user_lower = user_message.lower().strip()
+
+    # Check for strong goodbye phrases anywhere in bot response
+    for phrase in strong_goodbye_phrases:
         if phrase in bot_lower:
-            logger.info(f"[EndDetection] Found goodbye phrase in bot response: {phrase}")
+            logger.info(f"[EndDetection] Found strong goodbye phrase in bot response: {phrase}")
+            return True
+
+    # Check for end phrases only at the END of bot response (last 100 chars)
+    bot_end = bot_lower[-100:] if len(bot_lower) > 100 else bot_lower
+    for phrase in end_phrases:
+        if phrase in bot_end:
+            logger.info(f"[EndDetection] Found end phrase in bot response ending: {phrase}")
             return True
 
     # Check if user is saying goodbye
-    if any(phrase in user_lower for phrase in goodbye_phrases):
+    if any(phrase in user_lower for phrase in strong_goodbye_phrases + end_phrases):
         logger.info(f"[EndDetection] User said goodbye")
         return True
 
