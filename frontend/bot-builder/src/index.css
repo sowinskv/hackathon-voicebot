@@ -184,20 +184,20 @@
 @layer utilities {
   /* Text colors */
   .text-primary {
-    @apply text-white;
+    color: #ffffff !important;
   }
 
   .text-secondary {
-    @apply text-white/80;
+    color: #ffffff !important;
   }
 
   .text-muted {
-    @apply text-white/50;
+    color: rgba(255, 255, 255, 0.5) !important;
   }
 
   /* Gradient text */
   .text-gradient {
-    @apply text-white;
+    color: #ffffff !important;
   }
 
   /* Glass background */

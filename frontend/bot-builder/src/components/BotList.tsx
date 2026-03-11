@@ -151,8 +151,8 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-5xl font-bold text-white mb-3">{t('botList.title')}</h1>
-          <p className="text-white text-xl">
+          <h1 className="text-5xl font-bold mb-3" style={{ color: '#ffffff' }}>{t('botList.title')}</h1>
+          <p className="text-xl" style={{ color: '#ffffff' }}>
             {t('botList.subtitle')}
           </p>
         </div>

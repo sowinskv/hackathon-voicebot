@@ -3,12 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  /* Force white text EVERYWHERE */
+  * {
+    color: #ffffff !important;
+  }
+
   /* Premium font stack */
   body {
     @apply antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     @apply min-h-screen;
     letter-spacing: -0.01em;
+    color: #ffffff !important;
     background:
       radial-gradient(circle at 50% 45%, rgba(255, 90, 30, 0.9) 0%, transparent 30%),
       radial-gradient(circle at 48% 43%, rgba(255, 120, 40, 0.85) 0%, transparent 35%),
@@ -40,15 +46,22 @@
   h1 {
     @apply text-4xl font-bold tracking-tight;
     letter-spacing: -0.02em;
+    color: #ffffff !important;
   }
 
   h2 {
     @apply text-2xl font-semibold tracking-tight;
     letter-spacing: -0.01em;
+    color: #ffffff !important;
   }
 
   h3 {
     @apply text-xl font-semibold;
+    color: #ffffff !important;
+  }
+
+  p {
+    color: #ffffff !important;
   }
 
   /* Smooth transitions */
@@ -220,20 +233,20 @@
 @layer utilities {
   /* Text colors */
   .text-primary {
-    @apply text-white;
+    color: #ffffff !important;
   }
 
   .text-secondary {
-    @apply text-white/80;
+    color: #ffffff !important;
   }
 
   .text-muted {
-    @apply text-white/50;
+    color: rgba(255, 255, 255, 0.5) !important;
   }
 
   /* Gradient text */
   .text-gradient {
-    @apply text-white;
+    color: #ffffff !important;
   }
 
   /* Glass background */

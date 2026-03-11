@@ -65,17 +65,17 @@ const NaturalLanguageCreator: React.FC<Props> = ({ onGenerate }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-notion-text mb-2">
+        <h2 className="text-2xl font-semibold text-white mb-2">
           Create Bot with Natural Language
         </h2>
-        <p className="text-notion-textLight">
+        <p className="text-white/70">
           Describe what your bot should do, and AI will automatically create the flow, prompt, and fields.
         </p>
       </div>
 
       {/* Language Selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-notion-text mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           Bot Language
         </label>
         <div className="flex gap-2">
@@ -83,8 +83,8 @@ const NaturalLanguageCreator: React.FC<Props> = ({ onGenerate }) => {
             onClick={() => setLanguage('en')}
             className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
               language === 'en'
-                ? 'bg-notion-text text-white'
-                : 'bg-white border border-notion-border text-notion-text hover:bg-notion-hover'
+                ? 'bg-white/20 text-white'
+                : 'bg-white border border-white/10 text-white hover:bg-white/10'
             }`}
           >
             English
@@ -93,8 +93,8 @@ const NaturalLanguageCreator: React.FC<Props> = ({ onGenerate }) => {
             onClick={() => setLanguage('pl')}
             className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
               language === 'pl'
-                ? 'bg-notion-text text-white'
-                : 'bg-white border border-notion-border text-notion-text hover:bg-notion-hover'
+                ? 'bg-white/20 text-white'
+                : 'bg-white border border-white/10 text-white hover:bg-white/10'
             }`}
           >
             Polish
@@ -104,7 +104,7 @@ const NaturalLanguageCreator: React.FC<Props> = ({ onGenerate }) => {
 
       {/* Description Input */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-notion-text mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           Describe Your Bot
         </label>
         <textarea
@@ -114,7 +114,7 @@ const NaturalLanguageCreator: React.FC<Props> = ({ onGenerate }) => {
           className="input min-h-[200px] resize-none"
           disabled={isGenerating}
         />
-        <div className="mt-2 text-xs text-notion-textLight">
+        <div className="mt-2 text-xs text-white/70">
           Be specific about: what information to collect, the bot's personality, and any special requirements.
         </div>
       </div>
@@ -161,7 +161,7 @@ const NaturalLanguageCreator: React.FC<Props> = ({ onGenerate }) => {
 
       {/* Examples */}
       <div>
-        <h3 className="text-sm font-medium text-notion-text mb-4">Quick Start Examples</h3>
+        <h3 className="text-sm font-medium text-white mb-4">Quick Start Examples</h3>
         <div className="grid gap-4">
           {examples.map((example, idx) => (
             <div
@@ -171,10 +171,10 @@ const NaturalLanguageCreator: React.FC<Props> = ({ onGenerate }) => {
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="font-medium text-notion-text mb-1">{example.title}</h4>
-                  <p className="text-sm text-notion-textLight">{example.desc}</p>
+                  <h4 className="font-medium text-white mb-1">{example.title}</h4>
+                  <p className="text-sm text-white/70">{example.desc}</p>
                 </div>
-                <button className="text-xs text-notion-accent hover:underline">
+                <button className="text-xs text-blue-300 hover:underline">
                   Use this
                 </button>
               </div>

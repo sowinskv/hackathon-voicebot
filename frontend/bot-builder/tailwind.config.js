@@ -37,10 +37,11 @@ export default {
         secondary: '#e8e5e0',
       },
       textColor: {
-        primary: '#1a1a1a',
-        secondary: '#4a4a4a',
-        tertiary: '#787774',
-        inverse: '#ffffff',
+        primary: '#ffffff',
+        secondary: '#ffffff',
+        tertiary: '#ffffff',
+        inverse: '#1a1a1a',
+        white: '#ffffff',
       },
       borderColor: {
         light: '#e3e2df',
