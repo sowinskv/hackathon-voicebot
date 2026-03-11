@@ -115,6 +115,13 @@ router.get(
       [id]
     );
 
+    // Map database speaker values to the frontend expected values
+    const transcripts = transcriptResult.rows.map(transcript => ({
+      ...transcript,
+      // Make sure the speaker is properly identified as 'bot' when the speaker is 'bot'
+      speaker: transcript.speaker === 'bot' ? 'bot' : transcript.speaker
+    }));
+
     // Get collected data fields
     const dataFieldsResult = await query(
       `
@@ -134,7 +141,7 @@ router.get(
     // Create enhanced session object with collected data and transcript
     const enhancedSession = {
       ...session,
-      transcript: transcriptResult.rows,
+      transcript: transcripts, // Use the mapped transcripts
       collected_data: collectedData
     };
 
