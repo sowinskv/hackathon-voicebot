@@ -51,7 +51,7 @@ export function SessionDetail() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <svg
-            className="animate-spin h-12 w-12 mx-auto text-primary-600 mb-4"
+            className="animate-spin h-12 w-12 mx-auto text-white/40 mb-4"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -69,7 +69,7 @@ export function SessionDetail() {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <p className="text-gray-600">Loading session details...</p>
+          <p className="text-white/60">Loading session details...</p>
         </div>
       </div>
     );
@@ -77,22 +77,24 @@ export function SessionDetail() {
 
   if (error || !session) {
     return (
-      <div className="text-center py-12">
-        <svg
-          className="w-16 h-16 mx-auto mb-4 text-red-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <p className="text-red-600 font-medium mb-2">Session not found</p>
-        <p className="text-gray-600 text-sm mb-4">
+      <div className="text-center py-16">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6">
+          <svg
+            className="w-8 h-8 text-white/40"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <p className="text-white text-lg font-medium mb-2">Session not found</p>
+        <p className="text-white/50 text-sm mb-6 max-w-md mx-auto">
           {error || 'The requested session could not be loaded'}
         </p>
         <Link to="/sessions" className="btn-primary">
@@ -116,7 +118,7 @@ export function SessionDetail() {
         <div>
           <button
             onClick={() => navigate('/sessions')}
-            className="text-primary-600 hover:text-primary-700 font-medium text-sm mb-2 flex items-center gap-1"
+            className="text-white/70 hover:text-white font-medium text-sm mb-2 flex items-center gap-1 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -128,10 +130,10 @@ export function SessionDetail() {
             </svg>
             Back to Sessions
           </button>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-white">
             Session {session.session_id || session.id}
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-white/60 mt-1">
             Started {formatDistanceToNow(new Date(session.start_time || session.started_at), { addSuffix: true })}
           </p>
         </div>
@@ -153,9 +155,9 @@ export function SessionDetail() {
 
       {/* Escalation Alert */}
       {session.escalated && (
-        <div className="card bg-red-50 border-red-200">
+        <div className="glass-card border-red-400/20">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-red-100 rounded-lg text-red-600">
+            <div className="p-2 bg-red-400/10 rounded-lg text-red-300/90">
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -165,8 +167,8 @@ export function SessionDetail() {
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-red-900 mb-1">Case Escalated</h3>
-              <p className="text-red-700">{session.escalation_reason || 'No reason provided'}</p>
+              <h3 className="font-semibold text-white mb-1">Case Escalated</h3>
+              <p className="text-white/70">{session.escalation_reason || 'No reason provided'}</p>
             </div>
           </div>
         </div>
@@ -177,7 +179,7 @@ export function SessionDetail() {
         <div className="lg:col-span-2 space-y-6">
           {/* Transcript */}
           <div className="card">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               Conversation Transcript
             </h2>
             <div className="max-h-[600px] overflow-y-auto">
@@ -188,7 +190,7 @@ export function SessionDetail() {
           {/* Audio Recording */}
           {session.audio_url && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-xl font-semibold text-white mb-4">
                 Audio Recording
               </h2>
               <AudioPlayer audioUrl={session.audio_url} />
@@ -197,7 +199,7 @@ export function SessionDetail() {
 
           {/* Collected Data */}
           <div className="card">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               Collected Data
             </h2>
             <DataFieldsDisplay data={session.collected_data || {}} />
@@ -208,44 +210,44 @@ export function SessionDetail() {
         <div className="space-y-6">
           {/* Session Info */}
           <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Session Info</h3>
+            <h3 className="font-semibold text-white mb-4">Session Info</h3>
             <dl className="space-y-3">
               <div>
-                <dt className="text-sm text-gray-600">Session ID</dt>
-                <dd className="text-sm font-medium text-gray-900 font-mono">
+                <dt className="text-sm text-white/50">Session ID</dt>
+                <dd className="text-sm font-medium text-white font-mono">
                   {session.session_id}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm text-gray-600">Status</dt>
-                <dd className="text-sm font-medium text-gray-900">
+                <dt className="text-sm text-white/50">Status</dt>
+                <dd className="text-sm font-medium text-white">
                   {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm text-gray-600">Duration</dt>
-                <dd className="text-sm font-medium text-gray-900">
+                <dt className="text-sm text-white/50">Duration</dt>
+                <dd className="text-sm font-medium text-white">
                   {formatDuration(session.duration)}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm text-gray-600">Start Time</dt>
-                <dd className="text-sm font-medium text-gray-900">
+                <dt className="text-sm text-white/50">Start Time</dt>
+                <dd className="text-sm font-medium text-white">
                   {new Date(session.start_time).toLocaleString()}
                 </dd>
               </div>
               {session.end_time && (
                 <div>
-                  <dt className="text-sm text-gray-600">End Time</dt>
-                  <dd className="text-sm font-medium text-gray-900">
+                  <dt className="text-sm text-white/50">End Time</dt>
+                  <dd className="text-sm font-medium text-white">
                     {new Date(session.end_time).toLocaleString()}
                   </dd>
                 </div>
               )}
               {session.satisfaction_score && (
                 <div>
-                  <dt className="text-sm text-gray-600">Satisfaction Score</dt>
-                  <dd className="text-sm font-medium text-gray-900">
+                  <dt className="text-sm text-white/50">Satisfaction Score</dt>
+                  <dd className="text-sm font-medium text-white">
                     {session.satisfaction_score}/5.0
                   </dd>
                 </div>
@@ -256,28 +258,28 @@ export function SessionDetail() {
           {/* Client Info */}
           {session.client_info && Object.keys(session.client_info).length > 0 && (
             <div className="card">
-              <h3 className="font-semibold text-gray-900 mb-4">Client Info</h3>
+              <h3 className="font-semibold text-white mb-4">Client Info</h3>
               <dl className="space-y-3">
                 {session.client_info.name && (
                   <div>
-                    <dt className="text-sm text-gray-600">Name</dt>
-                    <dd className="text-sm font-medium text-gray-900">
+                    <dt className="text-sm text-white/50">Name</dt>
+                    <dd className="text-sm font-medium text-white">
                       {session.client_info.name}
                     </dd>
                   </div>
                 )}
                 {session.client_info.phone && (
                   <div>
-                    <dt className="text-sm text-gray-600">Phone</dt>
-                    <dd className="text-sm font-medium text-gray-900">
+                    <dt className="text-sm text-white/50">Phone</dt>
+                    <dd className="text-sm font-medium text-white">
                       {session.client_info.phone}
                     </dd>
                   </div>
                 )}
                 {session.client_info.email && (
                   <div>
-                    <dt className="text-sm text-gray-600">Email</dt>
-                    <dd className="text-sm font-medium text-gray-900">
+                    <dt className="text-sm text-white/50">Email</dt>
+                    <dd className="text-sm font-medium text-white">
                       {session.client_info.email}
                     </dd>
                   </div>
@@ -288,7 +290,7 @@ export function SessionDetail() {
 
           {/* Notes */}
           <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Notes</h3>
+            <h3 className="font-semibold text-white mb-4">Notes</h3>
             <NotesEditor
               initialNotes={session.agent_notes}
               onSave={async (notes) => {
