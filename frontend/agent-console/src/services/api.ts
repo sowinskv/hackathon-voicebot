@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export interface Session {
   id: string;
@@ -364,9 +364,13 @@ class ApiClient {
         mockDistribution[i.toString()] = dailyPattern[i];
       }
     } else if (timeframe === 'month') {
-      // 30 days
+      // 30 days - realistic daily variation pattern
+      const dailyPattern = [
+        45, 52, 48, 51, 49, 43, 38, 42, 48, 54, 58, 62, 59, 55, 51,
+        47, 49, 53, 57, 61, 64, 68, 65, 62, 58, 54, 50, 46, 42, 39
+      ];
       for (let i = 1; i <= 30; i++) {
-        mockDistribution[i.toString()] = Math.floor(Math.random() * 60) + 30;
+        mockDistribution[i.toString()] = dailyPattern[i - 1];
       }
     } else if (timeframe === 'year') {
       // 12 months

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from 'react';
+import React, { useState, useEffect, createContext, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import { SessionList } from './pages/SessionList';
@@ -128,25 +128,25 @@ function App() {
   // Implement metrics refresh function
   const [lastMetricsUpdate, setLastMetricsUpdate] = useState(Date.now());
 
-  // Handle WebSocket messages to trigger metrics updates
-  const handleWebSocketMessage = (message: WebSocketMessage) => {
-    console.log('WebSocket message received:', message.type);
-    // When a session is updated, created, or completed, refresh metrics
-    if (['session_update', 'new_escalation', 'session_completed'].includes(message.type)) {
-      refreshMetrics();
-    }
-  };
-
-  const { connected } = useWebSocket(handleWebSocketMessage);
-
   // Function to refresh metrics that can be called from anywhere in the app
-  const refreshMetrics = async () => {
+  const refreshMetrics = useCallback(async () => {
     console.log('Refreshing metrics due to session change');
     // We don't actually need to do anything here since the Dashboard
     // component already periodically refreshes metrics. We just need to
     // update the timestamp to trigger re-renders when necessary.
     setLastMetricsUpdate(Date.now());
-  };
+  }, []);
+
+  // Handle WebSocket messages to trigger metrics updates
+  const handleWebSocketMessage = useCallback((message: WebSocketMessage) => {
+    console.log('WebSocket message received:', message.type);
+    // When a session is updated, created, or completed, refresh metrics
+    if (['session_update', 'new_escalation', 'session_completed'].includes(message.type)) {
+      refreshMetrics();
+    }
+  }, [refreshMetrics]);
+
+  const { connected } = useWebSocket(handleWebSocketMessage);
 
   // Log WebSocket connection status
   useEffect(() => {

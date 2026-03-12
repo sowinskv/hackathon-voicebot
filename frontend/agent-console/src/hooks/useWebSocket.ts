@@ -20,8 +20,22 @@ export function useWebSocket(
   const ws = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const onMessageRef = useRef(onMessage);
+  const reconnectAttemptsRef = useRef(0);
+  const maxReconnectAttempts = 3;
+
+  // Update the ref when callback changes
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+  }, [onMessage]);
 
   const connect = useCallback(() => {
+    // Don't reconnect if we've tried too many times
+    if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+      console.log('Max WebSocket reconnection attempts reached, giving up');
+      return;
+    }
+
     try {
       const wsUrl = api.getWebSocketUrl();
       ws.current = new WebSocket(wsUrl);
@@ -29,12 +43,13 @@ export function useWebSocket(
       ws.current.onopen = () => {
         console.log('WebSocket connected');
         setConnected(true);
+        reconnectAttemptsRef.current = 0; // Reset on successful connection
       };
 
       ws.current.onmessage = (event) => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
-          onMessage?.(message);
+          onMessageRef.current?.(message);
         } catch (err) {
           console.error('Failed to parse WebSocket message:', err);
         }
@@ -48,16 +63,21 @@ export function useWebSocket(
         console.log('WebSocket disconnected');
         setConnected(false);
 
-        // Attempt to reconnect after 5 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          console.log('Attempting to reconnect...');
-          connect();
-        }, 5000);
+        // Only attempt to reconnect if we haven't exceeded max attempts
+        if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+          reconnectAttemptsRef.current++;
+          const delay = Math.min(5000 * reconnectAttemptsRef.current, 30000); // Exponential backoff, max 30s
+
+          reconnectTimeoutRef.current = setTimeout(() => {
+            console.log(`Attempting to reconnect... (attempt ${reconnectAttemptsRef.current})`);
+            connect();
+          }, delay);
+        }
       };
     } catch (err) {
       console.error('Failed to connect WebSocket:', err);
     }
-  }, [onMessage]);
+  }, []); // Empty dependencies - uses refs instead
 
   useEffect(() => {
     connect();

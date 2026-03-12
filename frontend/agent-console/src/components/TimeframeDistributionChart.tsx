@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
+import { motion, useMotionValue, animate } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { Timeframe } from './TimeframeSelector';
 
@@ -14,6 +15,8 @@ export function TimeframeDistributionChart({
   loading = false
 }: TimeframeDistributionChartProps) {
   const { language } = useLanguage();
+  const pathD = useMotionValue('');
+  const previousPath = useRef<string>('');
 
   // Helper function to get the appropriate label for each timeframe
   const getLabelForTimeUnit = (unit: string, timeframe: Timeframe) => {
@@ -53,7 +56,23 @@ export function TimeframeDistributionChart({
     });
   }, [data]);
 
-  // Generate smooth curve path using cubic bezier curves
+  // Interpolate values to get a smooth dataset with fixed number of points
+  const getInterpolatedValue = (data: [string, number][], position: number) => {
+    if (data.length === 0) return 0;
+    if (data.length === 1) return data[0][1];
+
+    const scaledPos = position * (data.length - 1);
+    const lowerIndex = Math.floor(scaledPos);
+    const upperIndex = Math.min(lowerIndex + 1, data.length - 1);
+    const fraction = scaledPos - lowerIndex;
+
+    const lowerValue = data[lowerIndex][1];
+    const upperValue = data[upperIndex][1];
+
+    return lowerValue + (upperValue - lowerValue) * fraction;
+  };
+
+  // Generate smooth curve path using cubic bezier curves with normalized point count
   const generateSmoothPath = useMemo(() => {
     if (sortedData.length === 0) return '';
 
@@ -63,10 +82,16 @@ export function TimeframeDistributionChart({
     const chartWidth = width - padding * 2;
     const chartHeight = height - padding * 2;
 
-    const points = sortedData.map(([_, value], index) => ({
-      x: padding + (index / (sortedData.length - 1)) * chartWidth,
-      y: padding + chartHeight - (value / maxValue) * chartHeight,
-    }));
+    // Always use 50 interpolated points for smooth morphing
+    const numPoints = 50;
+    const points = Array.from({ length: numPoints }, (_, i) => {
+      const t = i / (numPoints - 1);
+      const interpolatedValue = getInterpolatedValue(sortedData, t);
+      return {
+        x: padding + t * chartWidth,
+        y: padding + chartHeight - (interpolatedValue / maxValue) * chartHeight,
+      };
+    });
 
     // Create smooth curve using cubic bezier
     let path = `M ${points[0].x} ${points[0].y}`;
@@ -87,6 +112,27 @@ export function TimeframeDistributionChart({
 
     return path;
   }, [sortedData, maxValue]);
+
+  // Animate path changes
+  useEffect(() => {
+    if (!previousPath.current || previousPath.current === '') {
+      // First render - set immediately without animation
+      pathD.set(generateSmoothPath);
+      previousPath.current = generateSmoothPath;
+    } else if (previousPath.current !== generateSmoothPath) {
+      // Path changed - animate from previous to new
+      // Make sure pathD starts at the previous path
+      pathD.set(previousPath.current);
+
+      animate(pathD, generateSmoothPath, {
+        duration: 0.8,
+        ease: [0.4, 0.0, 0.2, 1]
+      });
+
+      // Update previous path for next change
+      previousPath.current = generateSmoothPath;
+    }
+  }, [generateSmoothPath, pathD]);
 
   if (loading) {
     return (
@@ -125,13 +171,46 @@ export function TimeframeDistributionChart({
 
       <div className="relative">
         {/* Y-axis scale */}
-        <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-xs text-white/40 pr-4">
-          <span>{maxValue}</span>
-          <span>{Math.round(maxValue * 0.75)}</span>
-          <span>{Math.round(maxValue * 0.5)}</span>
-          <span>{Math.round(maxValue * 0.25)}</span>
+        <motion.div
+          className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-xs text-white/40 pr-4"
+          initial={false}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.span
+            key={`max-${maxValue}`}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {maxValue}
+          </motion.span>
+          <motion.span
+            key={`75-${maxValue}`}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            {Math.round(maxValue * 0.75)}
+          </motion.span>
+          <motion.span
+            key={`50-${maxValue}`}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {Math.round(maxValue * 0.5)}
+          </motion.span>
+          <motion.span
+            key={`25-${maxValue}`}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            {Math.round(maxValue * 0.25)}
+          </motion.span>
           <span>0</span>
-        </div>
+        </motion.div>
 
         <div className="pl-12">
           <svg
@@ -159,8 +238,8 @@ export function TimeframeDistributionChart({
             <rect x="40" y="40" width="720" height="220" fill="url(#grid)" />
 
             {/* Wave area */}
-            <path
-              d={generateSmoothPath}
+            <motion.path
+              d={pathD}
               fill="url(#waveGradient)"
               stroke="rgba(255, 255, 255, 0.6)"
               strokeWidth="2"
