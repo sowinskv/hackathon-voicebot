@@ -379,7 +379,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between">
+      <div className="p-4 flex items-center justify-between relative z-20">
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="w-2.5 h-2.5 rounded-full bg-white shadow-lg shadow-white/50" />
@@ -393,7 +393,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
 
         <button
           onClick={onEnd}
-          className="text-white/70 hover:text-white transition-colors font-light text-sm"
+          className="text-white/70 hover:text-white transition-colors font-light text-base"
         >
           End chat
         </button>
@@ -452,7 +452,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
       </div>
 
       {/* Input */}
-      <div className="p-6">
+      <div className="p-6 relative z-20">
         <div className="flex gap-4 items-end">
           <div className="flex-1">
             <input
@@ -470,7 +470,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isLoading || callEnded}
-            className="text-white/70 hover:text-white transition-colors font-light text-sm disabled:opacity-30 disabled:cursor-not-allowed pb-2"
+            className="text-white/70 hover:text-white transition-colors font-light text-base disabled:opacity-30 disabled:cursor-not-allowed pb-2"
           >
             Send
           </button>
