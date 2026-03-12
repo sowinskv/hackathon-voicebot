@@ -17,13 +17,13 @@ export function SideMetricsWidget({
   const { translate } = useLanguage();
 
   return (
-    <div className="card space-y-8">
+    <div className="space-y-8">
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="text-[11px] uppercase tracking-widest text-white/40 font-medium">
             {translate('metrics.firstTryCompletion')}
           </div>
-          <div className={`text-lg font-semibold ${loading ? 'text-white/40' : 'text-white'}`}>
+          <div className={`text-lg font-light ${loading ? 'text-white/40' : 'text-white'}`}>
             {loading ? '...' : `${(firstTryCompletionRate * 100).toFixed(1)}%`}
           </div>
         </div>
@@ -40,7 +40,7 @@ export function SideMetricsWidget({
           <div className="text-[11px] uppercase tracking-widest text-white/40 font-medium">
             {translate('metrics.angryCustomers')}
           </div>
-          <div className={`text-lg font-semibold ${loading ? 'text-white/40' : 'text-white'}`}>
+          <div className={`text-lg font-light ${loading ? 'text-white/40' : 'text-white'}`}>
             {loading ? '...' : `${(angryCustomersRate * 100).toFixed(1)}%`}
           </div>
         </div>
@@ -57,7 +57,7 @@ export function SideMetricsWidget({
           <div className="text-[11px] uppercase tracking-widest text-white/40 font-medium">
             {translate('metrics.legalThreats')}
           </div>
-          <div className={`text-lg font-semibold ${loading ? 'text-white/40' : 'text-white'}`}>
+          <div className={`text-lg font-light ${loading ? 'text-white/40' : 'text-white'}`}>
             {loading ? '...' : `${(legalThreatsRate * 100).toFixed(1)}%`}
           </div>
         </div>

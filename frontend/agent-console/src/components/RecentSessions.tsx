@@ -75,10 +75,10 @@ export function RecentSessions() {
       </div>
 
       {/* Sessions List */}
-      <div className="card">
+      <div>
         {sessions.length === 0 ? (
           <div className="text-center py-16 text-white/60">
-            <p className="text-lg font-medium mb-2 text-white">
+            <p className="text-lg font-light mb-2 text-white">
               {statusFilter === 'escalated' ? translate('escalations.noEscalations') : 'No sessions found'}
             </p>
             <p className="text-sm text-white/40">

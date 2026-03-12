@@ -9,9 +9,9 @@ function BotComparisonCard({ bot, loading }: { bot: BotMetrics; loading: boolean
   const { translate } = useLanguage();
 
   return (
-    <div className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.04] rounded-3xl p-6 hover:bg-white/[0.04] transition-all duration-300">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-white tracking-tight">{bot.bot_name}</h3>
+    <div className="space-y-6 pb-8 border-b border-white/10">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-light text-white tracking-tight">{bot.bot_name}</h3>
         {loading && <div className="w-2 h-2 rounded-full bg-white/20 animate-pulse" />}
       </div>
 
@@ -19,30 +19,30 @@ function BotComparisonCard({ bot, loading }: { bot: BotMetrics; loading: boolean
         {/* Total Sessions */}
         <div className="flex justify-between items-baseline">
           <span className="text-xs uppercase tracking-wider text-white/40">{translate('metrics.totalSessions')}</span>
-          <span className="text-xl font-semibold text-white">{bot.total_sessions}</span>
+          <span className="text-xl font-light text-white">{bot.total_sessions}</span>
         </div>
 
         {/* Active Sessions */}
         <div className="flex justify-between items-baseline">
           <span className="text-xs uppercase tracking-wider text-white/40">{translate('metrics.activeSessions')}</span>
-          <span className="text-xl font-semibold text-white">{bot.active_sessions}</span>
+          <span className="text-xl font-light text-white">{bot.active_sessions}</span>
         </div>
 
         {/* Escalation Rate */}
         <div className="flex justify-between items-baseline">
           <span className="text-xs uppercase tracking-wider text-white/40">{translate('metrics.escalationRate')}</span>
-          <span className="text-xl font-semibold text-white">{((bot.escalation_rate || 0) * 100).toFixed(1)}%</span>
+          <span className="text-xl font-light text-white">{((bot.escalation_rate || 0) * 100).toFixed(1)}%</span>
         </div>
 
         {/* Avg Satisfaction */}
         <div className="flex justify-between items-baseline">
           <span className="text-xs uppercase tracking-wider text-white/40">{translate('metrics.avgSatisfaction')}</span>
-          <span className="text-xl font-semibold text-white">{(bot.avg_satisfaction || 0).toFixed(1)}/5.0</span>
+          <span className="text-xl font-light text-white">{(bot.avg_satisfaction || 0).toFixed(1)}/5.0</span>
         </div>
 
-        <div className="pt-4 border-t border-white/[0.06] flex justify-between items-baseline">
+        <div className="pt-4 border-t border-white/10 flex justify-between items-baseline">
           <span className="text-xs uppercase tracking-wider text-white/40">{translate('metrics.completed')}</span>
-          <span className="text-lg font-medium text-white/80">{bot.completed}</span>
+          <span className="text-lg font-light text-white/80">{bot.completed}</span>
         </div>
       </div>
     </div>
@@ -94,10 +94,10 @@ export function BotComparison() {
         <TimeframeSelector onChange={handleTimeframeChange} defaultValue={timeframe} />
       </div>
 
-      {/* Bot Comparison Cards */}
-      <div className="card">
+      {/* Bot Comparison List */}
+      <div>
         {metrics?.bots_metrics && metrics.bots_metrics.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-8">
             {metrics.bots_metrics.map(bot => (
               <BotComparisonCard
                 key={bot.bot_id}
@@ -115,20 +115,20 @@ export function BotComparison() {
 
       {/* Summary Stats */}
       {metrics?.bots_metrics && metrics.bots_metrics.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 pt-12 border-t border-white/10">
+          <div>
             <span className="text-[11px] uppercase tracking-widest text-white/40 font-medium mb-3 block">
               Total Bots
             </span>
-            <div className="text-4xl font-bold text-white tracking-tight">
+            <div className="text-4xl font-light text-white tracking-tight">
               {metrics.bots_metrics.length}
             </div>
           </div>
-          <div className="card">
+          <div>
             <span className="text-[11px] uppercase tracking-widest text-white/40 font-medium mb-3 block">
               Best Performer
             </span>
-            <div className="text-2xl font-bold text-white tracking-tight">
+            <div className="text-2xl font-light text-white tracking-tight">
               {metrics.bots_metrics.reduce((prev, curr) =>
                 (curr.avg_satisfaction || 0) > (prev.avg_satisfaction || 0) ? curr : prev
               ).bot_name}
@@ -139,11 +139,11 @@ export function BotComparison() {
               ).avg_satisfaction?.toFixed(1)}/5.0 satisfaction
             </div>
           </div>
-          <div className="card">
+          <div>
             <span className="text-[11px] uppercase tracking-widest text-white/40 font-medium mb-3 block">
               Most Active
             </span>
-            <div className="text-2xl font-bold text-white tracking-tight">
+            <div className="text-2xl font-light text-white tracking-tight">
               {metrics.bots_metrics.reduce((prev, curr) =>
                 curr.total_sessions > prev.total_sessions ? curr : prev
               ).bot_name}

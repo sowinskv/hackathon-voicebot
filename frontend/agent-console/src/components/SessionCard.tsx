@@ -30,11 +30,11 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
   return (
     <div
       onClick={onClick}
-      className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.04] rounded-3xl p-6 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer"
+      className="pb-6 border-b border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer"
     >
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="font-semibold text-lg text-white tracking-tight mb-1">
+          <h3 className="font-light text-lg text-white tracking-tight mb-1">
             {sessionId}
           </h3>
           <p className="text-xs text-white/40 uppercase tracking-wider">
@@ -72,7 +72,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
       )}
 
       {session.escalated && session.escalation_reason && (
-        <div className="mb-4 p-4 bg-white/[0.02] border border-red-400/15 rounded-2xl">
+        <div className="mb-4 pb-4 border-l-2 border-red-400/30 pl-4">
           <p className="text-xs font-medium text-red-300/70 mb-2 uppercase tracking-wider">
             Escalation Reason
           </p>
