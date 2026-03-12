@@ -79,9 +79,6 @@ export function MetricsOverview() {
 
         {/* Distribution Chart */}
         <div>
-          <span className="text-[11px] uppercase tracking-widest text-white/40 font-medium mb-6 block">
-            {translate('metrics.callDistribution')}
-          </span>
           <TimeframeDistributionChart
             data={metrics?.timeframe_distribution || {}}
             timeframe={timeframe}
