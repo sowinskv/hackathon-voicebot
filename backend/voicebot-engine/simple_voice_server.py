@@ -44,6 +44,44 @@ gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 active_sessions: Dict[str, dict] = {}
 
 
+def process_prompt_placeholders(prompt: str) -> str:
+    """Replace common placeholders with default values"""
+    replacements = {
+        '[Your Name]': 'Alex',
+        '[Your Company Name]': 'our insurance company',
+        '[Your Insurance Company Name]': 'our insurance company',
+        '[Company Name]': 'our insurance company',
+        '[Insurance Company Name]': 'our insurance company',
+        '[Bot Name]': 'Alex',
+        '[Agent Name]': 'Alex',
+        '[Assistant Name]': 'Alex',
+    }
+
+    logger.info(f"Processing prompt placeholders. Original length: {len(prompt)}")
+    processed = prompt
+    replacements_made = []
+
+    for placeholder, default_value in replacements.items():
+        if placeholder in processed:
+            processed = processed.replace(placeholder, default_value)
+            replacements_made.append(f"{placeholder} -> {default_value}")
+        # Also try lowercase and uppercase
+        if placeholder.lower() in processed:
+            processed = processed.replace(placeholder.lower(), default_value)
+            replacements_made.append(f"{placeholder.lower()} -> {default_value}")
+        if placeholder.upper() in processed:
+            processed = processed.replace(placeholder.upper(), default_value)
+            replacements_made.append(f"{placeholder.upper()} -> {default_value}")
+
+    if replacements_made:
+        logger.info(f"Made {len(replacements_made)} replacements: {', '.join(replacements_made)}")
+    else:
+        logger.info("No placeholders found to replace")
+
+    logger.info(f"Processed prompt (first 200 chars): {processed[:200]}")
+    return processed
+
+
 async def get_flow_config(flow_id: str) -> Dict:
     """Fetch flow configuration from API Gateway"""
     try:
@@ -244,7 +282,10 @@ async def websocket_endpoint(
 
     # Get flow configuration
     flow_config = await get_flow_config(flowId)
-    base_system_prompt = flow_config.get("data", {}).get("system_prompt", "You are a helpful AI assistant.")
+    raw_system_prompt = flow_config.get("data", {}).get("system_prompt", "You are a helpful AI assistant.")
+
+    # Process placeholders in the system prompt
+    base_system_prompt = process_prompt_placeholders(raw_system_prompt)
 
     # Add language instruction based on language parameter
     language_instruction = ""
