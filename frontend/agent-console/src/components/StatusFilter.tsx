@@ -15,15 +15,15 @@ const statuses = [
 
 export function StatusFilter({ value, onChange }: StatusFilterProps) {
   return (
-    <div className="flex gap-3">
+    <div className="flex items-center gap-2">
       {statuses.map(status => (
         <button
           key={status.value}
           onClick={() => onChange(status.value)}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
+          className={`px-4 py-2 text-sm font-light transition-all duration-300 ${
             value === status.value
-              ? 'bg-white/[0.08] text-white border border-white/20'
-              : 'bg-white/[0.02] text-white/60 border border-white/[0.06] hover:bg-white/[0.05] hover:text-white hover:border-white/10'
+              ? 'text-white border-b border-white'
+              : 'text-white/40 hover:text-white/70 border-b border-transparent'
           }`}
         >
           {status.label}

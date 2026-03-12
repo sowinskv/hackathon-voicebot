@@ -53,25 +53,25 @@ export function RecentSessions() {
         </Link>
       </div>
 
-      {/* Filter & Stats */}
-      <div className="flex items-center justify-between">
-        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
-
-        {/* Quick Stats */}
-        <div className="flex gap-6">
-          <div className="text-right">
-            <div className="text-xs uppercase tracking-wider text-white/40">Total Sessions</div>
-            <div className="text-2xl font-bold text-white">{metrics?.total_sessions || 0}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-xs uppercase tracking-wider text-white/40">Active Now</div>
-            <div className="text-2xl font-bold text-white">{metrics?.active_sessions || 0}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-xs uppercase tracking-wider text-white/40">Escalated</div>
-            <div className="text-2xl font-bold text-white">{metrics?.escalated || 0}</div>
-          </div>
+      {/* Quick Stats */}
+      <div className="flex gap-12">
+        <div>
+          <div className="text-xs uppercase tracking-wider text-white/40 mb-2">Total Sessions</div>
+          <div className="text-3xl font-light text-white">{metrics?.total_sessions || 0}</div>
         </div>
+        <div>
+          <div className="text-xs uppercase tracking-wider text-white/40 mb-2">Active Now</div>
+          <div className="text-3xl font-light text-white">{metrics?.active_sessions || 0}</div>
+        </div>
+        <div>
+          <div className="text-xs uppercase tracking-wider text-white/40 mb-2">Escalated</div>
+          <div className="text-3xl font-light text-white">{metrics?.escalated || 0}</div>
+        </div>
+      </div>
+
+      {/* Status Filter */}
+      <div>
+        <StatusFilter value={statusFilter} onChange={setStatusFilter} />
       </div>
 
       {/* Sessions List */}
