@@ -49,7 +49,8 @@ class VoiceBotAgent:
             except:
                 pass
 
-        self.system_prompt = metadata.get('systemPrompt', self._get_default_prompt())
+        raw_prompt = metadata.get('systemPrompt', self._get_default_prompt())
+        self.system_prompt = self._process_prompt_placeholders(raw_prompt)
         self.language = metadata.get('language', 'pl')
         self.conversation_history = []
 
@@ -65,6 +66,22 @@ class VoiceBotAgent:
         return """Jesteś pomocnym asystentem głosowym.
 Odpowiadaj krótko i rzeczowo. Zadawaj jedno pytanie na raz.
 Nie używaj cyfr - zapisuj je słownie."""
+
+    def _process_prompt_placeholders(self, prompt: str) -> str:
+        """Replace common placeholders with default values"""
+        replacements = {
+            '[Your Name]': 'Alex',
+            '[Your Company Name]': 'our insurance company',
+            '[Company Name]': 'our insurance company',
+            '[Bot Name]': 'Alex',
+            '[Agent Name]': 'Alex',
+        }
+
+        processed = prompt
+        for placeholder, default_value in replacements.items():
+            processed = processed.replace(placeholder, default_value)
+
+        return processed
 
     async def start(self):
         """Start the agent"""

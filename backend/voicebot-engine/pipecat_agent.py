@@ -54,7 +54,8 @@ class VoiceBotAgent:
     ):
         self.room_url = room_url
         self.token = token
-        self.system_prompt = system_prompt or self._get_default_prompt()
+        raw_prompt = system_prompt or self._get_default_prompt()
+        self.system_prompt = self._process_prompt_placeholders(raw_prompt)
         self.language = language
         self.transport = None
 
@@ -63,6 +64,22 @@ class VoiceBotAgent:
         return """You are a helpful voice assistant.
 Respond briefly and conversationally. Ask one question at a time.
 Do not use numbers - spell them out as words."""
+
+    def _process_prompt_placeholders(self, prompt: str) -> str:
+        """Replace common placeholders with default values"""
+        replacements = {
+            '[Your Name]': 'Alex',
+            '[Your Company Name]': 'our insurance company',
+            '[Company Name]': 'our insurance company',
+            '[Bot Name]': 'Alex',
+            '[Agent Name]': 'Alex',
+        }
+
+        processed = prompt
+        for placeholder, default_value in replacements.items():
+            processed = processed.replace(placeholder, default_value)
+
+        return processed
 
     async def run(self):
         """Start the voice bot"""
