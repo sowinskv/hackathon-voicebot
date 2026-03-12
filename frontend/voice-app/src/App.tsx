@@ -164,14 +164,7 @@ function App() {
         <button
           onClick={startCall}
           disabled={!selectedFlowId}
-          className="group relative mt-8 px-12 py-5 rounded-full font-medium text-lg overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15)'
-          }}
+          className="group relative mt-8 px-12 py-5 rounded-full font-medium text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
         >
           <span className="relative text-white flex items-center justify-center gap-3">
             {mode === 'chat' ? 'Start Chat' : 'Start Call'}
@@ -179,7 +172,6 @@ function App() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </span>
-          <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </button>
 
         {error && (
