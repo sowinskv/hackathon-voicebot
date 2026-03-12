@@ -147,13 +147,25 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
   }
 
   return (
-    <div className="space-y-12 py-8">
+    <div className="space-y-12 py-8 relative z-10">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-5xl font-bold mb-3" style={{ color: '#ffffff' }}>{t('botList.title')}</h1>
-          <p className="text-xl" style={{ color: '#ffffff' }}>
-            {t('botList.subtitle')}
+      <div className="flex items-center justify-between relative z-10">
+        <div style={{ position: 'relative', zIndex: 20 }}>
+          <h1 className="text-5xl font-bold mb-3" style={{
+            color: '#fff',
+            WebkitTextFillColor: '#fff',
+            opacity: 1,
+            filter: 'none'
+          }}>
+            Moje Voiceboty
+          </h1>
+          <p className="text-xl" style={{
+            color: '#fff',
+            WebkitTextFillColor: '#fff',
+            opacity: 1,
+            filter: 'none'
+          }}>
+            Zarządzaj wszystkimi swoimi botami głosowymi w jednym miejscu
           </p>
         </div>
         <button

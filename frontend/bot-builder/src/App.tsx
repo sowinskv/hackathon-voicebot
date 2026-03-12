@@ -238,7 +238,7 @@ function App() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative z-10">
       {/* Fixed Language Switcher - Top Right */}
       <div className="fixed top-4 right-8 z-50">
         <LanguageSwitcher />
@@ -338,8 +338,8 @@ function App() {
         </div>
       )}
 
-      <main className="flex-1 pb-12">
-        <div className="max-w-7xl mx-auto px-4">
+      <main className="flex-1 pb-12 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           {view === 'list' ? (
             <BotList onCreateNew={handleCreateNew} onEditBot={handleEditBot} />
           ) : (
