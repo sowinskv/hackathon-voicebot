@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -112,13 +112,13 @@ export const publishBotConfig = async (id: string): Promise<BotConfig> => {
 
 // Version Management APIs
 export const getBotVersions = async (botId: string): Promise<BotVersion[]> => {
-  const response = await api.get(`/api/bot-configs/${botId}/versions`);
-  return response.data;
+  const response = await api.get(`/api/flows/${botId}/versions`);
+  return response.data.data || response.data; // Handle both response formats
 };
 
 export const revertToVersion = async (botId: string, versionId: string): Promise<BotConfig> => {
-  const response = await api.post(`/api/bot-configs/${botId}/revert/${versionId}`);
-  return response.data;
+  const response = await api.post(`/api/flows/${botId}/revert/${versionId}`);
+  return response.data.data || response.data; // Handle both response formats
 };
 
 // Test Session APIs

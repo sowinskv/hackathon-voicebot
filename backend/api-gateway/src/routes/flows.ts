@@ -314,4 +314,90 @@ router.get(
   })
 );
 
+// GET /api/flows/:id/versions - Get version history for a flow
+router.get(
+  '/:id/versions',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    // Check if flow exists
+    const flowCheck = await query('SELECT id FROM flows WHERE id = $1', [id]);
+
+    if (flowCheck.rows.length === 0) {
+      throw new AppError('Flow not found', 404);
+    }
+
+    // Get all versions for this flow
+    const result = await query(
+      `
+      SELECT
+        id,
+        flow_id,
+        version,
+        name,
+        description,
+        status,
+        language,
+        system_prompt,
+        flow_definition,
+        required_fields,
+        validation_rules,
+        created_by,
+        created_at
+      FROM flow_versions
+      WHERE flow_id = $1
+      ORDER BY version DESC
+    `,
+      [id]
+    );
+
+    res.json({
+      status: 'success',
+      data: result.rows,
+      count: result.rows.length,
+    });
+  })
+);
+
+// POST /api/flows/:id/revert/:versionId - Revert flow to a specific version
+router.post(
+  '/:id/revert/:versionId',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id, versionId } = req.params;
+
+    // Check if flow exists
+    const flowCheck = await query('SELECT id FROM flows WHERE id = $1', [id]);
+
+    if (flowCheck.rows.length === 0) {
+      throw new AppError('Flow not found', 404);
+    }
+
+    // Check if version exists
+    const versionCheck = await query(
+      'SELECT id FROM flow_versions WHERE id = $1 AND flow_id = $2',
+      [versionId, id]
+    );
+
+    if (versionCheck.rows.length === 0) {
+      throw new AppError('Version not found', 404);
+    }
+
+    // Revert using the database function
+    const result = await query(
+      'SELECT * FROM revert_flow_to_version($1, $2)',
+      [id, versionId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('Failed to revert to version', 500);
+    }
+
+    res.json({
+      status: 'success',
+      message: 'Flow reverted to previous version',
+      data: result.rows[0],
+    });
+  })
+);
+
 export default router;
