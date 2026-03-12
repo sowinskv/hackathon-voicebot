@@ -27,6 +27,13 @@
   initial-value: 40%;
 }
 
+:root {
+  --gradient-orange-1: 25%;
+  --gradient-orange-2: 35%;
+  --gradient-blur-orange-1: 30%;
+  --gradient-blur-orange-2: 40%;
+}
+
 @layer base {
   /* Premium font stack */
   body {

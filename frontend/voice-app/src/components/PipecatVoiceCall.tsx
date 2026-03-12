@@ -693,7 +693,7 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-transparent">
       {/* Transcripts - moved to top */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10">
         {error && (

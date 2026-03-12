@@ -394,7 +394,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-transparent">
       {/* Header */}
       <div className="p-4 flex items-center justify-between relative z-20">
         <div className="flex items-center gap-3">
