@@ -17,36 +17,35 @@ export function TimeframeSelector({ onChange, defaultValue = 'all' }: TimeframeS
     onChange(defaultValue);
   }, []);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value as Timeframe;
+  const handleChange = (value: Timeframe) => {
     setTimeframe(value);
     onChange(value);
-    console.log('Timeframe changed:', value); // Debug log
+    console.log('Timeframe changed:', value);
   };
 
+  const timeframes: { value: Timeframe; label: string }[] = [
+    { value: 'all', label: translate('timeframe.allTime') },
+    { value: 'year', label: translate('timeframe.thisYear') },
+    { value: 'month', label: translate('timeframe.thisMonth') },
+    { value: 'week', label: translate('timeframe.thisWeek') },
+    { value: 'day', label: translate('timeframe.thisDay') },
+  ];
+
   return (
-    <div className="flex items-center gap-3">
-      <label htmlFor="timeframe-selector" className="text-[11px] font-medium text-white/40 uppercase tracking-widest">
-        {translate('timeframe.label')}
-      </label>
-      <select
-        id="timeframe-selector"
-        className="py-2.5 px-4 cursor-pointer appearance-none bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 focus:bg-white/[0.06] text-white rounded-xl transition-all duration-200"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='white' stroke-opacity='0.5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'right 1rem center',
-          paddingRight: '3rem'
-        }}
-        value={timeframe}
-        onChange={handleChange}
-      >
-        <option value="all">{translate('timeframe.allTime')}</option>
-        <option value="year">{translate('timeframe.thisYear')}</option>
-        <option value="month">{translate('timeframe.thisMonth')}</option>
-        <option value="week">{translate('timeframe.thisWeek')}</option>
-        <option value="day">{translate('timeframe.thisDay')}</option>
-      </select>
+    <div className="flex items-center gap-2">
+      {timeframes.map((tf) => (
+        <button
+          key={tf.value}
+          onClick={() => handleChange(tf.value)}
+          className={`px-4 py-2 text-sm font-light transition-all duration-300 ${
+            timeframe === tf.value
+              ? 'text-white border-b border-white'
+              : 'text-white/40 hover:text-white/70 border-b border-transparent'
+          }`}
+        >
+          {tf.label}
+        </button>
+      ))}
     </div>
   );
 }
