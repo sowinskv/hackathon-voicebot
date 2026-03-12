@@ -55,26 +55,19 @@ export function SessionList() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-4xl font-bold text-white tracking-tight mb-2">Sessions</h1>
+        <h1 className="text-4xl font-light text-white tracking-tight mb-2">Sessions</h1>
         <p className="text-white/50 text-lg">
           View and manage all customer interaction sessions
         </p>
       </div>
 
       {/* Filters */}
-      <div className="card space-y-6">
+      <div className="space-y-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <input
-                type="text"
-                placeholder="Search by session ID, name, phone, or email..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="input-field pl-10"
-              />
               <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40"
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -86,6 +79,13 @@ export function SessionList() {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-transparent border-0 border-b border-white/20 focus:border-white/40 outline-none pl-6 pb-2 text-white placeholder:text-white/40 transition-colors"
+              />
             </div>
           </div>
           <button
@@ -108,7 +108,7 @@ export function SessionList() {
       </div>
 
       {/* Results */}
-      <div className="card">
+      <div>
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
