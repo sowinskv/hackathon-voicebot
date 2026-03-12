@@ -71,13 +71,18 @@ Do not use numbers - spell them out as words."""
             '[Your Name]': 'Alex',
             '[Your Company Name]': 'our insurance company',
             '[Company Name]': 'our insurance company',
+            '[Insurance Company Name]': 'our insurance company',
             '[Bot Name]': 'Alex',
             '[Agent Name]': 'Alex',
+            '[Assistant Name]': 'Alex',
         }
 
         processed = prompt
         for placeholder, default_value in replacements.items():
+            # Case-insensitive replacement
             processed = processed.replace(placeholder, default_value)
+            processed = processed.replace(placeholder.lower(), default_value)
+            processed = processed.replace(placeholder.upper(), default_value)
 
         return processed
 
