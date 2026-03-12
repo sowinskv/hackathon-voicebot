@@ -91,8 +91,8 @@ function DashboardContent() {
           <LanguageSwitch />
         </div>
 
-        {/* Content Sections with fade transition */}
-        <div className="animate-fadeIn">
+        {/* Content Sections with staggered animation */}
+        <div key={activeSection} className="animate-stagger">
           {activeSection === 'overview' && <MetricsOverview />}
           {activeSection === 'bot-comparison' && <BotComparison />}
           {activeSection === 'recent-sessions' && <RecentSessions />}
