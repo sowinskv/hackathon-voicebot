@@ -38,22 +38,6 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Animate gradient on mount/unmount
-  useEffect(() => {
-    // Grow orange gradient when entering chat - way bigger!
-    document.documentElement.style.setProperty('--gradient-orange-1', '100%');
-    document.documentElement.style.setProperty('--gradient-orange-2', '120%');
-    document.documentElement.style.setProperty('--gradient-blur-orange-1', '110%');
-    document.documentElement.style.setProperty('--gradient-blur-orange-2', '130%');
-
-    return () => {
-      // Shrink back to original size when leaving
-      document.documentElement.style.setProperty('--gradient-orange-1', '25%');
-      document.documentElement.style.setProperty('--gradient-orange-2', '35%');
-      document.documentElement.style.setProperty('--gradient-blur-orange-1', '30%');
-      document.documentElement.style.setProperty('--gradient-blur-orange-2', '40%');
-    };
-  }, []);
 
   // Get initial greeting and flow config from bot
   useEffect(() => {
@@ -394,7 +378,16 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-transparent">
+    <>
+      {/* Warm overlay that fades in */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 animate-fadeIn"
+        style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(255, 120, 80, 0.15) 0%, transparent 70%)',
+        }}
+      />
+
+      <div className="flex flex-col h-screen bg-transparent relative z-10 animate-scaleIn">
       {/* Header */}
       <div className="p-4 flex items-center justify-between relative z-20">
         <div className="flex items-center gap-3">
@@ -494,6 +487,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

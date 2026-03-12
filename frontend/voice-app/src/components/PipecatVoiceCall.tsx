@@ -85,22 +85,6 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
     transcriptsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [transcripts]);
 
-  // Animate gradient on mount/unmount
-  useEffect(() => {
-    // Grow orange gradient when entering voice call - way bigger!
-    document.documentElement.style.setProperty('--gradient-orange-1', '100%');
-    document.documentElement.style.setProperty('--gradient-orange-2', '120%');
-    document.documentElement.style.setProperty('--gradient-blur-orange-1', '110%');
-    document.documentElement.style.setProperty('--gradient-blur-orange-2', '130%');
-
-    return () => {
-      // Shrink back to original size when leaving
-      document.documentElement.style.setProperty('--gradient-orange-1', '25%');
-      document.documentElement.style.setProperty('--gradient-orange-2', '35%');
-      document.documentElement.style.setProperty('--gradient-blur-orange-1', '30%');
-      document.documentElement.style.setProperty('--gradient-blur-orange-2', '40%');
-    };
-  }, []);
 
   const startCall = async () => {
     try {
@@ -693,7 +677,16 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
   }
 
   return (
-    <div className="flex flex-col h-screen bg-transparent">
+    <>
+      {/* Warm overlay that fades in */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 animate-fadeIn"
+        style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(255, 120, 80, 0.15) 0%, transparent 70%)',
+        }}
+      />
+
+      <div className="flex flex-col h-screen bg-transparent relative z-10 animate-scaleIn">
       {/* Transcripts - moved to top */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10">
         {error && (
@@ -804,6 +797,7 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
         </div>
       </div>
     </div>
+    </>
   );
 };
 
