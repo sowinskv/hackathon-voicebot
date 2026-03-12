@@ -70,6 +70,7 @@ Do not use numbers - spell them out as words."""
         replacements = {
             '[Your Name]': 'Alex',
             '[Your Company Name]': 'our insurance company',
+            '[Your Insurance Company Name]': 'our insurance company',
             '[Company Name]': 'our insurance company',
             '[Insurance Company Name]': 'our insurance company',
             '[Bot Name]': 'Alex',
@@ -77,13 +78,28 @@ Do not use numbers - spell them out as words."""
             '[Assistant Name]': 'Alex',
         }
 
+        logger.info(f"Processing prompt placeholders. Original length: {len(prompt)}")
         processed = prompt
-        for placeholder, default_value in replacements.items():
-            # Case-insensitive replacement
-            processed = processed.replace(placeholder, default_value)
-            processed = processed.replace(placeholder.lower(), default_value)
-            processed = processed.replace(placeholder.upper(), default_value)
+        replacements_made = []
 
+        for placeholder, default_value in replacements.items():
+            if placeholder in processed:
+                processed = processed.replace(placeholder, default_value)
+                replacements_made.append(f"{placeholder} -> {default_value}")
+            # Also try lowercase and uppercase
+            if placeholder.lower() in processed:
+                processed = processed.replace(placeholder.lower(), default_value)
+                replacements_made.append(f"{placeholder.lower()} -> {default_value}")
+            if placeholder.upper() in processed:
+                processed = processed.replace(placeholder.upper(), default_value)
+                replacements_made.append(f"{placeholder.upper()} -> {default_value}")
+
+        if replacements_made:
+            logger.info(f"Made {len(replacements_made)} replacements: {', '.join(replacements_made)}")
+        else:
+            logger.info("No placeholders found to replace")
+
+        logger.info(f"Processed prompt (first 200 chars): {processed[:200]}")
         return processed
 
     async def run(self):
