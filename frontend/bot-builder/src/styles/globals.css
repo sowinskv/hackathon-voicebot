@@ -289,10 +289,11 @@
 
 /* React Flow overrides for premium theme */
 .react-flow__node {
-  @apply shadow-premium;
-  background: rgba(255, 255, 255, 0.04) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .react-flow__node > div {

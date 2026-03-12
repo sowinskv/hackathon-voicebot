@@ -18,7 +18,7 @@ const NodeWrapper: React.FC<{
   selected?: boolean;
 }> = ({ children, color, selected }) => (
   <div
-    className={`px-4 py-3 rounded-xl border min-w-[180px] bg-white/[0.04] backdrop-blur-md transition-all duration-200 ${
+    className={`px-4 py-3 rounded-xl border-2 min-w-[180px] bg-white/[0.04] backdrop-blur-md transition-all duration-200 ${
       selected ? 'ring-2 ring-white/40 ring-offset-2 ring-offset-transparent shadow-[0_8px_30px_rgba(255,255,255,0.12)]' : 'shadow-[0_4px_20px_rgba(0,0,0,0.3)]'
     }`}
     style={{ borderColor: color }}
@@ -28,7 +28,7 @@ const NodeWrapper: React.FC<{
 );
 
 export const StartNode = memo(({ data, selected }: NodeProps) => (
-  <NodeWrapper color="rgba(16, 185, 129, 0.5)" selected={selected}>
+  <NodeWrapper color="rgba(16, 185, 129, 0.8)" selected={selected}>
     <div className="flex items-center gap-2 mb-2">
       <Play className="w-4 h-4 text-emerald-300" />
       <div className="font-semibold text-white text-sm">{data.label}</div>
@@ -41,7 +41,7 @@ export const StartNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 export const MessageNode = memo(({ data, selected }: NodeProps) => (
-  <NodeWrapper color="rgba(59, 130, 246, 0.5)" selected={selected}>
+  <NodeWrapper color="rgba(59, 130, 246, 0.8)" selected={selected}>
     <Handle type="target" position={Position.Top} className="!bg-blue-400/80 !w-2 !h-2 !border-2 !border-white/30" />
     <div className="flex items-center gap-2 mb-2">
       <MessageSquare className="w-4 h-4 text-blue-300" />
@@ -55,7 +55,7 @@ export const MessageNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 export const SlotCollectionNode = memo(({ data, selected }: NodeProps) => (
-  <NodeWrapper color="rgba(139, 92, 246, 0.5)" selected={selected}>
+  <NodeWrapper color="rgba(139, 92, 246, 0.8)" selected={selected}>
     <Handle type="target" position={Position.Top} className="!bg-purple-400/80 !w-2 !h-2 !border-2 !border-white/30" />
     <div className="flex items-center gap-2 mb-2">
       <Database className="w-4 h-4 text-purple-300" />
@@ -71,7 +71,7 @@ export const SlotCollectionNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 export const ValidationNode = memo(({ data, selected }: NodeProps) => (
-  <NodeWrapper color="rgba(245, 158, 11, 0.5)" selected={selected}>
+  <NodeWrapper color="rgba(245, 158, 11, 0.8)" selected={selected}>
     <Handle type="target" position={Position.Top} className="!bg-amber-400/80 !w-2 !h-2 !border-2 !border-white/30" />
     <div className="flex items-center gap-2 mb-2">
       <CheckCircle className="w-4 h-4 text-amber-300" />
@@ -86,7 +86,7 @@ export const ValidationNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 export const ConfirmationNode = memo(({ data, selected }: NodeProps) => (
-  <NodeWrapper color="rgba(6, 182, 212, 0.5)" selected={selected}>
+  <NodeWrapper color="rgba(6, 182, 212, 0.8)" selected={selected}>
     <Handle type="target" position={Position.Top} className="!bg-cyan-400/80 !w-2 !h-2 !border-2 !border-white/30" />
     <div className="flex items-center gap-2 mb-2">
       <AlertCircle className="w-4 h-4 text-cyan-300" />
@@ -101,7 +101,7 @@ export const ConfirmationNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 export const EscalationNode = memo(({ data, selected }: NodeProps) => (
-  <NodeWrapper color="rgba(239, 68, 68, 0.5)" selected={selected}>
+  <NodeWrapper color="rgba(239, 68, 68, 0.8)" selected={selected}>
     <Handle type="target" position={Position.Top} className="!bg-red-400/80 !w-2 !h-2 !border-2 !border-white/30" />
     <div className="flex items-center gap-2 mb-2">
       <PhoneForwarded className="w-4 h-4 text-red-300" />
@@ -115,7 +115,7 @@ export const EscalationNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 export const EndNode = memo(({ data, selected }: NodeProps) => (
-  <NodeWrapper color="rgba(100, 116, 139, 0.5)" selected={selected}>
+  <NodeWrapper color="rgba(100, 116, 139, 0.8)" selected={selected}>
     <Handle type="target" position={Position.Top} className="!bg-slate-400/80 !w-2 !h-2 !border-2 !border-white/30" />
     <div className="flex items-center gap-2 mb-2">
       <StopCircle className="w-4 h-4 text-slate-300" />
@@ -132,10 +132,10 @@ export const BranchNode = memo(({ data, selected }: NodeProps) => {
 
   return (
     <div
-      className={`bg-white/[0.04] backdrop-blur-md rounded-xl border shadow-[0_4px_20px_rgba(0,0,0,0.3)] min-w-[250px] transition-all duration-200 ${
+      className={`bg-white/[0.04] backdrop-blur-md rounded-xl border-2 shadow-[0_4px_20px_rgba(0,0,0,0.3)] min-w-[250px] transition-all duration-200 ${
         selected ? 'ring-2 ring-white/40 ring-offset-2 ring-offset-transparent shadow-[0_8px_30px_rgba(255,255,255,0.12)]' : ''
       }`}
-      style={{ borderColor: 'rgba(249, 115, 22, 0.5)' }}
+      style={{ borderColor: 'rgba(249, 115, 22, 0.8)' }}
     >
       <Handle type="target" position={Position.Top} className="!bg-orange-400/80 !w-2 !h-2 !border-2 !border-white/30" />
 
@@ -200,7 +200,7 @@ export const FieldGroupNode = memo(({ data, selected }: NodeProps) => {
   const fields = data.fields || [];
 
   return (
-    <NodeWrapper color="rgba(168, 85, 247, 0.5)" selected={selected}>
+    <NodeWrapper color="rgba(168, 85, 247, 0.8)" selected={selected}>
       <Handle type="target" position={Position.Top} className="!bg-purple-400/80 !w-2 !h-2 !border-2 !border-white/30" />
       <div className="flex items-center gap-2 mb-2">
         <FolderInput className="w-4 h-4 text-purple-300" />
@@ -222,14 +222,47 @@ export const FieldGroupNode = memo(({ data, selected }: NodeProps) => {
   );
 });
 
+// Survey node for satisfaction surveys
+export const SurveyNode = memo(({ data, selected }: NodeProps) => (
+  <NodeWrapper color="rgba(236, 72, 153, 0.8)" selected={selected}>
+    <Handle type="target" position={Position.Top} className="!bg-pink-400/80 !w-2 !h-2 !border-2 !border-white/30" />
+    <div className="flex items-center gap-2 mb-2">
+      <CheckCircle className="w-4 h-4 text-pink-300" />
+      <div className="font-semibold text-white text-sm">{data.label}</div>
+    </div>
+    {data.description && (
+      <div className="text-xs text-white/70 mt-1">{data.description}</div>
+    )}
+    <Handle type="source" position={Position.Bottom} className="!bg-pink-400/80 !w-2 !h-2 !border-2 !border-white/30" />
+  </NodeWrapper>
+));
+
+// Default node for any custom or unrecognized types
+export const DefaultNode = memo(({ data, selected }: NodeProps) => (
+  <NodeWrapper color="rgba(168, 85, 247, 0.8)" selected={selected}>
+    <Handle type="target" position={Position.Top} className="!bg-purple-400/80 !w-2 !h-2 !border-2 !border-white/30" />
+    <div className="flex items-center gap-2 mb-2">
+      <Database className="w-4 h-4 text-purple-300" />
+      <div className="font-semibold text-white text-sm">{data.label || 'Custom Node'}</div>
+    </div>
+    {data.description && (
+      <div className="text-xs text-white/70 mt-1">{data.description}</div>
+    )}
+    <Handle type="source" position={Position.Bottom} className="!bg-purple-400/80 !w-2 !h-2 !border-2 !border-white/30" />
+  </NodeWrapper>
+));
+
 export const nodeTypes = {
   start: StartNode,
   message: MessageNode,
   slotCollection: SlotCollectionNode,
+  slot_collection: SlotCollectionNode, // Alias for backwards compatibility
   fieldGroup: FieldGroupNode,
   branch: BranchNode,
   validation: ValidationNode,
   confirmation: ConfirmationNode,
   escalation: EscalationNode,
+  survey: SurveyNode,
   end: EndNode,
+  default: DefaultNode,
 };
