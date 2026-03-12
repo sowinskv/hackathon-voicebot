@@ -63,45 +63,27 @@ export function SessionList() {
 
       {/* Filters */}
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <svg
-                className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full bg-transparent border-0 border-b border-white/20 focus:border-white/40 outline-none pl-6 pb-2 text-white placeholder:text-white/40 transition-colors"
-              />
-            </div>
-          </div>
-          <button
-            onClick={refresh}
-            className="bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.06] text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 flex items-center gap-2"
+        <div className="relative">
+          <svg
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            Refresh
-          </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent border-0 border-b border-white/20 focus:border-white/40 outline-none pl-6 pb-2 text-white placeholder:text-white/40 transition-colors"
+          />
         </div>
 
         <StatusFilter value={status} onChange={handleStatusChange} />
