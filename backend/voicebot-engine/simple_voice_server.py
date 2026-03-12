@@ -287,6 +287,9 @@ async def websocket_endpoint(
     # Process placeholders in the system prompt
     base_system_prompt = process_prompt_placeholders(raw_system_prompt)
 
+    # Add identity instructions - tell the LLM what name and company to use
+    identity_instruction = "\n\nIMPORTANT: Your name is Alex. You work for 'our insurance company'. When introducing yourself, say 'My name is Alex' and refer to the company as 'our insurance company' or just 'our company'. Never use placeholders like [Your Name], [Insurance Company Name], [Your Company Name], etc."
+
     # Add language instruction based on language parameter
     language_instruction = ""
     if language == "pl":
@@ -294,7 +297,7 @@ async def websocket_endpoint(
     elif language == "en":
         language_instruction = "\n\nIMPORTANT: You MUST speak ONLY in English language. Always respond in English."
 
-    system_prompt = base_system_prompt + language_instruction
+    system_prompt = base_system_prompt + identity_instruction + language_instruction
 
     # Model name from environment variable
     model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
