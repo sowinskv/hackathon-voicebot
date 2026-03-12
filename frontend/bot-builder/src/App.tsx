@@ -493,7 +493,7 @@ function App() {
           {activeTab === 'test' && config && (
             <TestConsole flow={config.flow} prompt={config.prompt} fields={config.fields} />
           )}
-          {activeTab === 'versions' && <VersionHistory />}
+          {activeTab === 'versions' && <VersionHistory botId={currentBotId} />}
             </>
           )}
         </div>
