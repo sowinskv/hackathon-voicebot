@@ -113,13 +113,6 @@ function Layout({ children }: { children: React.ReactNode }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         {children}
       </main>
-      <footer className="border-t border-white/[0.04] mt-16 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <p className="text-center text-sm text-white/30 tracking-wide">
-            Agent Console - Voice AI Management System
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
