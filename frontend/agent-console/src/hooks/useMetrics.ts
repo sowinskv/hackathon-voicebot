@@ -12,36 +12,25 @@ import { Timeframe } from '../components/TimeframeSelector';
  */
 export function useMetrics(
   timeframe: Timeframe = 'all',
-  refreshInterval = 10000,
+  refreshInterval = 60000,
   initialFetch = true
 ) {
   const [metrics, setMetrics] = useState<SessionMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [currentTimeframe, setCurrentTimeframe] = useState<Timeframe>(timeframe);
-
-  // Update currentTimeframe when timeframe prop changes
-  useEffect(() => {
-    if (currentTimeframe !== timeframe) {
-      console.log(`Timeframe changed from ${currentTimeframe} to ${timeframe}`);
-      setCurrentTimeframe(timeframe);
-      // Force an immediate refresh when timeframe changes
-      fetchMetricsForTimeframe(timeframe);
-    }
-  }, [timeframe]);
 
   // Function to fetch metrics for a specific timeframe
-  const fetchMetricsForTimeframe = async (tf: Timeframe) => {
+  const fetchMetrics = useCallback(async () => {
     try {
-      console.log(`Explicitly fetching metrics for timeframe: ${tf}...`);
+      console.log(`Fetching metrics for timeframe: ${timeframe}...`);
       setError(null);
       setLoading(true);
 
-      const data = await api.getMetrics(tf);
+      const data = await api.getMetrics(timeframe);
       setMetrics(data);
       setLastUpdated(new Date());
-      console.log('Metrics updated for timeframe:', tf, data);
+      console.log('Metrics updated for timeframe:', timeframe, data);
       return data;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch metrics';
@@ -51,24 +40,22 @@ export function useMetrics(
     } finally {
       setLoading(false);
     }
-  };
+  }, [timeframe]);
 
-  // Function to fetch metrics using current timeframe
-  const fetchMetrics = useCallback(async () => {
-    return fetchMetricsForTimeframe(currentTimeframe);
-  }, [currentTimeframe]);
-
-  // Set up automatic refresh interval
+  // Fetch on mount and when timeframe changes
   useEffect(() => {
     if (initialFetch) {
       fetchMetrics();
     }
+  }, [fetchMetrics, initialFetch]);
 
+  // Set up automatic refresh interval (separate from timeframe changes)
+  useEffect(() => {
     if (refreshInterval > 0) {
       const interval = setInterval(fetchMetrics, refreshInterval);
       return () => clearInterval(interval);
     }
-  }, [fetchMetrics, initialFetch, refreshInterval, currentTimeframe]);
+  }, [fetchMetrics, refreshInterval]);
 
   return {
     metrics,

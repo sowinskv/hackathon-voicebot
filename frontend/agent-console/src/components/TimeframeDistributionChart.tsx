@@ -1,5 +1,5 @@
 import { useMemo, useRef, useEffect } from 'react';
-import { motion, useMotionValue, animate } from 'framer-motion';
+import { motion, useMotionValue, animate, useTransform } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { Timeframe } from './TimeframeSelector';
 
@@ -15,8 +15,9 @@ export function TimeframeDistributionChart({
   loading = false
 }: TimeframeDistributionChartProps) {
   const { language } = useLanguage();
-  const pathD = useMotionValue('');
-  const previousPath = useRef<string>('');
+  const progress = useMotionValue(0);
+  const previousDataRef = useRef<number[]>([]);
+  const currentDataRef = useRef<number[]>([]);
 
   // Helper function to get the appropriate label for each timeframe
   const getLabelForTimeUnit = (unit: string, timeframe: Timeframe) => {
@@ -72,9 +73,40 @@ export function TimeframeDistributionChart({
     return lowerValue + (upperValue - lowerValue) * fraction;
   };
 
-  // Generate smooth curve path using cubic bezier curves with normalized point count
-  const generateSmoothPath = useMemo(() => {
-    if (sortedData.length === 0) return '';
+  // Convert sortedData to normalized array of values
+  const normalizedValues = useMemo(() => {
+    const numPoints = 50;
+    return Array.from({ length: numPoints }, (_, i) => {
+      const t = i / (numPoints - 1);
+      return getInterpolatedValue(sortedData, t);
+    });
+  }, [sortedData]);
+
+  // Update refs and trigger animation when data changes
+  useEffect(() => {
+    if (normalizedValues.length > 0) {
+      // Store previous data for interpolation
+      if (currentDataRef.current.length > 0) {
+        previousDataRef.current = [...currentDataRef.current];
+      } else {
+        // First render - use current as previous (no animation)
+        previousDataRef.current = [...normalizedValues];
+      }
+
+      currentDataRef.current = [...normalizedValues];
+
+      // Animate from 0 to 1 to interpolate between previous and current
+      progress.set(0);
+      animate(progress, 1, {
+        duration: 0.8,
+        ease: [0.4, 0.0, 0.2, 1]
+      });
+    }
+  }, [normalizedValues, progress]);
+
+  // Generate smooth curve path using interpolated values
+  const generateSmoothPath = (values: number[], maxVal: number) => {
+    if (values.length === 0) return '';
 
     const width = 800;
     const height = 300;
@@ -82,14 +114,11 @@ export function TimeframeDistributionChart({
     const chartWidth = width - padding * 2;
     const chartHeight = height - padding * 2;
 
-    // Always use 50 interpolated points for smooth morphing
-    const numPoints = 50;
-    const points = Array.from({ length: numPoints }, (_, i) => {
-      const t = i / (numPoints - 1);
-      const interpolatedValue = getInterpolatedValue(sortedData, t);
+    const points = values.map((value, i) => {
+      const t = i / (values.length - 1);
       return {
         x: padding + t * chartWidth,
-        y: padding + chartHeight - (interpolatedValue / maxValue) * chartHeight,
+        y: padding + chartHeight - (value / maxVal) * chartHeight,
       };
     });
 
@@ -111,28 +140,23 @@ export function TimeframeDistributionChart({
     path += ` Z`;
 
     return path;
-  }, [sortedData, maxValue]);
+  };
 
-  // Animate path changes
-  useEffect(() => {
-    if (!previousPath.current || previousPath.current === '') {
-      // First render - set immediately without animation
-      pathD.set(generateSmoothPath);
-      previousPath.current = generateSmoothPath;
-    } else if (previousPath.current !== generateSmoothPath) {
-      // Path changed - animate from previous to new
-      // Make sure pathD starts at the previous path
-      pathD.set(previousPath.current);
-
-      animate(pathD, generateSmoothPath, {
-        duration: 0.8,
-        ease: [0.4, 0.0, 0.2, 1]
-      });
-
-      // Update previous path for next change
-      previousPath.current = generateSmoothPath;
+  // Use useTransform to interpolate between paths based on progress
+  const animatedPath = useTransform(progress, (p) => {
+    if (previousDataRef.current.length === 0 || currentDataRef.current.length === 0) {
+      return generateSmoothPath(currentDataRef.current, maxValue);
     }
-  }, [generateSmoothPath, pathD]);
+
+    // Interpolate between previous and current values
+    const interpolatedValues = currentDataRef.current.map((currentVal, i) => {
+      const previousVal = previousDataRef.current[i] || 0;
+      return previousVal + (currentVal - previousVal) * p;
+    });
+
+    return generateSmoothPath(interpolatedValues, maxValue);
+  });
+
 
   if (loading) {
     return (
@@ -239,7 +263,7 @@ export function TimeframeDistributionChart({
 
             {/* Wave area */}
             <motion.path
-              d={pathD}
+              d={animatedPath}
               fill="url(#waveGradient)"
               stroke="rgba(255, 255, 255, 0.6)"
               strokeWidth="2"
