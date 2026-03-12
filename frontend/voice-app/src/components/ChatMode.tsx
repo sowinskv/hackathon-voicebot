@@ -40,11 +40,11 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
 
   // Animate gradient on mount/unmount
   useEffect(() => {
-    // Grow orange gradient when entering chat
-    document.documentElement.style.setProperty('--gradient-orange-1', '60%');
-    document.documentElement.style.setProperty('--gradient-orange-2', '70%');
-    document.documentElement.style.setProperty('--gradient-blur-orange-1', '65%');
-    document.documentElement.style.setProperty('--gradient-blur-orange-2', '75%');
+    // Grow orange gradient when entering chat - way bigger!
+    document.documentElement.style.setProperty('--gradient-orange-1', '100%');
+    document.documentElement.style.setProperty('--gradient-orange-2', '120%');
+    document.documentElement.style.setProperty('--gradient-blur-orange-1', '110%');
+    document.documentElement.style.setProperty('--gradient-blur-orange-2', '130%');
 
     return () => {
       // Shrink back to original size when leaving
