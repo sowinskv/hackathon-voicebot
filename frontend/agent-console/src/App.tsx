@@ -88,16 +88,11 @@ function Navigation() {
           </div>
 
           {/* Right - User info */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <NotificationBell />
-            <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-              <div className="text-right">
-                <p className="text-sm font-semibold text-white" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.25)' }}>Agent User</p>
-                <p className="text-xs text-white/70 font-medium" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Consultant</p>
-              </div>
-              <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                <span className="text-white font-semibold">AU</span>
-              </div>
+            <div className="text-right pl-6 border-l border-white/10">
+              <p className="text-sm font-light text-white" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.25)' }}>Agent User</p>
+              <p className="text-xs text-white/60 font-light" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Consultant</p>
             </div>
           </div>
         </div>
