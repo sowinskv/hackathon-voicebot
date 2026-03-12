@@ -378,16 +378,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   }
 
   return (
-    <>
-      {/* Warm overlay that fades in */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0 animate-fadeIn"
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(255, 120, 80, 0.15) 0%, transparent 70%)',
-        }}
-      />
-
-      <div className="flex flex-col h-screen bg-transparent relative z-10 animate-scaleIn">
+    <div className="flex flex-col h-screen bg-transparent relative z-10 animate-blurIn">
       {/* Header */}
       <div className="p-4 flex items-center justify-between relative z-20">
         <div className="flex items-center gap-3">
@@ -487,7 +478,6 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

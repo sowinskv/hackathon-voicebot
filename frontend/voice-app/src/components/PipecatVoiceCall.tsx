@@ -677,16 +677,7 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
   }
 
   return (
-    <>
-      {/* Warm overlay that fades in */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0 animate-fadeIn"
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(255, 120, 80, 0.15) 0%, transparent 70%)',
-        }}
-      />
-
-      <div className="flex flex-col h-screen bg-transparent relative z-10 animate-scaleIn">
+    <div className="flex flex-col h-screen bg-transparent relative z-10 animate-blurIn">
       {/* Transcripts - moved to top */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10">
         {error && (
@@ -797,7 +788,6 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
         </div>
       </div>
     </div>
-    </>
   );
 };
 

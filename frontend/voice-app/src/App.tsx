@@ -79,7 +79,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-8 bg-transparent animate-scaleIn">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-8 bg-transparent animate-blurIn">
       {/* Logo - Top Left */}
       <div className="fixed top-8 left-8 z-50">
         <div className="flex items-center gap-3">
