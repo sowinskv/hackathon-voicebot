@@ -678,7 +678,7 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
   return (
     <div className="flex flex-col h-screen">
       {/* Transcripts - moved to top */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10">
         {error && (
           <div className="text-center py-8">
             <p className="font-semibold text-white mb-2">Something went wrong</p>
@@ -708,7 +708,7 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
               <p className="text-sm font-semibold mb-1 opacity-70">
                 {transcript.speaker === 'user' ? 'You' : 'Bot'}
               </p>
-              <p className="text-base">
+              <p className="text-base" style={{ color: 'rgb(255, 255, 255)' }}>
                 {transcript.speaker === 'bot' && transcript.displayedText !== undefined
                   ? transcript.displayedText
                   : transcript.text}

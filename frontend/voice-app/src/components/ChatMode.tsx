@@ -403,7 +403,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 relative z-10">
         {error && (
           <div className="text-center py-8">
             <p className="font-semibold text-white mb-2">Something went wrong</p>
@@ -432,7 +432,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
               <p className="text-sm font-semibold mb-1 opacity-70">
                 {message.role === 'user' ? 'You' : 'Bot'}
               </p>
-              <p className="text-base whitespace-pre-wrap">{message.content}</p>
+              <p className="text-base whitespace-pre-wrap" style={{ color: 'rgb(255, 255, 255)' }}>{message.content}</p>
               <p className="text-xs mt-1 opacity-50">
                 {message.timestamp.toLocaleTimeString()}
               </p>

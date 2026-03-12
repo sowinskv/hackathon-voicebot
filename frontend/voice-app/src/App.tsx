@@ -84,7 +84,7 @@ function App() {
       <div className="fixed top-8 left-8 z-50">
         <div className="flex items-center gap-3">
           <div className="accent-dot"></div>
-          <h1 className="text-xl font-bold text-white tracking-tight">super kitties</h1>
+          <h1 className="text-xl font-light text-white tracking-tight">super kitties</h1>
         </div>
       </div>
 
@@ -94,7 +94,7 @@ function App() {
           <div className="inline-block px-4 py-1.5 bg-white/[0.08] border border-white/10 rounded-full mb-6">
             <span className="text-xs font-medium text-white uppercase tracking-wider">AI Voice Assistant</span>
           </div>
-          <h2 className="text-7xl font-bold text-white mb-6 leading-tight">
+          <h2 className="text-7xl font-light text-white mb-6 leading-tight">
             Start Your
             <br />
             Conversation
@@ -107,7 +107,7 @@ function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
           {/* Flow Selector */}
           <div>
-            <label className="block text-[11px] font-semibold text-white/50 mb-3 uppercase tracking-widest">
+            <label className="block text-[11px] font-light text-white/50 mb-3 uppercase tracking-widest">
               Select Bot
             </label>
             <select
@@ -126,7 +126,7 @@ function App() {
 
           {/* Mode Selector */}
           <div>
-            <label className="block text-[11px] font-semibold text-white/50 mb-3 uppercase tracking-widest">
+            <label className="block text-[11px] font-light text-white/50 mb-3 uppercase tracking-widest">
               Mode
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -184,7 +184,7 @@ function App() {
 
         {error && (
           <div className="mt-8 text-center">
-            <h3 className="text-xl font-semibold text-white mb-2">Oops! Something went wrong</h3>
+            <h3 className="text-xl font-light text-white mb-2">Oops! Something went wrong</h3>
             <p className="text-white/70 text-sm mb-6">{error}</p>
             <button
               onClick={fetchPublishedFlows}
