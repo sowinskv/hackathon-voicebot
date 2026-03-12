@@ -112,7 +112,7 @@ export function SessionDetail() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-blurIn">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>

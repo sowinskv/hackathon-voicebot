@@ -11,7 +11,7 @@ function DashboardContent() {
   const [activeSection, setActiveSection] = useState<Section>('overview');
 
   return (
-    <div className="flex gap-12 min-h-screen">
+    <div className="flex gap-12 min-h-screen animate-blurIn">
       {/* Left Sidebar Navigation */}
       <aside className="w-72 flex-shrink-0">
         <nav className="sticky top-24 space-y-2">

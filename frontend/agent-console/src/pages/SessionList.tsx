@@ -53,7 +53,7 @@ export function SessionList() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 animate-blurIn">
       <div>
         <h1 className="text-4xl font-light text-white tracking-tight mb-2">Sessions</h1>
         <p className="text-white/50 text-lg">
