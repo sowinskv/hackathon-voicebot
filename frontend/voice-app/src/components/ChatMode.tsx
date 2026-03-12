@@ -38,6 +38,23 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Animate gradient on mount/unmount
+  useEffect(() => {
+    // Grow orange gradient when entering chat
+    document.documentElement.style.setProperty('--gradient-orange-1', '60%');
+    document.documentElement.style.setProperty('--gradient-orange-2', '70%');
+    document.documentElement.style.setProperty('--gradient-blur-orange-1', '65%');
+    document.documentElement.style.setProperty('--gradient-blur-orange-2', '75%');
+
+    return () => {
+      // Shrink back to original size when leaving
+      document.documentElement.style.setProperty('--gradient-orange-1', '25%');
+      document.documentElement.style.setProperty('--gradient-orange-2', '35%');
+      document.documentElement.style.setProperty('--gradient-blur-orange-1', '30%');
+      document.documentElement.style.setProperty('--gradient-blur-orange-2', '40%');
+    };
+  }, []);
+
   // Get initial greeting and flow config from bot
   useEffect(() => {
     if (!initialized) {

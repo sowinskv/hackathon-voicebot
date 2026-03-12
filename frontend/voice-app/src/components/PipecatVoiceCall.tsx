@@ -85,6 +85,23 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
     transcriptsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [transcripts]);
 
+  // Animate gradient on mount/unmount
+  useEffect(() => {
+    // Grow orange gradient when entering voice call
+    document.documentElement.style.setProperty('--gradient-orange-1', '60%');
+    document.documentElement.style.setProperty('--gradient-orange-2', '70%');
+    document.documentElement.style.setProperty('--gradient-blur-orange-1', '65%');
+    document.documentElement.style.setProperty('--gradient-blur-orange-2', '75%');
+
+    return () => {
+      // Shrink back to original size when leaving
+      document.documentElement.style.setProperty('--gradient-orange-1', '25%');
+      document.documentElement.style.setProperty('--gradient-orange-2', '35%');
+      document.documentElement.style.setProperty('--gradient-blur-orange-1', '30%');
+      document.documentElement.style.setProperty('--gradient-blur-orange-2', '40%');
+    };
+  }, []);
+
   const startCall = async () => {
     try {
       setIsConnecting(true);
