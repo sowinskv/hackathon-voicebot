@@ -6,6 +6,7 @@ import VersionHistory from './components/VersionHistory-simple';
 import BotList from './components/BotList';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { useLanguage } from './i18n/LanguageContext';
+import { Modal } from './components/Modal';
 
 interface Flow {
   nodes: any[];
@@ -58,6 +59,18 @@ function App() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message?: string;
+    type: 'info' | 'confirm' | 'success';
+    onConfirm?: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+  });
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -116,7 +129,17 @@ function App() {
   };
 
   const handleBackToList = () => {
-    if (hasUnsavedChanges && !window.confirm(t('common.unsavedChanges'))) {
+    if (hasUnsavedChanges) {
+      setModal({
+        isOpen: true,
+        title: 'Unsaved changes',
+        message: 'You have unsaved changes. Are you sure you want to leave?',
+        type: 'confirm',
+        onConfirm: () => {
+          setView('list');
+          setShowAdvanced(false);
+        },
+      });
       return;
     }
     setView('list');
@@ -162,10 +185,20 @@ function App() {
       }
 
       setHasUnsavedChanges(false);
-      alert(currentBotId ? t('common.updated') : t('common.saved'));
+      setModal({
+        isOpen: true,
+        title: 'Success',
+        message: currentBotId ? 'Bot updated successfully' : 'Bot saved successfully',
+        type: 'success',
+      });
     } catch (error: any) {
       console.error('[BOT-SAVE] Error:', error);
-      alert('Error: ' + error.message);
+      setModal({
+        isOpen: true,
+        title: 'Error',
+        message: 'Failed to save: ' + error.message,
+        type: 'info',
+      });
     }
   };
 
@@ -178,11 +211,27 @@ function App() {
     }
 
     if (!currentBotId) {
-      alert(t('common.saveFirst'));
+      setModal({
+        isOpen: true,
+        title: 'Save first',
+        message: 'Please save your bot before publishing',
+        type: 'info',
+      });
       return;
     }
 
-    if (!window.confirm(t('common.publishConfirm'))) return;
+    setModal({
+      isOpen: true,
+      title: 'Publish bot',
+      message: 'Are you sure you want to publish this bot? It will be available for use.',
+      type: 'confirm',
+      onConfirm: async () => {
+        await performPublish();
+      },
+    });
+  };
+
+  const performPublish = async () => {
 
     try {
       console.log('[BOT-PUBLISH] Publishing...', currentBotId);
@@ -198,10 +247,20 @@ function App() {
       }
 
       console.log('[BOT-PUBLISH] Published successfully');
-      alert(t('common.published'));
+      setModal({
+        isOpen: true,
+        title: 'Published',
+        message: 'Bot published successfully and is now available',
+        type: 'success',
+      });
     } catch (error: any) {
       console.error('[BOT-PUBLISH] Error:', error);
-      alert('Error: ' + error.message);
+      setModal({
+        isOpen: true,
+        title: 'Error',
+        message: 'Failed to publish: ' + error.message,
+        type: 'info',
+      });
     }
   };
 
@@ -275,14 +334,14 @@ function App() {
                 <>
                   <button
                     onClick={handleBackToList}
-                    className="btn btn-secondary"
+                    className="px-4 py-2 text-white/80 hover:text-white hover:scale-105 transition-all duration-200 font-medium"
                   >
                     {t('header.backToList')}
                   </button>
               {config && (
                 <button
                   onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="btn btn-secondary"
+                  className="px-4 py-2 text-white/80 hover:text-white hover:scale-105 transition-all duration-200 font-medium"
                 >
                   {showAdvanced ? t('header.hideAdvanced') : t('header.showAdvanced')}
                 </button>
@@ -290,14 +349,14 @@ function App() {
               <button
                 onClick={handleSave}
                 disabled={!config || !hasUnsavedChanges}
-                className="btn btn-secondary"
+                className="px-4 py-2 text-white/80 hover:text-white hover:scale-105 transition-all duration-200 font-medium disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {t('header.save')}
               </button>
               <button
                 onClick={handlePublish}
                 disabled={!config}
-                className="btn btn-primary"
+                className="px-4 py-2 text-white hover:scale-105 transition-all duration-200 font-medium disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {t('header.publish')}
               </button>
@@ -498,6 +557,16 @@ function App() {
           )}
         </div>
       </main>
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onConfirm={modal.onConfirm}
+      />
     </div>
   );
 }

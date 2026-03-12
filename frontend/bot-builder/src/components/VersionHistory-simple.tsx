@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { History, RotateCcw, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Modal } from './Modal';
 
 interface VersionHistoryProps {
   botId: string | null;
@@ -25,6 +26,10 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ botId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isReverting, setIsReverting] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [revertModal, setRevertModal] = useState<{
+    isOpen: boolean;
+    versionId: string | null;
+  }>({ isOpen: false, versionId: null });
 
   useEffect(() => {
     if (botId) {
@@ -56,13 +61,11 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ botId }) => {
     }
   };
 
-  const handleRevert = async (versionId: string) => {
-    if (!botId) return;
+  const handleRevert = async () => {
+    if (!botId || !revertModal.versionId) return;
 
-    if (!window.confirm('Are you sure you want to revert to this version? This will restore the configuration from this version.')) {
-      return;
-    }
-
+    const versionId = revertModal.versionId;
+    setRevertModal({ isOpen: false, versionId: null });
     setIsReverting(versionId);
     try {
       console.log('[VERSION-HISTORY] Reverting to version:', versionId);
@@ -77,11 +80,10 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ botId }) => {
       const result = await response.json();
       console.log('[VERSION-HISTORY] Reverted successfully:', result);
 
-      alert('Successfully reverted! Please refresh the page to see the changes.');
       await loadVersions();
+      window.location.reload(); // Reload to see changes
     } catch (error) {
       console.error('[VERSION-HISTORY] Error reverting:', error);
-      alert('Failed to revert to this version. Please try again.');
     } finally {
       setIsReverting(null);
     }
@@ -260,7 +262,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ botId }) => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRevert(version.id);
+                              setRevertModal({ isOpen: true, versionId: version.id });
                             }}
                             disabled={isReverting === version.id}
                             className="btn btn-primary flex items-center gap-2 text-sm px-4 py-2"
@@ -337,7 +339,7 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ botId }) => {
             </div>
 
             {/* Vertical navigation arrows on the right */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-4">
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-6">
               {/* Older (up arrow) */}
               <button
                 onClick={() => setActiveIndex(Math.min(versions.length - 1, activeIndex + 1))}
@@ -348,12 +350,8 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ botId }) => {
                 <ChevronUp className="w-8 h-8" strokeWidth={1.5} />
               </button>
 
-              {/* Page indicator */}
-              <div className="flex flex-col items-center gap-1 py-2">
-                <span className="text-white/80 font-medium text-sm">{activeIndex + 1}</span>
-                <div className="w-px h-4 bg-white/20"></div>
-                <span className="text-white/40 text-xs">{versions.length}</span>
-              </div>
+              {/* Separator line */}
+              <div className="w-px h-32 bg-white/20"></div>
 
               {/* Newer (down arrow) */}
               <button
@@ -374,6 +372,18 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ botId }) => {
           <strong className="text-white/80">Note:</strong> Versions are automatically created when you save or publish changes to your bot's system prompt, flow, required fields, or status.
         </p>
       </div>
+
+      {/* Revert confirmation modal */}
+      <Modal
+        isOpen={revertModal.isOpen}
+        onClose={() => setRevertModal({ isOpen: false, versionId: null })}
+        title="Revert to previous version"
+        message="Are you sure you want to revert to this version? This will restore the configuration and reload the page."
+        type="confirm"
+        onConfirm={handleRevert}
+        confirmText="Revert"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

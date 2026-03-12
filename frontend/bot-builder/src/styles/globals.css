@@ -402,6 +402,15 @@
   }
 }
 
+/* Modal text overrides */
+.modal-title {
+  color: #000000 !important;
+}
+
+.modal-message {
+  color: rgba(0, 0, 0, 0.85) !important;
+}
+
 /* Success animations - subtle and glowing */
 @keyframes successGlow {
   0% {
