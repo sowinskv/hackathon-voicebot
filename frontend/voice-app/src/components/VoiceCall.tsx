@@ -229,7 +229,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({ flowId, onEnd }) => {
             </button>
             <button
               onClick={endCall}
-              className="p-4 rounded-full bg-red-500 text-white hover:bg-red-600 transition"
+              className="p-4 rounded-full bg-white/20 border border-white/40 text-white hover:bg-white/30 transition backdrop-blur-sm"
             >
               <PhoneOff className="w-6 h-6" />
             </button>

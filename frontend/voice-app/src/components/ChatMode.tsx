@@ -393,9 +393,9 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
 
         <button
           onClick={onEnd}
-          className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
+          className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center border border-white/40"
           style={{
-            background: 'rgba(239, 68, 68, 0.15)'
+            background: 'rgba(255, 255, 255, 0.15)'
           }}
         >
           <PhoneOff size={22} className="text-white" />

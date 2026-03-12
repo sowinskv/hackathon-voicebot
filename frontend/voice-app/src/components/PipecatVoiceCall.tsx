@@ -12,6 +12,8 @@ interface Transcript {
   speaker: 'user' | 'bot';
   text: string;
   timestamp: Date;
+  isTyping?: boolean;
+  displayedText?: string;
 }
 
 interface RequiredField {
@@ -48,6 +50,8 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef(false);
+  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const currentBotMessageRef = useRef<{ id: string; text: string } | null>(null);
   const voiceRecognitionAudioRef = useRef<Int16Array[]>([]);
   const sessionIdRef = useRef<string>('');
 
@@ -197,7 +201,15 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
           console.log('[Voice] Received audio blob, size:', event.data.size);
           const arrayBuffer = await event.data.arrayBuffer();
           console.log('[Voice] ArrayBuffer size:', arrayBuffer.byteLength);
-          playAudio(arrayBuffer);
+
+          // Use the stored transcript ID and text for typing effect
+          const botMessage = currentBotMessageRef.current;
+          console.log('[Voice] Bot message for typing:', botMessage);
+          if (botMessage) {
+            playAudio(arrayBuffer, botMessage.text, botMessage.id);
+          } else {
+            playAudio(arrayBuffer);
+          }
         } else {
           // Text message (transcript)
           try {
@@ -239,7 +251,7 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
     }
   };
 
-  const playAudio = async (arrayBuffer: ArrayBuffer) => {
+  const playAudio = async (arrayBuffer: ArrayBuffer, text?: string, transcriptId?: string) => {
     console.log('[Voice] playAudio called, audioContext exists:', !!audioContextRef.current);
 
     if (!audioContextRef.current) {
@@ -262,6 +274,16 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
       source.buffer = audioBuffer;
       source.connect(audioContextRef.current.destination);
 
+      // Start typing effect synced with audio
+      if (text && transcriptId) {
+        const duration = audioBuffer.duration * 1000; // Convert to ms
+        startTypingEffect(transcriptId, text, duration);
+
+        source.onended = () => {
+          completeTypingEffect(transcriptId, text);
+        };
+      }
+
       console.log('[Voice] Starting audio playback');
       source.start();
       console.log('[Voice] Audio playback started');
@@ -270,16 +292,68 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
     }
   };
 
-  const addTranscript = (speaker: 'user' | 'bot', text: string) => {
-    setTranscripts(prev => [
-      ...prev,
-      {
-        id: `${Date.now()}-${Math.random()}`,
-        speaker,
-        text,
-        timestamp: new Date(),
+  const startTypingEffect = (transcriptId: string, fullText: string, duration: number) => {
+    // Clear any existing typing interval
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+    }
+
+    const charCount = fullText.length;
+    const msPerChar = duration / charCount;
+    let currentIndex = 0;
+
+    typingIntervalRef.current = setInterval(() => {
+      currentIndex++;
+      const displayedText = fullText.substring(0, currentIndex);
+
+      setTranscripts(prev => prev.map(t =>
+        t.id === transcriptId
+          ? { ...t, displayedText, isTyping: currentIndex < charCount }
+          : t
+      ));
+
+      if (currentIndex >= charCount) {
+        if (typingIntervalRef.current) {
+          clearInterval(typingIntervalRef.current);
+          typingIntervalRef.current = null;
+        }
       }
-    ]);
+    }, msPerChar);
+  };
+
+  const completeTypingEffect = (transcriptId: string, fullText: string) => {
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+
+    setTranscripts(prev => prev.map(t =>
+      t.id === transcriptId
+        ? { ...t, displayedText: fullText, isTyping: false }
+        : t
+    ));
+  };
+
+  const addTranscript = (speaker: 'user' | 'bot', text: string) => {
+    const transcriptId = `${Date.now()}-${Math.random()}`;
+    const newTranscript = {
+      id: transcriptId,
+      speaker,
+      text,
+      timestamp: new Date(),
+      isTyping: speaker === 'bot', // Bot messages start as typing
+      displayedText: speaker === 'bot' ? '' : text, // Start empty for bot, full for user
+    };
+
+    setTranscripts(prev => [...prev, newTranscript]);
+
+    // Store current bot message ID and text for audio sync
+    if (speaker === 'bot') {
+      currentBotMessageRef.current = { id: transcriptId, text };
+      console.log('[Voice] Stored bot message for typing:', { id: transcriptId, text: text.substring(0, 50) });
+    }
+
+    return transcriptId;
   };
 
   const identifySpeaker = async () => {
@@ -482,6 +556,10 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
     if (recordingTimeoutRef.current) {
       clearTimeout(recordingTimeoutRef.current);
     }
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
@@ -630,7 +708,12 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
               <p className="text-sm font-semibold mb-1 opacity-70">
                 {transcript.speaker === 'user' ? 'You' : 'Bot'}
               </p>
-              <p className="text-base">{transcript.text}</p>
+              <p className="text-base">
+                {transcript.speaker === 'bot' && transcript.displayedText !== undefined
+                  ? transcript.displayedText
+                  : transcript.text}
+                {transcript.isTyping && <span className="inline-block w-1 h-4 bg-white/70 ml-0.5 animate-pulse" />}
+              </p>
               <p className="text-xs mt-1 opacity-50">
                 {transcript.timestamp.toLocaleTimeString()}
               </p>
@@ -694,9 +777,9 @@ export const PipecatVoiceCall: React.FC<PipecatVoiceCallProps> = ({ flowId, lang
           {/* End Call Button */}
           <button
             onClick={endCall}
-            className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center"
+            className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center border border-white/40"
             style={{
-              background: 'rgba(239, 68, 68, 0.15)'
+              background: 'rgba(255, 255, 255, 0.15)'
             }}
           >
             <PhoneOff size={22} className="text-white" />
