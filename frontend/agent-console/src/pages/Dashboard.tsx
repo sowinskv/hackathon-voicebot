@@ -22,12 +22,12 @@ function DashboardContent() {
               activeSection === 'overview' ? '' : 'opacity-40 hover:opacity-70'
             }`}
           >
-            <span className={`text-6xl font-bold tracking-tight transition-all duration-300 ${
+            <span className={`text-6xl font-light tracking-tight transition-all duration-300 ${
               activeSection === 'overview' ? 'text-white' : 'text-white/60'
             }`}>
               1
             </span>
-            <span className={`text-2xl font-semibold tracking-tight transition-all duration-300 ${
+            <span className={`text-2xl font-light tracking-tight transition-all duration-300 ${
               activeSection === 'overview' ? 'text-white' : 'text-white/60'
             }`}>
               Overview
@@ -46,12 +46,12 @@ function DashboardContent() {
               activeSection === 'bot-comparison' ? '' : 'opacity-40 hover:opacity-70'
             }`}
           >
-            <span className={`text-6xl font-bold tracking-tight transition-all duration-300 ${
+            <span className={`text-6xl font-light tracking-tight transition-all duration-300 ${
               activeSection === 'bot-comparison' ? 'text-white' : 'text-white/60'
             }`}>
               2
             </span>
-            <span className={`text-2xl font-semibold tracking-tight transition-all duration-300 ${
+            <span className={`text-2xl font-light tracking-tight transition-all duration-300 ${
               activeSection === 'bot-comparison' ? 'text-white' : 'text-white/60'
             }`}>
               Bot Comparison
@@ -70,12 +70,12 @@ function DashboardContent() {
               activeSection === 'recent-sessions' ? '' : 'opacity-40 hover:opacity-70'
             }`}
           >
-            <span className={`text-6xl font-bold tracking-tight transition-all duration-300 ${
+            <span className={`text-6xl font-light tracking-tight transition-all duration-300 ${
               activeSection === 'recent-sessions' ? 'text-white' : 'text-white/60'
             }`}>
               3
             </span>
-            <span className={`text-2xl font-semibold tracking-tight transition-all duration-300 ${
+            <span className={`text-2xl font-light tracking-tight transition-all duration-300 ${
               activeSection === 'recent-sessions' ? 'text-white' : 'text-white/60'
             }`}>
               Recent Sessions

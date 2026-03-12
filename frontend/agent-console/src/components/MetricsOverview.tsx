@@ -46,10 +46,7 @@ export function MetricsOverview() {
   return (
     <div className="space-y-10">
       {/* Timeframe Selector */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-white tracking-tight">
-          {translate('dashboard.title')}
-        </h2>
+      <div className="flex items-center justify-end">
         <div className="flex items-center gap-6">
           <TimeframeSelector onChange={handleTimeframeChange} defaultValue={timeframe} />
           {lastUpdated && (

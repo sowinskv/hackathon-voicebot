@@ -89,11 +89,8 @@ export function BotComparison() {
 
   return (
     <div className="space-y-10">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-white tracking-tight">
-          {translate('comparison.title')}
-        </h2>
+      {/* Timeframe Selector */}
+      <div className="flex items-center justify-end">
         <TimeframeSelector onChange={handleTimeframeChange} defaultValue={timeframe} />
       </div>
 

@@ -43,11 +43,8 @@ export function RecentSessions() {
 
   return (
     <div className="space-y-10">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-white tracking-tight">
-          Recent Sessions
-        </h2>
+      {/* View All Link */}
+      <div className="flex items-center justify-end">
         <Link
           to="/sessions"
           className="text-white/60 hover:text-white font-medium text-sm transition-colors uppercase tracking-wider hover:scale-105 transition-all duration-200"
