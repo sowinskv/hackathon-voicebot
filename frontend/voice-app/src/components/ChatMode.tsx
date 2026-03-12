@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Loader2, PhoneOff } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface ChatModeProps {
   flowId: string;
@@ -393,12 +393,9 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
 
         <button
           onClick={onEnd}
-          className="glass-button group relative w-14 h-14 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center border border-white/40"
-          style={{
-            background: 'rgba(255, 255, 255, 0.15)'
-          }}
+          className="text-white/70 hover:text-white transition-colors font-light text-sm"
         >
-          <PhoneOff size={22} className="text-white" />
+          End chat
         </button>
       </div>
 
@@ -455,29 +452,27 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
       </div>
 
       {/* Input */}
-      <div className="p-4">
-        <div className="flex gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={callEnded ? "Call ended" : "Type your message..."}
-            disabled={isLoading || callEnded}
-            autoFocus
-            className="input flex-1"
-          />
+      <div className="p-6">
+        <div className="flex gap-4 items-end">
+          <div className="flex-1">
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={callEnded ? "Call ended" : "Type your message..."}
+              disabled={isLoading || callEnded}
+              autoFocus
+              className="w-full bg-transparent border-0 border-b border-white/20 focus:border-white/40 outline-none pb-2 text-white placeholder:text-white/40 transition-colors"
+            />
+          </div>
           <button
             onClick={sendMessage}
             disabled={!input.trim() || isLoading || callEnded}
-            className="glass-button px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
-            style={{
-              background: 'rgba(255, 255, 255, 0.1)'
-            }}
+            className="text-white/70 hover:text-white transition-colors font-light text-sm disabled:opacity-30 disabled:cursor-not-allowed pb-2"
           >
-            <Send size={20} className="text-white" />
-            <span className="text-white">Send</span>
+            Send
           </button>
         </div>
       </div>
