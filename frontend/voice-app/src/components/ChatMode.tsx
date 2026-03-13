@@ -31,6 +31,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   const [collectedData, setCollectedData] = useState<Record<string, string>>({});
   const [requiredFields, setRequiredFields] = useState<RequiredField[]>([]);
   const [extractingData, setExtractingData] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -38,6 +39,38 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+
+  // Create session when component mounts
+  useEffect(() => {
+    const createSession = async () => {
+      try {
+        console.log('[Chat] Creating session...');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/sessions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            flow_id: flowId,
+            language: 'en',
+            client_metadata: { source: 'chat' }
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setSessionId(data.data.id);
+          console.log('[Chat] Session created:', data.data.id);
+        } else {
+          console.error('[Chat] Failed to create session:', await response.text());
+        }
+      } catch (err) {
+        console.error('[Chat] Error creating session:', err);
+      }
+    };
+
+    createSession();
+  }, [flowId]);
 
   // Get initial greeting and flow config from bot
   useEffect(() => {
@@ -253,39 +286,70 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
     console.log('[Chat] Satisfaction rating:', satisfaction);
 
     try {
+      if (!sessionId) {
+        console.error('[Chat] No sessionId available');
+        onEnd();
+        return;
+      }
+
       // Calculate session duration (in seconds)
       const startTime = messages[0]?.timestamp?.getTime() || Date.now();
       const endTime = messages[messages.length - 1]?.timestamp?.getTime() || Date.now();
       const duration = Math.floor((endTime - startTime) / 1000);
 
-      // Save session data to database
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/sessions/complete`, {
-        method: 'POST',
+      // Update session with completion data
+      await fetch(`${import.meta.env.VITE_API_URL}/api/sessions/${sessionId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          flowId,
-          language: 'en', // or detect from flow
-          messages: messages.map(msg => ({
-            role: msg.role,
-            content: msg.content,
-            timestamp: msg.timestamp
-          })),
-          collectedData,
-          satisfactionScore: satisfaction,
-          duration
+          status: 'completed',
+          satisfaction_score: satisfaction,
+          ended_at: new Date().toISOString(),
+          client_metadata: {
+            source: 'chat',
+            collected_data: collectedData
+          }
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('[Chat] Session saved:', data.sessionId);
-      } else {
-        console.error('[Chat] Failed to save session:', await response.text());
+      // Save transcripts
+      for (const msg of messages) {
+        if (!msg.content) continue;
+        await fetch(`${import.meta.env.VITE_API_URL}/api/sessions/${sessionId}/transcript`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            speaker: msg.role === 'user' ? 'client' : 'bot',
+            text: msg.content,
+            timestamp: msg.timestamp,
+            language: 'en'
+          }),
+        });
       }
+
+      // Save collected data fields
+      for (const [fieldName, fieldValue] of Object.entries(collectedData)) {
+        if (!fieldValue) continue;
+        await fetch(`${import.meta.env.VITE_API_URL}/api/sessions/${sessionId}/data`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            field_name: fieldName,
+            field_value: fieldValue,
+            field_type: 'text'
+          }),
+        });
+      }
+
+      console.log('[Chat] Session completed:', sessionId);
     } catch (err) {
-      console.error('[Chat] Error saving session:', err);
+      console.error('[Chat] Error completing session:', err);
     }
 
     // Always close, even if save fails
@@ -393,7 +457,13 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
         </div>
 
         <button
-          onClick={onEnd}
+          onClick={async () => {
+            console.log('[Chat] User clicked End chat button');
+            setIsLoading(true);
+            await extractCollectedData(messages);
+            setIsLoading(false);
+            setCallEnded(true);
+          }}
           className="text-white/70 hover:text-white transition-colors font-light text-base"
         >
           End chat

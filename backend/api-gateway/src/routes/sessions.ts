@@ -7,13 +7,22 @@ const router = Router();
 
 interface Session {
   id: string;
-  name: string;
+  room_id: string;
   flow_id: string;
   status: string;
-  room_name: string;
+  language: string;
+  started_at: Date;
+  ended_at?: Date;
+  duration_seconds?: number;
+  escalated: boolean;
+  escalated_at?: Date;
+  escalation_reason?: string;
+  client_metadata?: any;
+  cost_data?: any;
+  tags?: string[];
+  satisfaction_score?: number;
   created_at: Date;
   updated_at: Date;
-  metadata?: any;
 }
 
 // GET /api/sessions - List all sessions
@@ -43,7 +52,7 @@ router.get(
       paramCount++;
     }
 
-    queryText += ` ORDER BY s.created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    queryText += ` ORDER BY s.started_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
     params.push(limit, offset);
 
     const result = await query<Session>(queryText, params);
@@ -162,10 +171,10 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { name, flow_id, metadata } = req.body;
+    const { flow_id, language = 'en', client_metadata } = req.body;
 
-    if (!name || !flow_id) {
-      throw new AppError('Name and flow_id are required', 400);
+    if (!flow_id) {
+      throw new AppError('flow_id is required', 400);
     }
 
     // Verify flow exists
@@ -177,16 +186,16 @@ router.post(
       throw new AppError('Flow not found', 404);
     }
 
-    // Generate unique room name
-    const room_name = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    // Generate unique room ID
+    const room_id = `room_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
     const result = await query<Session>(
       `
-      INSERT INTO sessions (name, flow_id, status, room_name, metadata)
-      VALUES ($1, $2, 'pending', $3, $4)
+      INSERT INTO sessions (room_id, flow_id, status, language, client_metadata)
+      VALUES ($1, $2, 'active', $3, $4)
       RETURNING *
     `,
-      [name, flow_id, room_name, metadata ? JSON.stringify(metadata) : null]
+      [room_id, flow_id, language, client_metadata ? JSON.stringify(client_metadata) : '{}']
     );
 
     const newSession = result.rows[0];
@@ -209,7 +218,7 @@ router.put(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { name, status, metadata } = req.body;
+    const { status, client_metadata, escalated, escalation_reason, satisfaction_score, ended_at } = req.body;
 
     // Check if session exists
     const existingSession = await query('SELECT id FROM sessions WHERE id = $1', [
@@ -225,14 +234,8 @@ router.put(
     const params: any[] = [];
     let paramCount = 1;
 
-    if (name !== undefined) {
-      updates.push(`name = $${paramCount}`);
-      params.push(name);
-      paramCount++;
-    }
-
     if (status !== undefined) {
-      const validStatuses = ['pending', 'active', 'completed', 'failed'];
+      const validStatuses = ['active', 'completed', 'escalated', 'abandoned'];
       if (!validStatuses.includes(status)) {
         throw new AppError('Invalid status value', 400);
       }
@@ -241,9 +244,37 @@ router.put(
       paramCount++;
     }
 
-    if (metadata !== undefined) {
-      updates.push(`metadata = $${paramCount}`);
-      params.push(JSON.stringify(metadata));
+    if (client_metadata !== undefined) {
+      updates.push(`client_metadata = $${paramCount}`);
+      params.push(JSON.stringify(client_metadata));
+      paramCount++;
+    }
+
+    if (escalated !== undefined) {
+      updates.push(`escalated = $${paramCount}`);
+      params.push(escalated);
+      paramCount++;
+
+      if (escalated && !existingSession.rows[0].escalated_at) {
+        updates.push(`escalated_at = NOW()`);
+      }
+    }
+
+    if (escalation_reason !== undefined) {
+      updates.push(`escalation_reason = $${paramCount}`);
+      params.push(escalation_reason);
+      paramCount++;
+    }
+
+    if (satisfaction_score !== undefined) {
+      updates.push(`satisfaction_score = $${paramCount}`);
+      params.push(satisfaction_score);
+      paramCount++;
+    }
+
+    if (ended_at !== undefined) {
+      updates.push(`ended_at = $${paramCount}`);
+      params.push(ended_at);
       paramCount++;
     }
 
@@ -338,6 +369,218 @@ router.get(
       status: 'success',
       data: result.rows,
       count: result.rows.length,
+    });
+  })
+);
+
+// POST /api/sessions/:id/transcript - Add transcript entry
+router.post(
+  '/:id/transcript',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { speaker, text, timestamp, language } = req.body;
+
+    if (!speaker || !text) {
+      throw new AppError('Speaker and text are required', 400);
+    }
+
+    const result = await query(
+      `INSERT INTO transcripts (session_id, speaker, text, timestamp, language)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [id, speaker, text, timestamp || new Date(), language || 'en']
+    );
+
+    res.json({
+      status: 'success',
+      data: result.rows[0],
+    });
+  })
+);
+
+// POST /api/sessions/:id/data - Add session data field
+router.post(
+  '/:id/data',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { field_name, field_value, field_type } = req.body;
+
+    if (!field_name || !field_value) {
+      throw new AppError('field_name and field_value are required', 400);
+    }
+
+    const result = await query(
+      `INSERT INTO session_data (session_id, field_name, field_value, field_type, validation_status)
+       VALUES ($1, $2, $3, $4, 'valid')
+       ON CONFLICT (session_id, field_name)
+       DO UPDATE SET field_value = $3, updated_at = NOW()
+       RETURNING *`,
+      [id, field_name, field_value, field_type || 'text']
+    );
+
+    res.json({
+      status: 'success',
+      data: result.rows[0],
+    });
+  })
+);
+
+// PATCH /api/sessions/:id/status - Update session status
+router.patch(
+  '/:id/status',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      throw new AppError('Status is required', 400);
+    }
+
+    const validStatuses = ['active', 'completed', 'escalated', 'abandoned'];
+    if (!validStatuses.includes(status)) {
+      throw new AppError('Invalid status value', 400);
+    }
+
+    const result = await query<Session>(
+      `UPDATE sessions
+       SET status = $1, updated_at = NOW()
+       WHERE id = $2
+       RETURNING *`,
+      [status, id]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('Session not found', 404);
+    }
+
+    res.json({
+      status: 'success',
+      data: result.rows[0],
+    });
+  })
+);
+
+// PATCH /api/sessions/:id/notes - Update session notes
+router.patch(
+  '/:id/notes',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    const result = await query<Session>(
+      `UPDATE sessions
+       SET escalation_reason = $1, updated_at = NOW()
+       WHERE id = $2
+       RETURNING *`,
+      [notes, id]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('Session not found', 404);
+    }
+
+    res.json({
+      status: 'success',
+      data: result.rows[0],
+    });
+  })
+);
+
+// POST /api/sessions/:id/resolve - Mark session as resolved
+router.post(
+  '/:id/resolve',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    const updates: string[] = ['status = $1', 'updated_at = NOW()'];
+    const params: any[] = ['completed'];
+    let paramCount = 2;
+
+    if (notes) {
+      updates.push(`escalation_reason = $${paramCount}`);
+      params.push(notes);
+      paramCount++;
+    }
+
+    params.push(id);
+
+    const result = await query<Session>(
+      `UPDATE sessions
+       SET ${updates.join(', ')}
+       WHERE id = $${paramCount}
+       RETURNING *`,
+      params
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('Session not found', 404);
+    }
+
+    res.json({
+      status: 'success',
+      data: result.rows[0],
+    });
+  })
+);
+
+// POST /api/sessions/:id/end - End a session
+router.post(
+  '/:id/end',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const result = await query<Session>(
+      `UPDATE sessions
+       SET status = 'completed', ended_at = NOW(), updated_at = NOW()
+       WHERE id = $1
+       RETURNING *`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('Session not found', 404);
+    }
+
+    res.json({
+      status: 'success',
+      data: result.rows[0],
+    });
+  })
+);
+
+// POST /api/sessions/:id/escalate - Escalate a session
+router.post(
+  '/:id/escalate',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const result = await query<Session>(
+      `UPDATE sessions
+       SET status = 'escalated',
+           escalated = true,
+           escalated_at = NOW(),
+           escalation_reason = $1,
+           updated_at = NOW()
+       WHERE id = $2
+       RETURNING *`,
+      [reason || 'Escalated by user', id]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('Session not found', 404);
+    }
+
+    // Broadcast escalation
+    broadcastSessionUpdate({
+      type: 'new_escalation',
+      session: result.rows[0],
+    });
+
+    res.json({
+      status: 'success',
+      data: result.rows[0],
     });
   })
 );

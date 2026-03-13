@@ -5,3 +5,4 @@ Ideas
 - [ ] Better buttons (mic and end call)
 - [ ] Make sure the whole page (including “dashboard” and “sessions”) in agent console Is properly translated
 - [ ] make the call logging to agent console actually work
+- [ ] make the readme updated and pretty
