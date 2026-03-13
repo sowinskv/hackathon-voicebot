@@ -307,7 +307,7 @@ function App() {
               {view === 'list' ? (
                 <div className="flex items-center gap-3">
                   <div className="accent-dot"></div>
-                  <h1 className="text-2xl font-bold text-gradient">super kitties</h1>
+                  <h1 className="text-2xl font-light text-white">super kitties</h1>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
@@ -319,7 +319,7 @@ function App() {
                       setBotName(e.target.value);
                       setHasUnsavedChanges(true);
                     }}
-                    className="text-xl font-bold text-gradient bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-[#c17b5c]/50 rounded-lg px-2"
+                    className="text-xl font-light text-white bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-white/20 rounded-lg px-2"
                   />
                 </div>
               )}
