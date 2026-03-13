@@ -58,6 +58,18 @@ services:
       - callcenter-network
     restart: unless-stopped
 
+  # Landing Page
+  landing-page:
+    image: nginx:alpine
+    container_name: callcenter-landing
+    ports:
+      - "8000:80"
+    volumes:
+      - ./frontend/landing-page/index.html:/usr/share/nginx/html/index.html:ro
+      - ./frontend/landing-page/public:/usr/share/nginx/html/public:ro
+    networks:
+      - callcenter-network
+
   # Frontend - Voice App
   voice-app:
     build:
