@@ -298,11 +298,6 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col relative z-10">
-      {/* Fixed Language Switcher - Top Right */}
-      <div className="fixed top-4 right-8 z-50">
-        <LanguageSwitcher />
-      </div>
-
       <header className={`sticky top-4 z-40 mx-4 mb-6 transition-all duration-300 ${
         isHeaderVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
       }`}>
@@ -362,6 +357,7 @@ function App() {
               </button>
                 </>
               )}
+              <LanguageSwitcher />
             </div>
           </div>
         </div>

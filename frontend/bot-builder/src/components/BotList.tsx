@@ -226,7 +226,16 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
                 {/* Thumbnail */}
                 <div className="relative h-44 bg-white/[0.02] flex items-center justify-center overflow-hidden">
                   {/* Circle with background showing through */}
-                  <div className="relative w-32 h-32 rounded-full border-4 border-white/20 overflow-hidden bg-transparent backdrop-blur-none group-hover:border-white/30 transition-all duration-300">
+                  <div className="relative w-32 h-32 rounded-full border-4 border-white/20 overflow-hidden group-hover:border-white/30 transition-all duration-300">
+                    {/* Unblurred background inside circle - different position for each bot */}
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        backgroundImage: 'url(/bg.jpg)',
+                        backgroundSize: '400%',
+                        backgroundPosition: `${(index * 37) % 100}% ${(index * 53) % 100}%`
+                      }}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
                   </div>
                 </div>

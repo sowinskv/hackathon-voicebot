@@ -103,14 +103,13 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-4">
+    <div className="max-w-6xl mx-auto py-8">
       {/* Header */}
-      <div className="p-12 text-center mb-8">
-        <div className="accent-dot mx-auto mb-4"></div>
-        <h1 className="text-5xl font-bold text-gradient mb-4">
+      <div className="py-16 text-center mb-16">
+        <h1 className="text-7xl font-light text-white mb-6 tracking-tight">
           {currentConfig ? t('creator.title.refine') : t('creator.title.create')}
         </h1>
-        <p className="text-xl text-secondary">
+        <p className="text-lg text-white/50 font-light max-w-2xl mx-auto">
           {currentConfig
             ? t('creator.subtitle.refine')
             : t('creator.subtitle.create')
@@ -119,14 +118,14 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
       </div>
 
       {/* Language Selection */}
-      <div className="mb-8 flex justify-center">
+      <div className="mb-12 flex justify-center">
         <div className="inline-flex gap-8 relative">
           <button
             onClick={() => setLanguage('pl')}
-            className={`relative px-4 py-2 text-base font-medium transition-all duration-300 ${
+            className={`relative px-2 py-2 text-sm font-light transition-all duration-300 ${
               language === 'pl'
                 ? 'text-white'
-                : 'text-white/60 hover:text-white/90'
+                : 'text-white/40 hover:text-white/70'
             }`}
           >
             {t('creator.language.pl')}
@@ -136,10 +135,10 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
           </button>
           <button
             onClick={() => setLanguage('en')}
-            className={`relative px-4 py-2 text-base font-medium transition-all duration-300 ${
+            className={`relative px-2 py-2 text-sm font-light transition-all duration-300 ${
               language === 'en'
                 ? 'text-white'
-                : 'text-white/60 hover:text-white/90'
+                : 'text-white/40 hover:text-white/70'
             }`}
           >
             {t('creator.language.en')}
@@ -153,116 +152,115 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
       {!currentConfig ? (
         /* Initial Creation */
         <>
-          <div className="glass-card p-10 mb-8">
-            <label className="section-label mb-4">
+          <div className="mb-12">
+            <label className="text-xs uppercase tracking-wider text-white/40 font-light mb-4 block">
               {t('creator.label.describe')}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('creator.placeholder')}
-              className="input min-h-[240px] text-lg"
+              className="w-full min-h-[280px] bg-white/[0.02] backdrop-blur-sm border border-white/[0.08] rounded-2xl p-8 text-white/90 text-base leading-relaxed tracking-tight font-light focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/10 focus:bg-white/[0.04] placeholder:text-white/30 placeholder:font-light transition-all duration-300 resize-none hover:bg-white/[0.03] hover:border-white/10"
               disabled={isGenerating}
             />
-            <div className="mt-4 text-sm text-muted">
+            <div className="mt-3 text-xs text-white/40 font-light">
               {t('creator.hint')}
             </div>
           </div>
 
           {error && (
             <div className="mb-8 text-center">
-              <p className="text-white/70 text-sm">{error}</p>
+              <p className="text-white/60 text-sm font-light">{error}</p>
             </div>
           )}
 
-          <div className="flex justify-center mb-12">
+          <div className="flex justify-center mb-20">
             <button
               onClick={() => handleGenerate()}
               disabled={isGenerating || !description.trim()}
-              className="btn btn-primary text-xl px-12 py-5 shadow-premium-lg"
+              className="btn btn-primary text-base px-10 py-4 font-light"
             >
               {isGenerating ? (
-                <span className="flex items-center gap-3">
-                  <Loader2 className="w-6 h-6 animate-spin" />
+                <span className="flex items-center gap-2.5">
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   {t('creator.generating')}
                 </span>
               ) : (
-                <span className="flex items-center gap-3">
-                  <Sparkles className="w-6 h-6" />
+                <span className="flex items-center gap-2.5">
+                  <Sparkles className="w-4 h-4" />
                   {t('creator.generate')}
                 </span>
               )}
             </button>
           </div>
 
-          {/* Examples */}
+          {/* Examples - Horizontal Scroll */}
           <div className="space-y-6">
-            <h3 className="section-label text-base">
+            <h3 className="text-xs uppercase tracking-wider text-white/40 font-light">
               {t('creator.examples.title')}
             </h3>
-            <div className="grid gap-5">
-              {examples.map((example, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => !isGenerating && setDescription(example.text)}
-                  className="card-hover-enhanced"
-                >
-                  <div className="flex items-start justify-between gap-6">
-                    <div className="flex-1">
-                      <h4 className="font-bold text-primary text-lg mb-3">{example.title}</h4>
-                      <p className="text-base text-secondary line-clamp-2 leading-relaxed">{example.text}</p>
+            <div className="relative">
+              <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide">
+                {examples.map((example, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => !isGenerating && setDescription(example.text)}
+                    className="flex-shrink-0 w-96 bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.12] rounded-2xl p-6 transition-all duration-300 cursor-pointer group"
+                  >
+                    <h4 className="font-medium text-white text-base mb-3 tracking-tight">{example.title}</h4>
+                    <p className="text-sm text-white/50 font-light line-clamp-3 leading-relaxed">{example.text}</p>
+                    <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                      <span className="text-xs text-white/40 font-light group-hover:text-white/60 transition-colors">
+                        {t('creator.examples.use')}
+                      </span>
                     </div>
-                    <button className="btn btn-secondary px-6 whitespace-nowrap">
-                      {t('creator.examples.use')}
-                    </button>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </>
       ) : (
         /* Refinement Mode */
-        <div className="space-y-8">
+        <div className="space-y-12">
           {/* Success message */}
-          <div className="relative overflow-visible p-8 text-center animate-[successGlow_1.2s_ease-out]">
-            {/* Ambient glow particles */}
-            <div className="absolute top-1/4 left-1/4 w-8 h-8 bg-white/30 rounded-full blur-xl animate-[glowFloat_3s_ease-in-out_infinite]" />
-            <div className="absolute top-1/3 right-1/4 w-12 h-12 bg-white/20 rounded-full blur-2xl animate-[glowFloat_4s_ease-in-out_infinite_0.5s]" />
-            <div className="absolute bottom-1/4 left-1/3 w-10 h-10 bg-white/25 rounded-full blur-xl animate-[glowFloat_3.5s_ease-in-out_infinite_1s]" />
-            <div className="absolute top-1/2 right-1/3 w-6 h-6 bg-white/35 rounded-full blur-lg animate-[glowFloat_2.5s_ease-in-out_infinite_1.5s]" />
+          <div className="relative overflow-visible py-12 text-center">
+            {/* Ambient glow particles - more subtle */}
+            <div className="absolute top-1/4 left-1/4 w-8 h-8 bg-white/20 rounded-full blur-xl animate-[glowFloat_3s_ease-in-out_infinite]" />
+            <div className="absolute top-1/3 right-1/4 w-12 h-12 bg-white/10 rounded-full blur-2xl animate-[glowFloat_4s_ease-in-out_infinite_0.5s]" />
+            <div className="absolute bottom-1/4 left-1/3 w-10 h-10 bg-white/15 rounded-full blur-xl animate-[glowFloat_3.5s_ease-in-out_infinite_1s]" />
 
-            {/* Message with subtle glow */}
+            {/* Message */}
             <div className="relative">
-              <h3 className="font-semibold text-white text-2xl mb-3 animate-[subtleSlide_0.8s_ease-out] drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+              <h3 className="font-light text-white text-3xl mb-4 animate-[subtleSlide_0.8s_ease-out] tracking-tight">
                 {t('creator.success')}
               </h3>
-              <p className="text-lg text-white/70 max-w-xl mx-auto animate-[subtleSlide_0.8s_ease-out_0.15s_both]">
+              <p className="text-base text-white/50 font-light max-w-xl mx-auto animate-[subtleSlide_0.8s_ease-out_0.15s_both]">
                 {t('creator.success.hint')}
               </p>
             </div>
           </div>
 
           {/* Refinement input */}
-          <div className="glass-card p-10">
-            <label className="section-label mb-4">
+          <div>
+            <label className="text-xs uppercase tracking-wider text-white/40 font-light mb-4 block">
               {t('creator.refine.label')}
             </label>
             <textarea
               value={refinement}
               onChange={(e) => setRefinement(e.target.value)}
               placeholder={t('creator.refine.placeholder')}
-              className="input min-h-[180px] text-lg"
+              className="w-full min-h-[200px] bg-white/[0.02] backdrop-blur-sm border border-white/[0.08] rounded-2xl p-8 text-white/90 text-base leading-relaxed tracking-tight font-light focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white/10 focus:bg-white/[0.04] placeholder:text-white/30 placeholder:font-light transition-all duration-300 resize-none hover:bg-white/[0.03] hover:border-white/10"
               disabled={isGenerating}
             />
-            <div className="mt-4 text-sm text-muted">
+            <div className="mt-3 text-xs text-white/40 font-light">
               {t('creator.refine.hint')}
             </div>
           </div>
 
           {error && (
             <div className="text-center py-6">
-              <p className="text-white/70 text-sm">{error}</p>
+              <p className="text-white/60 text-sm font-light">{error}</p>
             </div>
           )}
 
@@ -270,16 +268,16 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
             <button
               onClick={handleRefinement}
               disabled={isGenerating || !refinement.trim()}
-              className="btn btn-primary text-xl px-12 py-5 shadow-premium-lg"
+              className="btn btn-primary text-base px-10 py-4 font-light"
             >
               {isGenerating ? (
-                <span className="flex items-center gap-3">
-                  <Loader2 className="w-6 h-6 animate-spin" />
+                <span className="flex items-center gap-2.5">
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   {t('creator.refine.updating')}
                 </span>
               ) : (
-                <span className="flex items-center gap-3">
-                  <RefreshCw className="w-6 h-6" />
+                <span className="flex items-center gap-2.5">
+                  <RefreshCw className="w-4 h-4" />
                   {t('creator.refine.update')}
                 </span>
               )}
@@ -288,11 +286,11 @@ export const ConversationalCreator: React.FC<Props> = ({ onGenerate, currentConf
 
           {/* History */}
           {history.length > 0 && (
-            <div className="glass-card p-8">
-              <h3 className="section-label text-base mb-6">{t('creator.history')}</h3>
-              <div className="space-y-3">
+            <div className="mt-16 pt-12 border-t border-white/[0.06]">
+              <h3 className="text-xs uppercase tracking-wider text-white/40 font-light mb-6">{t('creator.history')}</h3>
+              <div className="space-y-4">
                 {history.map((item, idx) => (
-                  <div key={idx} className="text-base text-secondary pl-5 border-l-2 border-[#c17b5c]/40 py-2">
+                  <div key={idx} className="text-sm text-white/50 font-light pl-6 border-l border-white/20 py-3">
                     {item}
                   </div>
                 ))}
