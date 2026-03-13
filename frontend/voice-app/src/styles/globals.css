@@ -89,7 +89,6 @@
   /* Glass morphism card - semi-transparent white on dark background */
   .glass-card {
     @apply bg-white/5 backdrop-blur-xl border border-white/10;
-    @apply shadow-[0_4px_16px_rgba(0,0,0,0.3)];
     @apply rounded-2xl;
   }
 
@@ -312,4 +311,48 @@
 
 .animate-blurIn {
   animation: blurIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Minimal slider styles - track with line and discrete dots */
+input[type="range"].slider-minimal {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  height: 24px;
+}
+
+/* Webkit (Chrome, Safari, Edge) */
+input[type="range"].slider-minimal::-webkit-slider-track {
+  background: rgba(255, 255, 255, 0.15);
+  height: 1px;
+  border-radius: 0;
+}
+
+input[type="range"].slider-minimal::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  margin-top: -6px;
+}
+
+/* Firefox */
+input[type="range"].slider-minimal::-moz-range-track {
+  background: rgba(255, 255, 255, 0.15);
+  height: 1px;
+  border-radius: 0;
+}
+
+input[type="range"].slider-minimal::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }

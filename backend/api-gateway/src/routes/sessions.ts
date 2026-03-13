@@ -218,7 +218,7 @@ router.put(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { status, client_metadata, escalated, escalation_reason, satisfaction_score, ended_at } = req.body;
+    const { status, client_metadata, escalated, escalation_reason, satisfaction_score, satisfaction_details, ended_at } = req.body;
 
     // Check if session exists
     const existingSession = await query('SELECT id FROM sessions WHERE id = $1', [
@@ -269,6 +269,12 @@ router.put(
     if (satisfaction_score !== undefined) {
       updates.push(`satisfaction_score = $${paramCount}`);
       params.push(satisfaction_score);
+      paramCount++;
+    }
+
+    if (satisfaction_details !== undefined) {
+      updates.push(`satisfaction_details = $${paramCount}`);
+      params.push(JSON.stringify(satisfaction_details));
       paramCount++;
     }
 

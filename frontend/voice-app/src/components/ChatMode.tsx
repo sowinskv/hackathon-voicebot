@@ -28,6 +28,13 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   const [initialized, setInitialized] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [satisfaction, setSatisfaction] = useState<number | null>(null);
+  const [ratings, setRatings] = useState<Record<string, number>>({
+    response_quality: 3,
+    bot_helpfulness: 3,
+    conversation_flow: 3,
+    speed_efficiency: 3,
+    overall_satisfaction: 3
+  });
   const [collectedData, setCollectedData] = useState<Record<string, string>>({});
   const [requiredFields, setRequiredFields] = useState<RequiredField[]>([]);
   const [extractingData, setExtractingData] = useState(false);
@@ -283,7 +290,7 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   };
 
   const submitSatisfaction = async () => {
-    console.log('[Chat] Satisfaction rating:', satisfaction);
+    console.log('[Chat] Satisfaction ratings:', ratings);
 
     try {
       if (!sessionId) {
@@ -305,11 +312,13 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
         },
         body: JSON.stringify({
           status: 'completed',
-          satisfaction_score: satisfaction,
+          satisfaction_score: ratings.overall_satisfaction, // Keep overall for backward compatibility
+          satisfaction_details: ratings, // Store all dimensional ratings
           ended_at: new Date().toISOString(),
           client_metadata: {
             source: 'chat',
-            collected_data: collectedData
+            collected_data: collectedData,
+            satisfaction_details: ratings
           }
         }),
       });
@@ -359,16 +368,14 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   // Show summary screen after call ends
   if (callEnded) {
     return (
-      <div className="flex flex-col h-screen items-center justify-center p-6">
-        <div className="max-w-2xl w-full glass-card p-8">
-          <div className="flex items-center gap-3 justify-center mb-6">
-            <div className="accent-dot"></div>
-            <h2 className="text-3xl font-bold text-white">Call Summary</h2>
-          </div>
-
-          {/* Collected Data */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold text-white mb-4">Collected Information</h3>
+      <div className="flex flex-col h-screen items-center justify-center p-6 overflow-y-auto">
+        <div className="max-w-4xl w-full space-y-8 py-8">
+          {/* Collected Data Section */}
+          <div className="glass-card p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="accent-dot"></div>
+              <h2 className="text-2xl font-light text-white">Collected Information</h2>
+            </div>
 
             {extractingData ? (
               <div className="flex items-center justify-center py-8">
@@ -384,12 +391,12 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
                     const isRequired = field.required;
 
                     return (
-                      <tr key={field.name} className="border-b border-white/10">
-                        <td className="px-4 py-3 bg-white/[0.05] font-semibold text-white/90 w-1/3">
+                      <tr key={field.name} className="border-b border-white/10 last:border-0">
+                        <td className="px-4 py-3 bg-white/[0.03] font-light text-white/90 w-1/3">
                           {label}
                           {isRequired && <span className="text-red-400 ml-1">*</span>}
                         </td>
-                        <td className={`px-4 py-3 ${value ? 'text-white/90' : 'text-white/40 italic'}`}>
+                        <td className={`px-4 py-3 ${value ? 'text-white/90 font-light' : 'text-white/40 italic font-light'}`}>
                           {value || '(None)'}
                         </td>
                       </tr>
@@ -398,44 +405,250 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
                 </tbody>
               </table>
             ) : (
-              <p className="text-white/50 text-center py-4">No required fields configured</p>
+              <p className="text-white/50 text-center py-4 font-light">No required fields configured</p>
             )}
           </div>
 
-          {/* Satisfaction Survey */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold text-white mb-4 text-center">
-              How satisfied are you with this call?
-            </h3>
-            <div className="flex justify-center gap-4 mb-6">
-              {[1, 2, 3, 4, 5].map((rating) => (
-                <button
-                  key={rating}
-                  onClick={() => setSatisfaction(rating)}
-                  className={`w-16 h-16 rounded-full text-2xl font-bold transition-all ${
-                    satisfaction === rating
-                      ? 'bg-white/90 text-[#1a0510] scale-110 shadow-lg shadow-white/20'
-                      : 'bg-white/10 text-white/70 hover:bg-white/20 border border-white/20'
-                  }`}
-                >
-                  {rating}
-                </button>
-              ))}
+          {/* Rating Section */}
+          <div className="glass-card p-8 relative">
+            <div className="flex items-center gap-3 mb-8 relative z-10">
+              <div className="accent-dot"></div>
+              <h2 className="text-2xl font-light text-white">Rate Your Experience</h2>
             </div>
-            <div className="flex justify-between text-sm text-white/60 px-8">
-              <span>Very Dissatisfied</span>
-              <span>Very Satisfied</span>
-            </div>
-          </div>
 
-          {/* Close Button */}
-          <button
-            onClick={submitSatisfaction}
-            disabled={satisfaction === null}
-            className="w-full btn btn-success text-lg"
-          >
-            {satisfaction === null ? 'Please rate your experience' : 'Submit & Close'}
-          </button>
+            <div className="space-y-10 relative">
+              {/* Background gradient blobs for each selected rating - positioned inside the sliders container */}
+              <div className="absolute inset-0 pointer-events-none overflow-visible" style={{ zIndex: 0 }}>
+                {/* Response Quality glow */}
+                <div
+                  className="absolute w-80 h-80 rounded-full"
+                  style={{
+                    left: `calc(${((ratings.response_quality - 1) / 4) * 100}% - 160px)`,
+                    top: '0px',
+                    background: 'radial-gradient(circle, rgba(144, 202, 249, 0.5) 0%, rgba(255, 158, 128, 0.3) 50%, transparent 70%)',
+                    filter: 'blur(60px)',
+                    transition: 'all 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    willChange: 'transform, left'
+                  }}
+                />
+                {/* Bot Helpfulness glow */}
+                <div
+                  className="absolute w-80 h-80 rounded-full"
+                  style={{
+                    left: `calc(${((ratings.bot_helpfulness - 1) / 4) * 100}% - 160px)`,
+                    top: '100px',
+                    background: 'radial-gradient(circle, rgba(255, 158, 128, 0.6) 0%, rgba(144, 202, 249, 0.4) 50%, transparent 70%)',
+                    filter: 'blur(60px)',
+                    transition: 'all 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    willChange: 'transform, left'
+                  }}
+                />
+                {/* Conversation Flow glow */}
+                <div
+                  className="absolute w-80 h-80 rounded-full"
+                  style={{
+                    left: `calc(${((ratings.conversation_flow - 1) / 4) * 100}% - 160px)`,
+                    top: '200px',
+                    background: 'radial-gradient(circle, rgba(144, 202, 249, 0.5) 0%, rgba(255, 158, 128, 0.4) 50%, transparent 70%)',
+                    filter: 'blur(60px)',
+                    transition: 'all 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    willChange: 'transform, left'
+                  }}
+                />
+                {/* Speed glow */}
+                <div
+                  className="absolute w-80 h-80 rounded-full"
+                  style={{
+                    left: `calc(${((ratings.speed_efficiency - 1) / 4) * 100}% - 160px)`,
+                    top: '300px',
+                    background: 'radial-gradient(circle, rgba(255, 158, 128, 0.5) 0%, rgba(144, 202, 249, 0.3) 50%, transparent 70%)',
+                    filter: 'blur(60px)',
+                    transition: 'all 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    willChange: 'transform, left'
+                  }}
+                />
+                {/* Overall glow */}
+                <div
+                  className="absolute w-80 h-80 rounded-full"
+                  style={{
+                    left: `calc(${((ratings.overall_satisfaction - 1) / 4) * 100}% - 160px)`,
+                    top: '400px',
+                    background: 'radial-gradient(circle, rgba(144, 202, 249, 0.6) 0%, rgba(255, 158, 128, 0.4) 50%, transparent 70%)',
+                    filter: 'blur(60px)',
+                    transition: 'all 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+                    willChange: 'transform, left'
+                  }}
+                />
+              </div>
+              {/* Response Quality */}
+              <div className="relative z-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Poor Quality</span>
+                  <span className="text-base text-white/90 font-light">Response Quality</span>
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Excellent</span>
+                </div>
+                <div className="relative">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={ratings.response_quality}
+                    onChange={(e) => setRatings({...ratings, response_quality: parseInt(e.target.value)})}
+                    className="w-full slider-minimal"
+                  />
+                  <div className="flex justify-between absolute top-0 w-full pointer-events-none" style={{ marginTop: '-6px' }}>
+                    {[1, 2, 3, 4, 5].map((pos) => (
+                      <div
+                        key={pos}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          ratings.response_quality === pos
+                            ? 'bg-white shadow-[0_0_30px_rgba(255,158,128,0.8),0_0_15px_rgba(255,255,255,0.5)]'
+                            : 'bg-white/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bot Helpfulness */}
+              <div className="relative z-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Unhelpful</span>
+                  <span className="text-base text-white/90 font-light">Bot Helpfulness</span>
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Very Helpful</span>
+                </div>
+                <div className="relative">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={ratings.bot_helpfulness}
+                    onChange={(e) => setRatings({...ratings, bot_helpfulness: parseInt(e.target.value)})}
+                    className="w-full slider-minimal"
+                  />
+                  <div className="flex justify-between absolute top-0 w-full pointer-events-none" style={{ marginTop: '-6px' }}>
+                    {[1, 2, 3, 4, 5].map((pos) => (
+                      <div
+                        key={pos}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          ratings.bot_helpfulness === pos
+                            ? 'bg-white shadow-[0_0_30px_rgba(255,158,128,0.8),0_0_15px_rgba(255,255,255,0.5)]'
+                            : 'bg-white/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Conversation Flow */}
+              <div className="relative z-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Confusing</span>
+                  <span className="text-base text-white/90 font-light">Conversation Flow</span>
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Natural</span>
+                </div>
+                <div className="relative">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={ratings.conversation_flow}
+                    onChange={(e) => setRatings({...ratings, conversation_flow: parseInt(e.target.value)})}
+                    className="w-full slider-minimal"
+                  />
+                  <div className="flex justify-between absolute top-0 w-full pointer-events-none" style={{ marginTop: '-6px' }}>
+                    {[1, 2, 3, 4, 5].map((pos) => (
+                      <div
+                        key={pos}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          ratings.conversation_flow === pos
+                            ? 'bg-white shadow-[0_0_30px_rgba(255,158,128,0.8),0_0_15px_rgba(255,255,255,0.5)]'
+                            : 'bg-white/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Speed/Efficiency */}
+              <div className="relative z-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Slow</span>
+                  <span className="text-base text-white/90 font-light">Speed & Efficiency</span>
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Fast</span>
+                </div>
+                <div className="relative">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={ratings.speed_efficiency}
+                    onChange={(e) => setRatings({...ratings, speed_efficiency: parseInt(e.target.value)})}
+                    className="w-full slider-minimal"
+                  />
+                  <div className="flex justify-between absolute top-0 w-full pointer-events-none" style={{ marginTop: '-6px' }}>
+                    {[1, 2, 3, 4, 5].map((pos) => (
+                      <div
+                        key={pos}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          ratings.speed_efficiency === pos
+                            ? 'bg-white shadow-[0_0_30px_rgba(255,158,128,0.8),0_0_15px_rgba(255,255,255,0.5)]'
+                            : 'bg-white/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Overall Satisfaction */}
+              <div className="relative z-10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Dissatisfied</span>
+                  <span className="text-base text-white/90 font-light">Overall Satisfaction</span>
+                  <span className="text-sm text-white/60 font-light uppercase tracking-wider">Very Satisfied</span>
+                </div>
+                <div className="relative">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={ratings.overall_satisfaction}
+                    onChange={(e) => setRatings({...ratings, overall_satisfaction: parseInt(e.target.value)})}
+                    className="w-full slider-minimal"
+                  />
+                  <div className="flex justify-between absolute top-0 w-full pointer-events-none" style={{ marginTop: '-6px' }}>
+                    {[1, 2, 3, 4, 5].map((pos) => (
+                      <div
+                        key={pos}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          ratings.overall_satisfaction === pos
+                            ? 'bg-white shadow-[0_0_30px_rgba(255,158,128,0.8),0_0_15px_rgba(255,255,255,0.5)]'
+                            : 'bg-white/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              onClick={submitSatisfaction}
+              className="w-full mt-10 px-6 py-4 rounded-2xl font-light text-base bg-white/[0.08] backdrop-blur-sm text-white border border-white/10 hover:bg-white/[0.12] hover:border-white/20 transition-all duration-300 shadow-none"
+            >
+              Submit & Close
+            </button>
+          </div>
         </div>
       </div>
     );
