@@ -75,7 +75,7 @@ export function TimeframeDistributionChart({
 
   // Convert sortedData to normalized array of values
   const normalizedValues = useMemo(() => {
-    const numPoints = 50;
+    const numPoints = 100; // Increased from 50 for smoother curves
     return Array.from({ length: numPoints }, (_, i) => {
       const t = i / (numPoints - 1);
       return getInterpolatedValue(sortedData, t);
@@ -122,15 +122,24 @@ export function TimeframeDistributionChart({
       };
     });
 
-    // Create smooth curve using cubic bezier
+    // Create smooth curve using cubic bezier with better control points
     let path = `M ${points[0].x} ${points[0].y}`;
 
     for (let i = 0; i < points.length - 1; i++) {
       const current = points[i];
       const next = points[i + 1];
-      const controlPointX = (current.x + next.x) / 2;
 
-      path += ` C ${controlPointX} ${current.y}, ${controlPointX} ${next.y}, ${next.x} ${next.y}`;
+      // Calculate control points for smoother curves
+      const tension = 0.3; // Controls curve smoothness
+      const prev = i > 0 ? points[i - 1] : current;
+      const after = i < points.length - 2 ? points[i + 2] : next;
+
+      const cp1x = current.x + (next.x - prev.x) * tension;
+      const cp1y = current.y + (next.y - prev.y) * tension;
+      const cp2x = next.x - (after.x - current.x) * tension;
+      const cp2y = next.y - (after.y - current.y) * tension;
+
+      path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
     }
 
     // Close the path to create filled area

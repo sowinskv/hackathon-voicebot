@@ -27,6 +27,8 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   const [error, setError] = useState('');
   const [initialized, setInitialized] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [satisfaction, setSatisfaction] = useState<number | null>(null);
   const [ratings, setRatings] = useState<Record<string, number>>({
     response_quality: 3,
@@ -45,6 +47,32 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Manage background blur state
+  useEffect(() => {
+    // Add chat-active class to body when component mounts
+    document.body.classList.add('chat-active');
+
+    return () => {
+      // Remove classes when component unmounts
+      document.body.classList.remove('chat-active', 'chat-transitioning');
+    };
+  }, []);
+
+  // Update blur state when transitioning
+  useEffect(() => {
+    if (isTransitioning) {
+      document.body.classList.remove('chat-active');
+      document.body.classList.add('chat-transitioning');
+    }
+  }, [isTransitioning]);
+
+  // Update blur state when showing survey
+  useEffect(() => {
+    if (callEnded) {
+      document.body.classList.remove('chat-active', 'chat-transitioning');
+    }
+  }, [callEnded]);
 
 
   // Create session when component mounts
@@ -151,6 +179,9 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
       setIsLoading(true);
       await extractCollectedData(messages);
       setIsLoading(false);
+      // Fade out chat interface
+      setIsTransitioning(true);
+      await new Promise(resolve => setTimeout(resolve, 400));
       setCallEnded(true);
       return;
     }
@@ -214,6 +245,9 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
         setTimeout(async () => {
           // Extract collected data from conversation using LLM
           await extractCollectedData([...messages, assistantMessage]);
+          // Fade out chat interface
+          setIsTransitioning(true);
+          await new Promise(resolve => setTimeout(resolve, 400));
           // Show summary screen
           setCallEnded(true);
         }, 2000);
@@ -291,6 +325,10 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
 
   const submitSatisfaction = async () => {
     console.log('[Chat] Satisfaction ratings:', ratings);
+    setIsSubmitting(true);
+
+    // Wait for fade out animation
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     try {
       if (!sessionId) {
@@ -368,8 +406,12 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   // Show summary screen after call ends
   if (callEnded) {
     return (
-      <div className="flex flex-col h-screen items-center justify-center p-6 overflow-y-auto">
-        <div className="max-w-4xl w-full space-y-8 py-8">
+      <div className={`flex flex-col h-screen items-center justify-center p-6 overflow-y-auto transition-opacity duration-500 ${
+        isSubmitting ? 'opacity-0' : 'opacity-100'
+      }`}>
+        <div className={`max-w-4xl w-full space-y-8 py-8 transition-all duration-700 ease-out ${
+          isSubmitting ? 'scale-95 opacity-0' : 'scale-100 opacity-100 animate-fadeInUp'
+        }`}>
           {/* Collected Data Section */}
           <div className="glass-card p-8">
             <div className="flex items-center gap-3 mb-6">
@@ -655,7 +697,9 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-transparent relative z-10 animate-blurIn">
+    <div className={`flex flex-col h-screen bg-transparent relative z-10 transition-all duration-500 ${
+      isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100 animate-blurIn'
+    }`}>
       {/* Header */}
       <div className="p-4 flex items-center justify-between relative z-20">
         <div className="flex items-center gap-3">
@@ -675,6 +719,9 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
             setIsLoading(true);
             await extractCollectedData(messages);
             setIsLoading(false);
+            // Fade out chat interface
+            setIsTransitioning(true);
+            await new Promise(resolve => setTimeout(resolve, 400));
             setCallEnded(true);
           }}
           className="text-white/70 hover:text-white transition-colors font-light text-base"
@@ -698,10 +745,11 @@ export const ChatMode: React.FC<ChatModeProps> = ({ flowId, onEnd }) => {
           </div>
         )}
 
-        {messages.filter(msg => msg.content).map(message => (
+        {messages.filter(msg => msg.content).map((message, index) => (
           <div
             key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-messageUnblur`}
+            style={{ animationDelay: `${index * 0.05}s` }}
           >
             <div
               className={`max-w-[70%] rounded-xl px-4 py-3 ${

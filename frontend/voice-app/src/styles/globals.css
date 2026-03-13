@@ -62,6 +62,15 @@
     filter: blur(40px);
     pointer-events: none;
     z-index: 0;
+    transition: filter 1.2s ease-out;
+  }
+
+  body.chat-active::before {
+    filter: blur(10px);
+  }
+
+  body.chat-transitioning::before {
+    filter: blur(40px);
   }
 
   /* Typography scale */
@@ -311,6 +320,28 @@
 
 .animate-blurIn {
   animation: blurIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Message box unblur animation */
+@keyframes messageUnblur {
+  from {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+.animate-messageUnblur {
+  animation: messageUnblur 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Minimal slider styles - track with line and discrete dots */
