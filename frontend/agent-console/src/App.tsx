@@ -57,7 +57,7 @@ function Navigation() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-3">
               <div className="accent-dot"></div>
-              <h1 className="text-xl font-bold text-white tracking-tight">super kitties</h1>
+              <h1 className="text-xl font-light text-white tracking-tight">super kitties</h1>
             </Link>
           </div>
 
