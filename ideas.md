@@ -6,3 +6,4 @@ Ideas
 - [ ] Make sure the whole page (including “dashboard” and “sessions”) in agent console Is properly translated
 - [ ] make the call logging to agent console actually work
 - [ ] make the readme updated and pretty
+- [ ] make survey look more refined and interactive, for now its just boring - how interesting can a survey be?

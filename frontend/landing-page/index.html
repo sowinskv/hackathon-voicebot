@@ -62,19 +62,19 @@
             animation: lineAppear 1.5s ease-out;
         }
 
-        /* Center title */
+        /* Left title */
         .title {
             position: absolute;
-            left: 50%;
+            right: calc(50% + 80px);
             top: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+            transform: translateY(-50%);
+            text-align: right;
             animation: titleAppear 1s ease-out 0.3s backwards;
             z-index: 20;
         }
 
         .title h1 {
-            font-size: 4rem;
+            font-size: 3.5rem;
             font-weight: 300;
             color: white;
             letter-spacing: 0.15em;
