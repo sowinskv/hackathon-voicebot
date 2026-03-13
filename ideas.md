@@ -1,11 +1,6 @@
 Ideas
-- [ ] Give bot a default name (one for female voice, one for male voice), to fix this: Hello! Thank you for calling. My name is [Your Name], and I'm here to help you report your claim today. show the name in place of “bot” on the message top
 - [ ] Add mcp to get todays date and then incident date based on someones response, for example if someone says “yesterday” or “a week ago”
 - [ ] Add some note to push to talk button so that its intuitive for the user to push it
 - [ ] Better buttons (mic and end call)
-- [ ] Fade colors in the agent console or do something better with them
-- [ ] Change bell to “notifications”
 - [ ] Make sure the whole page (including “dashboard” and “sessions”) in agent console Is properly translated
-- [ ] Fix the bug in “metrics.calldistribution”
-- [ ] Better, more interesting view, no “cards” layout
 - [ ] Pop up window - make it a bit transparent

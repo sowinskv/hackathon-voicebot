@@ -147,25 +147,25 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
   }
 
   return (
-    <div className="space-y-12 py-8 relative z-10">
+    <div className="space-y-16 py-8 relative z-10">
       {/* Header */}
       <div className="flex items-center justify-between relative z-10">
         <div style={{ position: 'relative', zIndex: 20 }}>
-          <h1 className="text-5xl font-bold mb-3" style={{
+          <h1 className="text-6xl font-light mb-3 tracking-tight" style={{
             color: '#fff',
             WebkitTextFillColor: '#fff',
             opacity: 1,
             filter: 'none'
           }}>
-            Moje Voiceboty
+            {t('botList.title')}
           </h1>
-          <p className="text-xl" style={{
-            color: '#fff',
-            WebkitTextFillColor: '#fff',
+          <p className="text-lg font-light text-white/50" style={{
+            color: 'rgba(255,255,255,0.5)',
+            WebkitTextFillColor: 'rgba(255,255,255,0.5)',
             opacity: 1,
             filter: 'none'
           }}>
-            Zarządzaj wszystkimi swoimi botami głosowymi w jednym miejscu
+            {t('botList.subtitle')}
           </p>
         </div>
         <button
@@ -178,15 +178,15 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 relative">
+      <div className="flex gap-8 relative">
         {['all', 'draft', 'published', 'archived'].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}
-            className={`relative px-4 py-2 text-sm font-normal transition-all duration-300 ${
+            className={`relative px-2 py-2 text-sm font-light transition-all duration-300 ${
               filter === f
                 ? 'text-white'
-                : 'text-white/60 hover:text-white/90'
+                : 'text-white/40 hover:text-white/70'
             }`}
           >
             {f === 'all' ? t('botList.filter.all') : getStatusLabel(f)}
@@ -200,92 +200,86 @@ export const BotList: React.FC<Props> = ({ onCreateNew, onEditBot }) => {
       {/* Bot List */}
       {bots.length === 0 ? (
         <div key={filter} className="p-16 text-center animate-[fadeIn_0.4s_ease-out]">
-          <h3 className="text-2xl font-semibold text-white mb-3">
+          <h3 className="text-2xl font-light text-white mb-3">
             {filter === 'all' ? t('botList.empty') : `${t('botList.empty.filtered')} "${getStatusLabel(filter)}"`}
           </h3>
-          <p className="text-white/60 text-lg mb-8">
+          <p className="text-white/50 text-base font-light mb-8">
             {t('botList.empty.cta')}
           </p>
           <button
             onClick={onCreateNew}
-            className="btn btn-primary text-lg px-8 py-4"
+            className="btn btn-primary text-base px-8 py-4"
           >
             {t('botList.createFirst')}
           </button>
         </div>
       ) : (
-        <div key={filter} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {bots.map((bot, index) => (
-            <div
-              key={bot.id}
-              className="card-hover-enhanced animate-[fadeInUp_0.4s_ease-out_forwards] group"
-              style={{ animationDelay: `${index * 0.05}s`, opacity: 0 }}
-              onClick={() => onEditBot(bot)}
-            >
-              {/* Accent border */}
-              <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent transition-all duration-300 group-hover:via-white/30" />
-
-              {/* Header with icon and title */}
-              <div className="relative flex items-start justify-between mb-6">
-                <div className="flex items-start gap-4 flex-1 min-w-0">
-                  <div className="relative mt-1">
-                    <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
-                      <Bot className="w-6 h-6 text-white/70" />
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white text-xl mb-2 truncate leading-tight tracking-tight">{bot.name}</h3>
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider bg-white/5 text-white/60 border border-white/10 group-hover:bg-white/10 group-hover:border-white/20 transition-all duration-300">
-                        <span className="w-1 h-1 rounded-full bg-white/60" />
-                        {getStatusLabel(bot.status)}
-                      </span>
-                    </div>
+        <div key={filter} className="relative">
+          <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide">
+            {bots.map((bot, index) => (
+              <div
+                key={bot.id}
+                className="flex-shrink-0 w-72 bg-white/[0.03] backdrop-blur-sm hover:bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.15] rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer group animate-[fadeInUp_0.4s_ease-out_forwards]"
+                style={{ animationDelay: `${index * 0.05}s`, opacity: 0 }}
+                onClick={() => onEditBot(bot)}
+              >
+                {/* Thumbnail */}
+                <div className="relative h-44 bg-white/[0.02] flex items-center justify-center overflow-hidden">
+                  {/* Circle with background showing through */}
+                  <div className="relative w-32 h-32 rounded-full border-4 border-white/20 overflow-hidden bg-transparent backdrop-blur-none group-hover:border-white/30 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
                   </div>
                 </div>
-              </div>
 
-              {/* Description with better spacing */}
-              {bot.description && (
-                <p className="relative text-sm text-white/60 mb-6 line-clamp-2 leading-relaxed">{bot.description}</p>
-              )}
+                {/* Content */}
+                <div className="p-5">
+                  <h3 className="font-medium text-white text-base mb-2 truncate tracking-tight">{bot.name}</h3>
 
-              {/* Metadata grid - more elegant layout */}
-              <div className="relative grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-white/5">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium">{t('botList.fields')}</span>
-                  <span className="text-lg font-semibold text-white/90">{bot.required_fields.length}</span>
+                  {/* Stats */}
+                  <div className="flex items-center gap-4 text-sm text-white/50 mb-4">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-white/90 font-medium">{bot.required_fields.length}</span>
+                      <span className="text-[11px]">fields</span>
+                    </div>
+                    <span className="text-white/20">•</span>
+                    <div className="text-[11px]">{new Date(bot.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                  </div>
+
+                  {/* Status badge and Actions */}
+                  <div className="flex items-center justify-between gap-2">
+                    {/* Status */}
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-light uppercase tracking-wider text-white/50">
+                      <span className="w-1 h-1 rounded-full bg-white/50" />
+                      {getStatusLabel(bot.status)}
+                    </span>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditBot(bot);
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-xs font-medium transition-all duration-300 flex items-center justify-center gap-1.5"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(bot.id, bot.name);
+                        }}
+                        className="px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/80 transition-all duration-300"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Updated</span>
-                  <span className="text-xs text-white/70">{new Date(bot.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                </div>
               </div>
-
-              {/* Action buttons - cleaner */}
-              <div className="relative flex gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditBot(bot);
-                  }}
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  {t('botList.edit')}
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(bot.id, bot.name);
-                  }}
-                  className="px-3 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/80 transition-all duration-300"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>
